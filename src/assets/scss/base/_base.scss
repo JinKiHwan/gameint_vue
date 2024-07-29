@@ -1,0 +1,46 @@
+@use '../helpers/' as *;
+
+html {
+  font-size: 16px;
+
+  @include mobile {
+    font-size: 10.5px;
+  }
+
+  @include custom(450px) {
+    font-size: 8px;
+  }
+}
+
+:root {
+  --app-height: 100%;
+}
+
+html,
+body {
+  width: 100%;
+  scroll-behavior: smooth;
+  word-break: keep-all;
+}
+
+body {
+  &.-noneScroll {
+    min-height: 100vh;
+    overflow: hidden;
+    touch-action: none;
+  }
+}
+
+.pc {
+  @include mobile {
+    display: none !important;
+  }
+}
+
+.mo {
+  display: none !important;
+
+  @include mobile {
+    display: flex !important;
+  }
+}

@@ -1,0 +1,166 @@
+@use './variables' as *;
+@use './mediaQueries' as *;
+
+@function remove-unit($value) {
+    @return ($value / ($value * 0 + 1));
+}
+
+$base-rem-size: 16px;
+
+@function remSet($px, $base: $base-rem-size) {
+    @return (($px / $base)) * 1rem;
+}
+
+// FLEXBOX
+$flex-map: (
+    f-start: flex-start,
+    f-end: flex-end,
+    between: space-between,
+    around: space-around,
+    stretch: stretch,
+    center: center,
+);
+
+@function _get-flex-value($key) {
+    @return map-get($flex-map, $key);
+}
+
+@mixin flex($j: center, $a: center, $d: row) {
+    display: flex;
+    justify-content: _get-flex-value($j);
+    align-items: _get-flex-value($a);
+    flex-direction: $d;
+}
+
+// POSITION
+@mixin position($p: absolute, $t: null, $r: null, $b: null, $l: null) {
+    position: $p;
+    top: $t;
+    right: $r;
+    bottom: $b;
+    left: $l;
+
+    @if $t==50% and $l ==50% {
+        transform: translate(-50%, -50%);
+    } @else if $t ==50% {
+        transform: translateY(-50%);
+    } @else if $l ==50% {
+        transform: translateX(-50%);
+    }
+}
+
+// BACKGROUND
+@mixin background-cover($value: 0) {
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+
+    @if ($value ==1) {
+        background-size: 99% 99%;
+    }
+}
+
+// ALERT
+@mixin alertCustom {
+    display: none;
+    padding: remSet(34px) remSet(40px) remSet(30px) remSet(40px);
+    text-align: center;
+    color: $c-dark;
+    background-color: $c-white;
+
+    @include mobile {
+        width: remSet(600px);
+        padding: remSet(77px) remSet(50px) remSet(40px) remSet(50px);
+    }
+
+    &.-show {
+        display: block;
+    }
+
+    &-text {
+        font-size: remSet(20px);
+        line-height: 1.5;
+        letter-spacing: -0.035em;
+
+        @include mobile {
+            font-size: remSet(30px);
+        }
+    }
+}
+
+// CUSTOM SCROLL
+@mixin custom-scroll($color: #ccc, $back: $c-white) {
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+        width: 17px;
+
+        @include mobile {
+            width: 20px;
+        }
+    }
+
+    &::-webkit-scrollbar-track {
+        // margin-top: 0.5em;
+        // border-radius: 50px;
+        border-left: 1px solid $c-gray;
+        border-right: 1px solid $c-gray;
+        padding: 0 3px;
+        background-color: $back;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        height: 80px;
+        border-radius: 50px;
+        background-color: $color;
+        background-clip: padding-box;
+        border: 4px solid transparent;
+
+        @include mobile {
+            height: 50px;
+        }
+    }
+}
+
+//keyframe
+@keyframes flicker {
+    0% {
+        opacity: 1;
+    }
+    5% {
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+
+    30% {
+        opacity: 1;
+    }
+    35% {
+        opacity: 0;
+    }
+    40% {
+        opacity: 1;
+    }
+
+    60% {
+        opacity: 1;
+    }
+    65% {
+        opacity: 0;
+    }
+    70% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+    95% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
