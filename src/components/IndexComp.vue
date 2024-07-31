@@ -16,18 +16,18 @@
                 </a>
             </li>
             <li class="recommend">
-                <router-link to="/">
+                <a href="javascript:void(0)" @click="browserOpen('favorite')">
                     <figure>
                         <img :src="recommend" alt="" />
                     </figure>
-                </router-link>
+                </a>
             </li>
             <li class="history">
-                <router-link to="/">
+                <a href="javascript:void(0)" @click="browserOpen('history')">
                     <figure>
                         <img :src="history" alt="" />
                     </figure>
-                </router-link>
+                </a>
             </li>
             <li class="mybooks">
                 <router-link to="/">
@@ -73,8 +73,12 @@
                     </ul>
                 </header>
 
-                <HomeComp v-if="menuStatus.home"></HomeComp>
-                <MonthlyComp v-if="menuStatus.monthly"></MonthlyComp>
+                <div class="browser_content">
+                    <HomeComp v-if="menuStatus.home"></HomeComp>
+                    <MonthlyComp v-if="menuStatus.monthly"></MonthlyComp>
+                    <FavoriteBookComp v-if="menuStatus.favorite"></FavoriteBookComp>
+                    <HistoryComp v-if="menuStatus.history"></HistoryComp>
+                </div>
             </article>
         </div>
     </Transition>
@@ -84,6 +88,8 @@
 import LoginComp from '@/components/LoginComp.vue';
 import HomeComp from '@/components/HomeComp.vue';
 import MonthlyComp from '@/components/MonthlyComp.vue';
+import FavoriteBookComp from '@/components/FavoriteBookComp.vue';
+import HistoryComp from '@/components/HistoryComp.vue';
 
 import { ref, onMounted, reactive } from 'vue';
 export default {
@@ -92,6 +98,8 @@ export default {
         LoginComp,
         HomeComp,
         MonthlyComp,
+        FavoriteBookComp,
+        HistoryComp,
     },
 
     setup() {
@@ -104,10 +112,13 @@ export default {
         const mypage = ref(require('@/assets/img/mypage.webp'));
         const place = ref(require('@/assets/img/place.webp'));
         const recommend = ref(require('@/assets/img/recommend.webp'));
-        const browserStatus = ref(false);
+        // const browserStatus = ref(false);
+        const browserStatus = ref(true);
         const menuStatus = reactive({
             home: false,
-            monthly: false,
+            monthly: true,
+            favorite: false,
+            history: false,
             // 추가 메뉴들...
         });
 
@@ -305,7 +316,6 @@ export default {
         width: min(1300px, 95%);
         height: auto;
         aspect-ratio: 16/9;
-        border: 1px solid #f00;
         border-radius: 15px;
         background: #eee;
         //backdrop-filter: blur(15px);
@@ -317,6 +327,13 @@ export default {
             align-items: center;
             background: #333333;
         }
+    }
+
+    &_content {
+        padding: 10px;
+        width: 100%;
+        height: calc(100% - 35px);
+        overflow: auto;
     }
 }
 
