@@ -96,7 +96,7 @@
                     </dl>
                     <dl>
                         <dt>NAME</dt>
-                        <dd><input type="text" /></dd>
+                        <dd><input type="text" v-model="username" /></dd>
                     </dl>
                     <dl>
                         <dt>PW</dt>
@@ -116,7 +116,7 @@
                     </dl>
                     <dl>
                         <dt>Telegram</dt>
-                        <dd><input type="text" placeholder="https://t.me/eljsh95" /></dd>
+                        <dd><input type="text" v-model="telegram" placeholder="https://t.me/eljsh95" /></dd>
                     </dl>
                 </div>
 
@@ -130,6 +130,8 @@
 
 <script>
 import { ref } from 'vue';
+import axios from 'axios';
+
 export default {
     name: 'SignComp',
 
@@ -159,6 +161,9 @@ export default {
         const passwordError = ref('');
         const passwordConfirm = ref('');
         const isPasswordValid = ref(false); //유효성 통과 상태체크
+
+        const username = ref('');
+        const telegram = ref('');
         /* //변수 모음 */
 
         /* 아이디 유효성 검사 */
@@ -214,13 +219,42 @@ export default {
         };
 
         /* 회원가입 버튼 */
-        const handleSignup = () => {
-            console.log(isIdValid.value, isPasswordValid.value);
+        // const handleSignup = () => {
+        //     console.log(isIdValid.value, isPasswordValid.value);
 
+        //     if (!isIdValid.value || !isPasswordValid.value) {
+        //         alert('입력폼 다시 확인 해주세요');
+        //     } else {
+        //         alert('가입성공!');
+        //     }
+        // };
+
+        const handleSignup = async () => {
             if (!isIdValid.value || !isPasswordValid.value) {
-                alert('입력폼 다시 확인 해주세요');
+                alert('입력폼을 다시 확인해 주세요');
             } else {
-                alert('가입성공!');
+                try {
+                    const response = await axios.post(
+                        'http://localhost:8080/member/create',
+                        {
+                            name: username.value,
+                            account: userId.value,
+                            password: password.value,
+                            telegram: telegram.value,
+                        },
+                        {
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        }
+                    );
+
+                    if (response === 200) {
+                        alert('가입성공!');
+                    }
+                } catch (error) {
+                    alert('가입실패');
+                }
             }
         };
 
@@ -246,6 +280,8 @@ export default {
             password,
             passwordConfirm,
             isPasswordValid,
+            username,
+            telegram,
             isPwCheck,
             validateId,
             validatePw,
