@@ -2,18 +2,15 @@
     <div class="wrap">
         <header class="header"></header>
 
-        <MonthlyComp></MonthlyComp>
+        <transition name="fade" mode="out-in">
+            <router-view></router-view>
+        </transition>
     </div>
 </template>
 
 <script>
-import MonthlyComp from '../components/MonthlyComp.vue';
-
 export default {
     name: 'WrapComp',
-    components: {
-        MonthlyComp,
-    },
 };
 </script>
 
@@ -38,5 +35,14 @@ export default {
         background: #00f;
         margin-bottom: 10px;
     }
+}
+
+/* 트랜지션 애니메이션 정의 */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+    opacity: 0;
 }
 </style>

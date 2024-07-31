@@ -38,10 +38,10 @@
 
         <div class="montly_btn_wrap">
             <button class="btn_review_view">리뷰보기</button>
-            <button class="btn_review_write">작성하기</button>
+            <button class="btn_review_write" @click="showReviewForm">작성하기</button>
         </div>
 
-        <ReviewFormComp></ReviewFormComp>
+        <ReviewFormComp v-if="reviewForm" @close-form="closeReviewForm"></ReviewFormComp>
     </div>
 </template>
 
@@ -58,7 +58,17 @@ export default {
     data() {
         return {
             book: require('@/assets/img/book01.webp'),
+            reviewForm: false,
         };
+    },
+
+    methods: {
+        showReviewForm() {
+            this.reviewForm = true;
+        },
+        closeReviewForm() {
+            this.reviewForm = false;
+        },
     },
 };
 </script>
@@ -68,6 +78,7 @@ export default {
     padding: 0 10px 10px;
     height: calc(100% - 60px);
     position: relative;
+
     &_inner {
         display: flex;
         width: min(80%, 1000px);

@@ -1,19 +1,11 @@
 <template>
-    <MenuComp></MenuComp>
-
-    <WrapComp> </WrapComp>
+    <router-view></router-view>
 </template>
 
 <script>
-import MenuComp from './components/MenuComp.vue';
-import WrapComp from './components/WrapComp.vue';
-
 export default {
     name: 'App',
-    components: {
-        MenuComp,
-        WrapComp,
-    },
+    components: {},
 };
 </script>
 
@@ -23,6 +15,35 @@ body {
     background: url('/src/assets/img/bg.png') no-repeat 100% 100% / cover;
     #app {
         height: 100vh;
+    }
+}
+
+.btnWraps {
+    display: flex;
+    gap: 0.5vw;
+    margin-left: 1vw;
+
+    li {
+        border-radius: 50%;
+        overflow: hidden;
+        width: 15px;
+        aspect-ratio: 1/1;
+
+        a {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        &.red {
+            background: red;
+        }
+        &.yellow {
+            background: orange;
+        }
+        &.green {
+            background: greenyellow;
+        }
     }
 }
 </style>

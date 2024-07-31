@@ -1,5 +1,6 @@
 const { defineConfig } = require('@vue/cli-service');
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = defineConfig({
     transpileDependencies: true,
@@ -21,5 +22,12 @@ module.exports = defineConfig({
         static: {
             directory: path.join(__dirname, ''), // 설정하면 url(/src/assets") 경로 사용 가능
         },
+    },
+    configureWebpack: {
+        plugins: [
+            new webpack.DefinePlugin({
+                __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(false),
+            }),
+        ],
     },
 });
