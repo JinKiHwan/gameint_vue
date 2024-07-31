@@ -2,18 +2,18 @@
     <div class="menu">
         <ul>
             <li class="home">
-                <router-link to="/">
+                <a href="javascript:void(0)" @click="browserOpen('home')">
                     <figure>
                         <img :src="home" alt="" />
                     </figure>
-                </router-link>
+                </a>
             </li>
             <li class="monthly">
-                <router-link to="/">
+                <a href="javascript:void(0)" @click="browserOpen('monthly')">
                     <figure>
                         <img :src="monthly" alt="" />
                     </figure>
-                </router-link>
+                </a>
             </li>
             <li class="recommend">
                 <router-link to="/">
@@ -61,16 +61,37 @@
     </div>
 
     <LoginComp v-if="popupState" v-model:popupState="popupState"></LoginComp>
+
+    <Transition name="fade">
+        <div class="browser" v-if="browserStatus">
+            <article class="browser_wrap">
+                <header class="header">
+                    <ul class="btnWraps">
+                        <li class="red"><a href="javascript:void(0)" @click="browserClose"></a></li>
+                        <li class="yellow"><a href="javascript:void(0)"></a></li>
+                        <li class="green"><a href="javascript:void(0)" @click="browserClose"></a></li>
+                    </ul>
+                </header>
+
+                <HomeComp v-if="menuStatus.home"></HomeComp>
+                <MonthlyComp v-if="menuStatus.monthly"></MonthlyComp>
+            </article>
+        </div>
+    </Transition>
 </template>
 
 <script>
 import LoginComp from '@/components/LoginComp.vue';
+import HomeComp from '@/components/HomeComp.vue';
+import MonthlyComp from '@/components/MonthlyComp.vue';
 
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, reactive } from 'vue';
 export default {
     name: 'IndexComp',
     components: {
         LoginComp,
+        HomeComp,
+        MonthlyComp,
     },
 
     setup() {
@@ -83,6 +104,12 @@ export default {
         const mypage = ref(require('@/assets/img/mypage.webp'));
         const place = ref(require('@/assets/img/place.webp'));
         const recommend = ref(require('@/assets/img/recommend.webp'));
+        const browserStatus = ref(false);
+        const menuStatus = reactive({
+            home: false,
+            monthly: false,
+            // 추가 메뉴들...
+        });
 
         onMounted(() => {});
 
@@ -90,6 +117,26 @@ export default {
         function popupOpen() {
             popupState.value = true;
         }
+
+        const browserOpen = (page) => {
+            console.log(`Opening browser with page: ${page}`);
+            browserStatus.value = true;
+
+            Object.keys(menuStatus).forEach((key) => {
+                menuStatus[key] = false;
+            });
+            if (page in menuStatus) {
+                menuStatus[page] = true;
+            }
+        };
+
+        const browserClose = () => {
+            browserStatus.value = false;
+
+            Object.keys(menuStatus).forEach((key) => {
+                menuStatus[key] = false;
+            });
+        };
 
         return {
             home,
@@ -102,6 +149,10 @@ export default {
             recommend,
             popupState,
             popupOpen,
+            browserStatus,
+            browserOpen,
+            browserClose,
+            menuStatus,
         };
     },
 
@@ -238,5 +289,47 @@ export default {
     .fade-leave-to {
         opacity: 0;
     }
+}
+
+.browser {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &_wrap {
+        width: min(1300px, 95%);
+        height: auto;
+        aspect-ratio: 16/9;
+        border: 1px solid #f00;
+        border-radius: 15px;
+        background: #eee;
+        //backdrop-filter: blur(15px);
+        overflow: hidden;
+        .header {
+            width: 100%;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            background: #333333;
+        }
+    }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    /* transform-origin: center bottom; */
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+    transform: scale(0);
+    /* transform-origin: center bottom; */
 }
 </style>

@@ -1,7 +1,7 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router';
 import Index from '@/components/IndexComp.vue';
-import Sign from '@/components/SignComp.vue';
+import SignComp from '@/components/SignComp.vue';
 import NotFound from '@/components/NotFound.vue'; // 404 페이지
 
 const routes = [
@@ -11,11 +11,11 @@ const routes = [
         name: 'Index',
         component: Index,
     },
-    //로그인
+    //회원가입
     {
         path: '/sign',
-        name: 'sign',
-        component: Sign,
+        name: 'SignComp',
+        component: SignComp,
     },
 
     //404
@@ -27,7 +27,7 @@ const routes = [
 ];
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHistory(process.env.BASE_URL),
     routes,
 });
 

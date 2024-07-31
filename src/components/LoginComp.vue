@@ -3,7 +3,7 @@
     <div v-show="popupState" class="popupLayout">
         <div class="popupLayout_header">
             <ul class="btnWraps">
-                <li class="red"><a href="#!" @click="closePopup"></a></li>
+                <li class="red"><a href="javascript:void(0)" @click="closePopup"></a></li>
                 <li class="yellow"><a href="javascript:void(0)"></a></li>
                 <li class="green"><a href="javascript:void(0)" @click="closePopup"></a></li>
             </ul>

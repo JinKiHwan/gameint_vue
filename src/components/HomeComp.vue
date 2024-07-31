@@ -1,12 +1,12 @@
 <template>
     <div>
-        <h2>Monthly입니다.</h2>
+        <h2>home입니다.</h2>
     </div>
 </template>
 
 <script>
 export default {
-    name: 'MonthlyComp',
+    name: 'homeComp',
 };
 </script>
 
