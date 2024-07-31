@@ -72,7 +72,7 @@
 
         <div class="popupLayout_inner">
             <div class="popupLayout_sign">
-                <h2>회원가입</h2>
+                <h2>회원가입z</h2>
 
                 <div class="popupLayout_sign_profile">
                     <figure>
