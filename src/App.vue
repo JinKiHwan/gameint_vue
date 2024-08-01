@@ -1,4 +1,5 @@
 <template>
+    howsiwoo
     <router-view></router-view>
 </template>
 
