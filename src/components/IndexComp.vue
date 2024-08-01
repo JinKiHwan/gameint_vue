@@ -116,8 +116,8 @@ export default {
         const browserStatus = ref(true);
         const menuStatus = reactive({
             home: false,
-            monthly: true,
-            favorite: false,
+            monthly: false,
+            favorite: true,
             history: false,
             // 추가 메뉴들...
         });
