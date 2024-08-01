@@ -1,4 +1,16 @@
 <template>
+    <div class="system">
+        <div class="current_time">{{ formattedTime }}</div>
+        <div class="widgets">
+            <ul>
+                <li><img :src="signal" alt="" /></li>
+                <li><img :src="wifi" alt="" /></li>
+                <li>100%</li>
+                <li><img :src="battery" alt="" /></li>
+            </ul>
+        </div>
+    </div>
+
     <div class="menu">
         <ul>
             <li class="home">
@@ -91,7 +103,7 @@ import MonthlyComp from '@/components/MonthlyComp.vue';
 import FavoriteBookComp from '@/components/FavoriteBookComp.vue';
 import HistoryComp from '@/components/HistoryComp.vue';
 
-import { ref, onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive, computed, onUnmounted } from 'vue';
 export default {
     name: 'IndexComp',
     components: {
@@ -112,25 +124,51 @@ export default {
         const mypage = ref(require('@/assets/img/mypage.webp'));
         const place = ref(require('@/assets/img/place.webp'));
         const recommend = ref(require('@/assets/img/recommend.webp'));
+        const battery = ref(require('@/assets/img/battery.svg'));
+        const signal = ref(require('@/assets/img/signal.svg'));
+        const wifi = ref(require('@/assets/img/wifi.svg'));
         // const browserStatus = ref(false);
         const browserStatus = ref(true);
+        const currentTime = ref(new Date());
+        let timer;
         const menuStatus = reactive({
-            home: false,
-            monthly: true,
+            home: true,
+            monthly: false,
             favorite: false,
             history: false,
             // 추가 메뉴들...
         });
 
-        onMounted(() => {});
+        const formattedTime = computed(() => {
+            const date = currentTime.value;
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const month = months[date.getMonth()];
+            const day = date.getDate();
+            const weekday = days[date.getDay()];
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
 
+            return `${month} ${day} ${weekday} ${hours}:${minutes}`;
+        });
+
+        const updateTime = () => {
+            currentTime.value = new Date();
+        };
+
+        onMounted(() => {
+            timer = setInterval(updateTime, 1000); // 1초마다 업데이트
+        });
+        onUnmounted(() => {
+            clearInterval(timer); // 컴포넌트 소멸 시 타이머 정리
+        });
         // Toggle the popup state
         function popupOpen() {
             popupState.value = true;
         }
 
         const browserOpen = (page) => {
-            console.log(`Opening browser with page: ${page}`);
+            //console.log(`Opening browser with page: ${page}`);
             browserStatus.value = true;
 
             Object.keys(menuStatus).forEach((key) => {
@@ -164,6 +202,10 @@ export default {
             browserOpen,
             browserClose,
             menuStatus,
+            formattedTime,
+            battery,
+            signal,
+            wifi,
         };
     },
 
@@ -172,6 +214,37 @@ export default {
 </script>
 
 <style lang="scss">
+body {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+.system {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 25px;
+    padding: 0 17px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+
+    .current_time {
+        color: #fff;
+        font-weight: 500;
+    }
+
+    .widgets {
+        ul {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #fff;
+        }
+    }
+}
+
 .menu {
     width: 100%;
     height: 100%;
@@ -317,9 +390,11 @@ export default {
         height: auto;
         aspect-ratio: 16/9;
         border-radius: 15px;
-        background: #eee;
-        //backdrop-filter: blur(15px);
+        background: rgba($color: #dfdfdf, $alpha: 0.8);
+        backdrop-filter: blur(15px);
         overflow: hidden;
+        box-shadow: 0 0 10px rgba($color: #000000, $alpha: 0.5);
+
         .header {
             width: 100%;
             height: 35px;
@@ -330,23 +405,23 @@ export default {
     }
 
     &_content {
-        padding: 10px;
         width: 100%;
         height: calc(100% - 35px);
-        overflow: auto;
+        //overflow: auto;
     }
 }
 
 .fade-enter-active,
 .fade-leave-active {
     transition: opacity 0.3s ease, transform 0.3s ease;
-    /* transform-origin: center bottom; */
+    transform-origin: center bottom;
 }
 
 .fade-enter-from,
 .fade-leave-to {
     opacity: 0;
     transform: scale(0);
+    transform-origin: center bottom;
     /* transform-origin: center bottom; */
 }
 </style>

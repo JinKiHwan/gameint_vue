@@ -35,13 +35,13 @@ body {
         }
 
         &.red {
-            background: red;
+            background: #ff453a;
         }
         &.yellow {
-            background: orange;
+            background: #ff9f0a;
         }
         &.green {
-            background: greenyellow;
+            background: #30d158;
         }
     }
 }
