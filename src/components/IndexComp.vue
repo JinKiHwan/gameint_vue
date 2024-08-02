@@ -128,11 +128,11 @@ export default {
         const signal = ref(require('@/assets/img/signal.svg'));
         const wifi = ref(require('@/assets/img/wifi.svg'));
         // const browserStatus = ref(false);
-        const browserStatus = ref(true);
+        const browserStatus = ref(false);
         const currentTime = ref(new Date());
         let timer;
         const menuStatus = reactive({
-            home: true,
+            home: false,
             monthly: false,
             favorite: false,
             history: false,
