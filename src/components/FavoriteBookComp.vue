@@ -223,7 +223,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 /*
 @font-face {
     font-family: 'Hahmlet-Regular';
@@ -257,7 +257,7 @@ export default {
         background-color: #333333;
         /* 스크롤바 둥글게 설정    */
         border-radius: 10px; 
-        border: 7px solid rgba(0,0,0,0.8);
+        border: 7px solid #333;
         }
 
         /* 스크롤바 뒷 배경 설정*/
@@ -285,13 +285,13 @@ export default {
                         line-height: 23px;
                         letter-spacing: -0.01em;
                         font-weight: bold;
-                        color: #333;
+                        color: #000;
                     }
                     > dd{
                         display: flex;
                         margin-top: 5px;
                         font-size: 13px;
-                        color: #999;
+                        color: #424242;
                         letter-spacing: -0.01em;
                     }
                 }
@@ -357,9 +357,10 @@ export default {
                     bottom: 0;
                     right: 0;
                     z-index: 1;
-                    background: #eee;
+                    background: rgba($color: #dfdfdf, $alpha: 0.8);
+                    backdrop-filter: blur(15px);
                     padding: 8px 0 0 8px;
-                    border-radius: 32.5px 0px 0px 0px;
+                    border-radius: 32.5px 0px 32.5px 0px;
 
                 }
                 .fav_profile{
@@ -410,8 +411,8 @@ export default {
     }
     .writeBtn{
         position:absolute;
-        bottom: 0;
-        right: 0;
+        bottom: 5px;
+        right: 10px;
         z-index: 1;
     }
 }
@@ -420,20 +421,26 @@ export default {
     font-size: 14px;
     border: none;
     cursor: pointer;
-    transition: all 0.3s ease-in-out;
     color: #fff;
     border-radius: 5px;
-    &.btn-blue{
-        background: #0C28BB;
-    }
-    &.btn-green{
-        background: #0CBB7C;
-    }
-    &.btn-red{
-        background: #FC0C0C;
-    }
-    &:hover{
-        transform: scale(1.1);
+    box-sizing: border-box;
+    background: #6E6D70;
+    border: 0.5px solid rgba(0, 0, 0, 0.12);
+    box-shadow: 0px 0.5px 1px rgba(0, 0, 0, 0.1), inset 0px 0.5px 0.5px rgba(255, 255, 255, 0.5);
+    border-radius: 6px;
+    transition: all 0.2s ease-in-out;
+
+    &:hover,
+    &.-active{
+        &.btn-blue{
+            background: #4B91F7;
+        }
+        &.btn-green{
+            background: #0CBB7C;
+        }
+        &.btn-red{
+            background: #FC0C0C;
+        }
     }
 }
 
