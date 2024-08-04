@@ -76,12 +76,12 @@
 
     <Transition name="fade">
         <div class="browser" v-if="browserStatus">
-            <article class="browser_wrap">
+            <article class="browser_wrap" ref="browserRef">
                 <header class="header">
                     <ul class="btnWraps">
                         <li class="red"><a href="javascript:void(0)" @click="browserClose"></a></li>
                         <li class="yellow"><a href="javascript:void(0)"></a></li>
-                        <li class="green"><a href="javascript:void(0)" @click="browserClose"></a></li>
+                        <li class="green"><a href="javascript:void(0)" @click="browserFullmode"></a></li>
                     </ul>
                 </header>
 
@@ -127,12 +127,14 @@ export default {
         const battery = ref(require('@/assets/img/battery.svg'));
         const signal = ref(require('@/assets/img/signal.svg'));
         const wifi = ref(require('@/assets/img/wifi.svg'));
-        // const browserStatus = ref(false);
-        const browserStatus = ref(false);
+        const browserRef = ref(null);
+        const isFullScreen = ref(false);
+        const browserStatus = ref(true);
         const currentTime = ref(new Date());
+
         let timer;
         const menuStatus = reactive({
-            home: false,
+            home: true,
             monthly: false,
             favorite: false,
             history: false,
@@ -187,6 +189,24 @@ export default {
             });
         };
 
+        const browserFullmode = () => {
+            if (browserRef.value) {
+                isFullScreen.value = !isFullScreen.value;
+
+                if (isFullScreen.value) {
+                    //전체창 모드 시
+                    browserRef.value.style.width = '100%';
+                    browserRef.value.style.height = '100%';
+                    browserRef.value.style.borderRadius = '0';
+                } else {
+                    //전체창 모드 해제 시
+                    browserRef.value.style.width = '';
+                    browserRef.value.style.height = '';
+                    browserRef.value.style.borderRadius = '';
+                }
+            }
+        };
+
         return {
             home,
             bookreviews,
@@ -201,11 +221,14 @@ export default {
             browserStatus,
             browserOpen,
             browserClose,
+            browserFullmode,
+            browserRef,
             menuStatus,
             formattedTime,
             battery,
             signal,
             wifi,
+            isFullScreen,
         };
     },
 
@@ -384,17 +407,18 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    padding-top: 25px;
 
     &_wrap {
         width: min(1300px, 95%);
-        height: auto;
-        aspect-ratio: 16/9;
+        height: 65%;
+        //aspect-ratio: 16/9;
         border-radius: 15px;
         background: rgba($color: #dfdfdf, $alpha: 0.8);
         backdrop-filter: blur(15px);
         overflow: hidden;
         box-shadow: 0 0 10px rgba($color: #000000, $alpha: 0.5);
-
+        transition: all 0.5s;
         .header {
             width: 100%;
             height: 35px;
