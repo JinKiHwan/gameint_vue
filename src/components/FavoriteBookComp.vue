@@ -118,8 +118,8 @@ export default {
     name: 'FavoriteBookComp',
     setup() {
         // 변수
-        //let isFavoriteBookStatus = ref(0); // List : 0, Write & View : 1
-        const isFavoriteBookStatus = ref(1); // List : 0, Write & View : 1
+        const isFavoriteBookStatus = ref(0); // List : 0, Write & View : 1
+        //const isFavoriteBookStatus = ref(1); // List : 0, Write & View : 1
         const bookName = ref('');
         const publisher = ref('');
         const writer = ref('');
