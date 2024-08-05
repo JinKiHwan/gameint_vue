@@ -71,7 +71,7 @@
                             <li class="hc">
                                 <label for="message">추천 이유</label>
                                 <div class="editerArea">
-                                    <QuillEditor v-model="content" ref="quillEditor" />
+                                    <QuillEditor v-model="bookContent"  ref="quillEditor" :options="editorOption"/>
                                     <div v-if="false" id="preview" class="content ql-editor" v-html="content"></div>
                                 </div>
                             </li>
@@ -136,9 +136,20 @@ export default {
         const bookTitle = ref('');
         const bookPub = ref('');
         const bookCate = ref('');
+        const bookContent = ref('');
         const fileName = ref(null);
         const previewImage = ref(null);
-
+        const editorOption = {
+            modules: {
+                toolbar: [
+                    [{ header: [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline'],
+                    ['code-block'],
+                    [{ list: 'ordered' }, 'blockquote']
+                ],
+            },
+            placeholder: "추천 이유를 작성 해주세요."
+        }
         let isFavoriteBookList = ref([]);
         let master = ref(false); // 마스터 시 true
         let editMode = ref(false); // 마스터 시 true
@@ -353,8 +364,10 @@ export default {
             bookTitle,
             bookPub,
             bookCate,
+            bookContent,
             fileName,
             previewImage,
+            editorOption,
             doMouseOver,
             doMouseLeave,
             changeFavoriteType,   
