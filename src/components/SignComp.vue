@@ -235,7 +235,7 @@ export default {
             } else {
                 try {
                     const response = await axios.post(
-                        'http://localhost:8080/member/create',
+                        'http://localhost:3000/api/member/create',
                         {
                             name: username.value,
                             account: userId.value,
@@ -244,16 +244,16 @@ export default {
                         },
                         {
                             headers: {
-                                'Content-Type': 'application/json',
+                                'Content-Type': 'multipart/form-data',
                             },
                         }
                     );
-
-                    if (response === 200) {
+                    console.log(response);
+                    if (response.data.code === 1) {
                         alert('가입성공!');
                     }
                 } catch (error) {
-                    alert('가입실패');
+                    alert(error);
                 }
             }
         };

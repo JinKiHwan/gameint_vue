@@ -297,8 +297,28 @@ export default {
 
             h3 {
                 font-size: 3vw;
+                font-weight: 800;
+                color: transparent;
+                -webkit-text-stroke: 1px #000;
+                font-family: 'Bodoni Moda', serif;
+
                 span {
                     font-size: 1vw;
+                }
+            }
+            ul {
+                display: flex;
+                gap: 1vw;
+                li {
+                    width: min(600px, 25vw);
+                    aspect-ratio: 1/1;
+                    border: 1px solid #000;
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        filter: grayscale(1);
+                    }
                 }
             }
         }
