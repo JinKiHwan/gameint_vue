@@ -92,16 +92,25 @@
             <!--[e] 작성/수정/View-->
         </div>
         <div class="btRightBtn">
-            <button v-if="isFavoriteBookStatus === 0" type="button"  @click="changeFavoriteType(1)" class="cool-button btn-blue" >
-                <span >
-                    글쓰기
-                </span>
-            </button>
-            <button v-else type="submit" class="cool-button btn-blue" @click="changeFavoriteType(0)">
-                <span>
-                    {{chWriteBtnTxt}}
-                </span>
-            </button>
+            <div v-if="isFavoriteBookStatus === 0" >
+                <button type="button"  @click="changeFavoriteType(1)" class="cool-button btn-blue" >
+                    <span >
+                        글쓰기
+                    </span>
+                </button>
+            </div>
+            <div v-else>
+                <button  type="submit" class="cool-button btn-blue" @click="changeFavoriteType(0)">
+                    <span>
+                        {{chWriteBtnTxt}}
+                    </span>
+                </button>
+                <button type="button" class="cool-button btn-black" @click="changeFavoriteType(0)">
+                    <span>
+                        취소
+                    </span>
+                </button>
+            </div>
         </div>
     </div>
 </template>
@@ -710,6 +719,12 @@ export default {
         bottom: 5px;
         right: 10px;
         z-index: 1;
+        > div{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
     }
     .cool-button{
         border: none;
@@ -736,6 +751,9 @@ export default {
             }
             &.btn-red{
                 background: #FC0C0C;
+            }
+            &.btn-black{
+                background: #000;
             }
         }
     }
