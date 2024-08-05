@@ -745,6 +745,12 @@ export default {
         width: 100%;
         background-color: #dddddd;
         box-sizing: border-box;
+        strong{
+            font-weight: bold;
+        }
+        em{
+            font-style: italic;
+        }
     }
     .ql-toolbar{
         height: 13%;
