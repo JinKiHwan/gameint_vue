@@ -16,39 +16,56 @@
                         <li><img :src="picture[2].img" alt="" /></li>
                         <li><img :src="picture[3].img" alt="" /></li>
                         <li><img :src="picture[4].img" alt="" /></li>
-                        <li><img :src="picture[0].img" alt="" /></li>
-                        <li><img :src="picture[1].img" alt="" /></li>
-                        <li><img :src="picture[2].img" alt="" /></li>
-                        <li><img :src="picture[3].img" alt="" /></li>
-                        <li><img :src="picture[4].img" alt="" /></li>
+                        <li><img :src="picture[5].img" alt="" /></li>
+                        <li><img :src="picture[6].img" alt="" /></li>
+                        <li><img :src="picture[7].img" alt="" /></li>
+                        <li><img :src="picture[8].img" alt="" /></li>
+                        <li><img :src="picture[9].img" alt="" /></li>
                     </ul>
                 </div>
 
                 <div class="homeComp_main_picture bottom">
                     <ul>
-                        <li><img :src="picture[0].img" alt="" /></li>
-                        <li><img :src="picture[1].img" alt="" /></li>
-                        <li><img :src="picture[2].img" alt="" /></li>
-                        <li><img :src="picture[3].img" alt="" /></li>
-                        <li><img :src="picture[4].img" alt="" /></li>
-                        <li><img :src="picture[0].img" alt="" /></li>
-                        <li><img :src="picture[1].img" alt="" /></li>
-                        <li><img :src="picture[2].img" alt="" /></li>
-                        <li><img :src="picture[3].img" alt="" /></li>
-                        <li><img :src="picture[4].img" alt="" /></li>
+                        <li><img :src="picture[10].img" alt="" /></li>
+                        <li><img :src="picture[11].img" alt="" /></li>
+                        <li><img :src="picture[12].img" alt="" /></li>
+                        <li><img :src="picture[13].img" alt="" /></li>
+                        <li><img :src="picture[14].img" alt="" /></li>
+                        <li><img :src="picture[15].img" alt="" /></li>
+                        <li><img :src="picture[16].img" alt="" /></li>
+                        <li><img :src="picture[17].img" alt="" /></li>
+                        <li><img :src="picture[18].img" alt="" /></li>
+                        <li><img :src="picture[19].img" alt="" /></li>
                     </ul>
                 </div>
             </div>
 
             <div class="homeComp_merit">
                 <article>
-                    <h3>여러 작가를 만나다</h3>
+                    <h3>Meet several writers <span>여러 작가를 만나다</span></h3>
                     <ul>
-                        <li></li>
+                        <li>
+                            <img src="https://image.ajunews.com/content/image/2021/12/01/20211201155123634014.jpg" alt="" />
+                        </li>
+                        <li>
+                            <img src="https://i.namu.wiki/i/HAkoBRVZDjrcAN_piKSCY64WZZpYRGYjsTd9vRB1YeQM6gSgEAGSauMJPF81090jrQ7aPQC8UvepudfYdsiPYAMAhcARCU_ap8S5qNCQY5NwGIOEWWr84Ci2VVabcFRwokat2UV-LYc_4VF2k_rTumKTrKBI2TuToNWF6tdX3Tw.webp" alt="" />
+                        </li>
+                        <li>
+                            <img src="https://www.theartof.com/assets/images/speaker-headshots/large/ChipHeath.jpg" alt="" />
+                        </li>
+                        <li>
+                            <img src="https://i.namu.wiki/i/HAkoBRVZDjrcAN_piKSCY-6nfUIpeRj6fkLGisZD6c4ichJmSztoZD143Q4u655FIivuas1qDq5Q9oN1dpzLBea5BZEahdc-81iujmypt-ywpeUJrScozyEnRcGoQ6lZ3-WDIFYiENTTaJojVUUBTUcBUXIYsTBaE6Jh_PROq3A.jpg" alt="" />
+                        </li>
+                        <li>
+                            <img src="https://www.kyobostory.co.kr/resources/front/images/contents/fs_travel/20191010/img03.png" alt="" />
+                        </li>
+                        <li>
+                            <img src="https://i.namu.wiki/i/HAkoBRVZDjrcAN_piKSCY537tZ-XL2gIGBD-bBee89bMcGM33P18poSbjanO3MSPhBFNEDnNSYdNOLKein00xBoL1MBxsSJDwGL6qy9cPNyTq9XEuS0VL7D-h0KNWXLuEeKSlIp_6gXnCd6j7j3MkDYwMqVwJFDebR2DRWcpQko.webp" alt="" />
+                        </li>
                     </ul>
                 </article>
                 <article>
-                    <h3>다양한 의견을 나누다</h3>
+                    <h3>Share various opinions<span>다양한 의견을 나누다</span></h3>
                     <ul>
                         <li></li>
                     </ul>
@@ -71,7 +88,28 @@ export default {
         const { animations, initAnimation, initMainScrollMotion } = createHomeAnimations();
         const telegramLogo = require('@/assets/img/telegram.svg');
         const bg = require('@/assets/img/home/library.mp4');
-        const picture = [{ img: require('@/assets/img/home/picture01.png') }, { img: require('@/assets/img/home/picture02.png') }, { img: require('@/assets/img/home/picture03.png') }, { img: require('@/assets/img/home/picture04.png') }, { img: require('@/assets/img/home/picture05.png') }];
+        const picture = [
+            { img: require('@/assets/img/home/picture01.png') },
+            { img: require('@/assets/img/home/picture02.png') },
+            { img: require('@/assets/img/home/picture03.png') },
+            { img: require('@/assets/img/home/picture04.png') },
+            { img: require('@/assets/img/home/picture05.png') },
+            { img: require('@/assets/img/home/picture06.png') },
+            { img: require('@/assets/img/home/picture07.png') },
+            { img: require('@/assets/img/home/picture08.png') },
+            { img: require('@/assets/img/home/picture09.png') },
+            { img: require('@/assets/img/home/picture10.png') },
+            { img: require('@/assets/img/home/picture11.png') },
+            { img: require('@/assets/img/home/picture12.png') },
+            { img: require('@/assets/img/home/picture13.png') },
+            { img: require('@/assets/img/home/picture14.png') },
+            { img: require('@/assets/img/home/picture15.png') },
+            { img: require('@/assets/img/home/picture16.png') },
+            { img: require('@/assets/img/home/picture17.png') },
+            { img: require('@/assets/img/home/picture18.png') },
+            { img: require('@/assets/img/home/picture19.png') },
+            { img: require('@/assets/img/home/picture20.png') },
+        ];
 
         onMounted(() => {
             initAnimation();
@@ -254,6 +292,15 @@ export default {
 
         article {
             height: auto;
+            width: 95%;
+            margin: 0 auto;
+
+            h3 {
+                font-size: 3vw;
+                span {
+                    font-size: 1vw;
+                }
+            }
         }
     }
 }
