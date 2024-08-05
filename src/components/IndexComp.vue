@@ -134,9 +134,9 @@ export default {
 
         let timer;
         const menuStatus = reactive({
-            home: false,
+            home: true,
             monthly: false,
-            favorite: true,
+            favorite: false,
             history: false,
             // 추가 메뉴들...
         });
