@@ -1,8 +1,10 @@
 <template>
     <div class="favorite">
-        <div class="favorite_inner" v-bind:class="{ '-view': isFavoriteBookStatus === 1 }">
-            <!--[s] 리스트-->
-            <div class="favorite_list" v-if="isFavoriteBookStatus === 0">
+
+        <div class="favorite_inner" v-bind:class="{ '-view': isFavoriteBookStatus !== 0 }">
+
+            <!--[s] 책 추천 리스트-->
+            <div class="favorite_list" v-if="isFavoriteBookStatus == 0">
                 <ul>
                     <li v-for="(info, index) in isFavoriteBookList" :key="index">
                         <div class="fav_img" @mouseover="doMouseOver(index)" @mouseleave="doMouseLeave(index)" @touchstart="doMouseOver(index)" @touchend="doMouseLeave(index)">
@@ -15,13 +17,13 @@
                             <div v-show="info.isHovered" class="fav_hover">
                                 <div class="fav_hover_inner">
                                     <div v-if="info.edit">
-                                        <button type="button" class="cool-button btn-blue">내용 수정</button>
+                                        <button type="button" class="cool-button btn-blue" @click="changeFavoriteType(1, 'edit', info)">내용 수정</button>
                                     </div>
                                     <div>
-                                        <button type="button" class="cool-button btn-green">글 보기</button>
+                                        <button type="button" class="cool-button btn-green" @click="changeFavoriteType(2)">글 보기</button>
                                     </div>
                                     <div v-if="info.master" class="bt">
-                                        <button type="button" class="cool-button btn-red">책 당선</button>
+                                        <button type="button" class="cool-button btn-red" @click="selBook(index, info)">책 당선</button>
                                     </div>
                                 </div>
                             </div>
@@ -49,10 +51,10 @@
                     </li>
                 </ul>
             </div>
-            <!--[e] 리스트-->
+            <!--[e] 책 추천 리스트-->
             
-            <!--[s] 작성/수정/View-->
-            <div class="favorite_form" v-if="isFavoriteBookStatus === 1">
+            <!--[s] 책 추천 작성/수정-->
+            <div class="favorite_form" v-if="isFavoriteBookStatus == 1">
                 <div class="form-container">
                     <div class="form-left">
                         <ul>
@@ -71,7 +73,7 @@
                             <li class="hc">
                                 <label for="message">추천 이유</label>
                                 <div class="editerArea">
-                                    <QuillEditor v-model="content" ref="quillEditor" />
+                                    <QuillEditor v-model="bookContent"  ref="quillEditor" :options="editorOption"/>
                                     <div v-if="false" id="preview" class="content ql-editor" v-html="content"></div>
                                 </div>
                             </li>
@@ -89,9 +91,92 @@
                     </div>
                 </div>
             </div>
-            <!--[e] 작성/수정/View-->
+            <!--[e] 책 추천 작성/수정-->
+
+            <!--[s] 책 추천 글 보기-->
+            <div class="favorite_view" v-if="isFavoriteBookStatus == 2">
+                <div class="favorite_area">
+
+                    <div class="favorite_book_img">
+                        <figure>
+                            <img :src="favoriteBook" alt="" />
+                        </figure>
+                    </div>
+
+                    <div class="favorite_book_reviews">
+                        <div class="writerArea">
+                            <div class="review_item">
+                                <div class="review-li">
+                                    <div class="user_profile">
+                                        <figure>
+                                            <img :src="writerView.userProfile" :alt="writerView.writer" />
+                                        </figure>
+                                        <span>{{ writerView.writer }}</span>
+                                    </div>
+                                    <div class="user_review">
+                                        <p>{{ writerView.userReview }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="comment">
+                                <div class="block">
+                                    <div class="block-header">
+                                        <div class="title">
+                                            <h2>댓글</h2>
+                                            <div class="tag">{{userReviewWraps.length}}</div> 개
+                                        </div>
+                                    </div>
+                                    <div class="writing">
+                                        <div contenteditable="true" class="textarea" autofocus spellcheck="false">
+                                            
+                                        </div>
+                                        <button type="button">
+                                            등록
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>                                                
+                        </div>
+                        <div class="writerCommentArea">
+                            <ul class="review_item">
+                                <li v-for="(review, index) in userReviewWraps" :key="index" class="comment">
+                                    <div class="user-banner">
+                                        <div class="user">
+                                            <div class="avatar">
+                                                <img :src="review.userProfile" :alt="review.userName" />
+                                            </div>
+                                            <h5>{{ review.userName }}</h5>
+                                        </div>
+                                    </div>
+                                    <div class="content">
+                                        <p v-if="commnetEdit != true">{{ review.userReview }}</p>
+                                        <div v-else class="writing">
+                                            <div contenteditable="true" class="textarea" autofocus spellcheck="false" v-html="review.userReview">
+                                                
+                                            </div>
+                                            <button type="button" @click="actComment('edit')">
+                                                등록
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div v-if="true" class="writer_util">
+                                        <button type="button" @click="editComment('edit')">수정</button>
+                                        <span>|</span><button type="button" @click="editComment('del')">삭제</button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+                <button class="history_back" @click="changeFavoriteType(0)">←뒤로가기</button>
+            </div>
+            <!--[e] 책 추천 글 보기-->
+
         </div>
-        <div class="btRightBtn">
+
+        <!-- [s] 버튼 영역 -->
+        <div v-if="isFavoriteBookStatus != 2" class="btRightBtn">
             <div v-if="isFavoriteBookStatus === 0" >
                 <button type="button"  @click="changeFavoriteType(1)" class="cool-button btn-blue" >
                     <span >
@@ -112,6 +197,7 @@
                 </button>
             </div>
         </div>
+        <!-- [e] 버튼 영역 -->
     </div>
 </template>
 
@@ -127,24 +213,37 @@ export default {
     name: 'FavoriteBookComp',
     setup() {
         // 변수
-        const isFavoriteBookStatus = ref(0); // List : 0, Write & View : 1
-        //const isFavoriteBookStatus = ref(1); // List : 0, Write & View : 1
+        const isFavoriteBookStatus = ref(0); // List : 0, Write/Edit : 1, View : 2
         const bookName = ref('');
         const publisher = ref('');
         const writer = ref('');
+        const category = ref('');
         const commentNum = ref('');
         const bookTitle = ref('');
         const bookPub = ref('');
         const bookCate = ref('');
+        const bookContent = ref('');
         const fileName = ref(null);
         const previewImage = ref(null);
+        const editorOption = {
+            modules: {
+                toolbar: [
+                    [{ header: [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline'],
+                    ['code-block'],
+                    [{ list: 'ordered' }, 'blockquote']
+                ],
+            },
+            placeholder: "추천 이유를 작성 해주세요."
+        }
+        const favoriteBook = ref(require('@/assets/img/book01.webp'));
 
         let isFavoriteBookList = ref([]);
         let master = ref(false); // 마스터 시 true
-        let editMode = ref(false); // 마스터 시 true
+        let editMode = ref(false); // 본인 작성 글 true
         let emptyImg = ref(true);
         let edit = ref(false); // 본인 작성 글 true
-
+        let commnetEdit = ref(false);
         // ================ 테스트 데이터================
         let memberId = 1; // (e.x 마스터 idx : 1)
         let bookIndex = 1; // (e.x 멤버 idx 와 비교 할 책 index)
@@ -177,6 +276,7 @@ export default {
                 title: (bookName.value = '제일 긴 책제목은 과연 몇자일까요오오오오오'),
                 publisher: (publisher.value = '민음사'),
                 writer: (writer.value = '김동동'),
+                category: (category.value = '에세이'),
                 commentNum: (commentNum.value = '10'),
                 recommender: require('@/assets/img/profile/test.jpg'),
                 edit,
@@ -188,6 +288,7 @@ export default {
                 title: (bookName.value = '제일 긴 책제목은 과연'),
                 publisher: (publisher.value = '민음사'),
                 writer: (writer.value = '김동동'),
+                category: (category.value = '에세이'),
                 commentNum: (commentNum.value = '10'),
                 recommender: require('@/assets/img/profile/test.jpg'),
                 edit,
@@ -196,9 +297,10 @@ export default {
             },
             {
                 img: require('@/assets/img/favorite/book28.webp'),
-                title: (bookName.value = ' 몇자일까요오오오오오'),
+                title: (bookName.value = '몇자일까요오오오오오'),
                 publisher: (publisher.value = '민음사'),
                 writer: (writer.value = '김동동'),
+                category: (category.value = '에세이'),
                 commentNum: (commentNum.value = '2'),
                 recommender: require('@/assets/img/profile/test.jpg'),
                 edit,
@@ -210,6 +312,7 @@ export default {
                 title: (bookName.value = '효자손으로도 때리지 말라'),
                 publisher: (publisher.value = '민음사'),
                 writer: (writer.value = '김동동'),
+                category: (category.value = '에세이'),
                 commentNum: (commentNum.value = '3'),
                 recommender: require('@/assets/img/profile/test.jpg'),
                 edit,
@@ -221,6 +324,7 @@ export default {
                 title: (bookName.value = '임금 인상을 요청하기 위해 과장에게 접근하는 기술과 방법'),
                 publisher: (publisher.value = '민음사'),
                 writer: (writer.value = '김동동'),
+                category: (category.value = '에세이'),
                 commentNum: (commentNum.value = '4'),
                 recommender: require('@/assets/img/profile/test.jpg'),
                 edit,
@@ -232,6 +336,7 @@ export default {
                 title: (bookName.value = '에피쿠로스 쾌락 6'),
                 publisher: (publisher.value = '민음사'),
                 writer: (writer.value = '김동동'),
+                category: (category.value = '에세이'),
                 commentNum: (commentNum.value = '4'),
                 recommender: require('@/assets/img/profile/test.jpg'),
                 edit,
@@ -243,6 +348,7 @@ export default {
                 title: (bookName.value = '에피쿠로스 쾌락 7'),
                 publisher: (publisher.value = '민음사'),
                 writer: (writer.value = '김동동'),
+                category: (category.value = '에세이'),
                 commentNum: (commentNum.value = '5'),
                 recommender: require('@/assets/img/profile/test.jpg'),
                 edit,
@@ -254,6 +360,7 @@ export default {
                 title: (bookName.value = '에피쿠로스 쾌락 7'),
                 publisher: (publisher.value = '민음사'),
                 writer: (writer.value = '김동동'),
+                category: (category.value = '에세이'),
                 commentNum: (commentNum.value = '5'),
                 recommender: require('@/assets/img/profile/test.jpg'),
                 edit,
@@ -265,6 +372,7 @@ export default {
                 title: (bookName.value = '에피쿠로스 쾌락 7'),
                 publisher: (publisher.value = '민음사'),
                 writer: (writer.value = '김동동'),
+                category: (category.value = '에세이'),
                 commentNum: (commentNum.value = '5'),
                 recommender: require('@/assets/img/profile/test.jpg'),
                 edit,
@@ -276,6 +384,7 @@ export default {
                 title: (bookName.value = '에피쿠로스 쾌락 7'),
                 publisher: (publisher.value = '민음사'),
                 writer: (writer.value = '김동동'),
+                category: (category.value = '에세이'),
                 commentNum: (commentNum.value = '5'),
                 recommender: require('@/assets/img/profile/test.jpg'),
                 edit,
@@ -296,11 +405,25 @@ export default {
         };
 
         // 추천 책 리스트/작성,수정 전환
-        const changeFavoriteType = (index) => {
-            resetInputs();
-            isFavoriteBookStatus.value = index;
+        const changeFavoriteType = (index, type, data) => {
+            if (type == 'edit') {
+                
+                bookTitle.value = data.title;
+                bookPub.value = data.publisher;
+                bookCate.value = data.category;
+                
+                editMode.value = true;
 
+            } else {
+                resetInputs();  
+
+            }
+            isFavoriteBookStatus.value = index;
         }
+        const selBook = (index,info) => {
+            index = index + 1;
+            alert('[' + info.title + '] 가(이)\n당선이오  (해당 리스트에 ' + index + '번 책)')
+        };
 
         ///////////////////////////////////////////
         // 추천 책 글쓰기
@@ -343,25 +466,109 @@ export default {
             }
         };
 
+        ///////////////////////////////////////////
+        // 추천 책 글보기
+        ///////////////////////////////////////////
+        // 책 추천 글 (작성자)
+        const writerView = ref({
+            writer: '김기현',
+            userProfile: require('@/assets/img/profile/profile_df.webp'),
+            userReview: '다윗의 진화론을 바탕으로 한 과학이야기. 어떻게 인간은 진화해 왔는가 왜 매미는 큰 울음소리를 갖게되었는가 왜 나무늘보는 느리지만 끝까지 살아남았는가',
+        })
+        // 책 추천 글보기 리뷰
+        const userReviewWraps = ref([
+            {
+                userName: '안승필',
+                userProfile: require('@/assets/img/profile/profile_df.webp'),
+                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
+            },
+            {
+                userName: '김효종',
+                userProfile: require('@/assets/img/profile/profile_df.webp'),
+                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
+                
+            },
+            {
+                userName: '진기환',
+                userProfile: require('@/assets/img/profile/profile_df.webp'),
+                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
+                
+            },
+            {
+                userName: '맹주영',
+                userProfile: require('@/assets/img/profile/profile_df.webp'),
+                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
+                
+            },
+            {
+                userName: '안승필',
+                userProfile: require('@/assets/img/profile/profile_df.webp'),
+                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
+                
+            },
+            {
+                userName: '김효종',
+                userProfile: require('@/assets/img/profile/profile_df.webp'),
+                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
+                
+            },
+            {
+                userName: '진기환',
+                userProfile: require('@/assets/img/profile/profile_df.webp'),
+                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
+                
+            },
+            {
+                userName: '맹주영',
+                userProfile: require('@/assets/img/profile/profile_df.webp'),
+                userReview:'세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
+                
+            },
+        ]);
+        // 댓글 등록
+        const actComment = (type) => {
+            if(type == 'edit'){
+                alert('댓글 수정 등록')
+            } else {
+                alert('댓글 등록')
+            }
+        };
+        // 댓글 수정 / 삭제
+        const editComment = (type) => {
+           if(type == 'edit'){
+               commnetEdit.value = true;
+           } else if (type == 'del') {
+                alert('댓글 삭제')
+           }
+        };
 
         return {
+            favoriteBook,
             isFavoriteBookStatus,
             isFavoriteBookList,
             editMode,
+            commnetEdit,
             chWriteBtnTxt,
             emptyImg,
             bookTitle,
             bookPub,
             bookCate,
+            bookContent,
             fileName,
             previewImage,
+            editorOption,
+            writerView,
+            userReviewWraps,
             doMouseOver,
             doMouseLeave,
             changeFavoriteType,   
             resetInputs,
             uploadImg, 
             base64,
-            handleFileUpload
+            handleFileUpload,
+            editComment,
+            actComment,
+            selBook,
         };
     },
     components: {
@@ -414,6 +621,20 @@ export default {
         &::-webkit-scrollbar-track {
             background-color: rgba(0, 0, 0, 0);
         }
+    }
+    &_view{
+        width: 100%;
+    }
+    &_area{
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        display: flex;
+        justify-content: center;
+        position: relative;
+        padding: 10px;
+        gap: 20px;
     }
     &_list {
         width: 90%;
@@ -713,7 +934,236 @@ export default {
             background-color: #0056b3; /* Button background color for dark mode on hover */
         }
     }
+    &_book_img {
+        max-width: 45%;
+        p {
+            text-align: center;
+            font-size: 18px;
+            margin-block: 10px;
+        }
+        figure {
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            img {
+                object-fit: contain;
+                height: 100%;
+            }
+        }
+    }
+    &_book_reviews {
+        width: min(650px, 45%);
+        .writerArea{
+            .review_item {
+                display: flex;
+                flex-direction: column;
+                gap: 30px;
+                padding-top: 30px;
+                height: 100%;
+                overflow: auto;
+                border-bottom: 2px solid #fff;
+                padding-bottom: 25px;
+                .review-li {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 15px;
 
+                    .user_profile {
+                        position: relative;
+                        border-radius: 50%;
+                        overflow: hidden;
+                        figure {
+                            width: 100px;
+                            aspect-ratio: 1/1;
+                            border-radius: 50%;
+                            overflow: hidden;
+                            &.wC {
+                                width: 60px;
+                            }
+                        }
+
+                        span {
+                            position: absolute;
+                            left: 0;
+                            top: 0;
+                            width: 100%;
+                            height: 100%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            background: #000;
+                            opacity: 0;
+                            color: #fff;
+                        }
+
+                        &:hover {
+                            span {
+                                opacity: 1;
+                            }
+                        }
+                    }
+
+                    .user_review {
+                        width: 70%;
+                        line-height: 1.3;
+                    }
+                }
+            }
+            .block{
+                margin-top: 20px;
+                &-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 16px;
+                    .title {
+                        display: flex;
+                        align-items: flex-start;
+                        .tag {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin-left: 4px;
+                            background: #f7f7f7;
+                            color: #1c1c1c;
+                            text-align: center;
+                            padding: 0 4px;
+                            letter-spacing: 0.04em;
+                            text-transform: uppercase;
+                            font-weight: 500;
+                            font-size: 12px;
+                            line-height: 16px;
+                            border: 1px solid #e8e8e8;
+                            border-radius: 96px;
+                        }
+                    }
+                }
+                
+            }
+        }
+
+        .writerCommentArea{
+            height: 35%;
+            overflow-y: auto;
+            .comment {
+                display: grid;
+                gap: 14px;
+                padding-bottom: 12px;
+                margin-bottom: 12px;
+                border-bottom: 1px solid #e8e8e8;
+                
+                .user-banner {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    .user {
+                        gap: 8px;
+                        align-items: center;
+                        display: flex;
+                        .avatar {
+                            height: 32px;
+                            width: 32px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            border: 1px solid transparent;
+                            position: relative;
+                            border-radius: 100px;
+                            font-weight: 500;
+                            font-size: 13px;
+                            line-height: 20px;
+                            img {
+                                max-width: 100%;
+                                border-radius: 50%;
+                            }
+                            .stat {
+                                display: flex;
+                                position: absolute;
+                                right: -2px;
+                                bottom: -2px;
+                                display: block;
+                                width: 12px;
+                                height: 12px;
+                                z-index: 9;
+                                border: 2px solid #ffffff;
+                                border-radius: 100px;
+                                &.green {
+                                    background: #00ba34;
+                                }
+                                &.grey {
+                                    background: #969696;
+                                }
+                            }
+                        }
+                    }
+                }
+                .writer_util{
+                    display:flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                    > span{
+                        font-size: 10px;
+                        color: #fff;
+                    }
+                    button {
+                        font-size: 12px;
+                        padding: 0 8px;
+                        &:hover{
+                            color: #0085ff;
+                        }
+                    }
+                }
+                p {
+                    font-size: 14px;
+                    line-height: 24px;
+                }
+            }
+        }
+    
+        .writing {
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            margin-bottom: 24px;
+            .textarea {
+                width: 83%;
+                margin-right: 2%;
+                padding: 12px;
+                background: #ffffff;
+                border: 1px solid #e8e8e8;
+                border-radius: 8px;
+                color: #585757;
+                height: 80px;
+                overflow-y: auto;
+                appearance: none;
+                border: 0;
+                outline: 0;
+                resize: none;
+                font-size: 14px;
+                line-height: 24px;
+                &:focus-within {
+                    border: 1px solid #0085ff;
+                    box-shadow: 0px 0px 2px 2px rgba(0, 133, 255, 0.15);
+                }
+            }
+            button{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #6d6d6d;
+                border-radius: 5px;
+                color: #fff;
+                font-size: 1.125rem;
+                font-weight: 600;
+                width: 15%;
+                height: 80px;
+                &:hover{
+                    background-color: #0085ff;
+                }
+            }
+        }
+    }
     .btRightBtn{
         position:absolute;
         bottom: 5px;
@@ -784,6 +1234,12 @@ export default {
         height: 87%;
         border-top-left-radius: 0;
         border-top-right-radius: 0;
+    }
+    .history_back {
+        position: absolute;
+        z-index: 1;
+        left: 10px;
+        top: 10px;
     }
 }
 
