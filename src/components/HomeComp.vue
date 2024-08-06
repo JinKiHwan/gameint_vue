@@ -41,8 +41,8 @@
             </div>
 
             <div class="homeComp_merit">
-                <article>
-                    <h3>Meet several writers <span>여러 작가를 만나다</span></h3>
+                <article class="left writer">
+                    <h3>Meet writers <span>여러 작가를 만나다</span></h3>
                     <ul>
                         <li>
                             <img src="https://image.ajunews.com/content/image/2021/12/01/20211201155123634014.jpg" alt="" />
@@ -64,10 +64,50 @@
                         </li>
                     </ul>
                 </article>
-                <article>
-                    <h3>Share various opinions<span>다양한 의견을 나누다</span></h3>
+                <article class="right">
+                    <h3><span>다양한 의견을 나누다</span>Share opinions</h3>
                     <ul>
-                        <li></li>
+                        <li>
+                            <img src="https://image.ajunews.com/content/image/2021/12/01/20211201155123634014.jpg" alt="" />
+                        </li>
+                        <li>
+                            <img src="https://i.namu.wiki/i/HAkoBRVZDjrcAN_piKSCY64WZZpYRGYjsTd9vRB1YeQM6gSgEAGSauMJPF81090jrQ7aPQC8UvepudfYdsiPYAMAhcARCU_ap8S5qNCQY5NwGIOEWWr84Ci2VVabcFRwokat2UV-LYc_4VF2k_rTumKTrKBI2TuToNWF6tdX3Tw.webp" alt="" />
+                        </li>
+                        <li>
+                            <img src="https://www.theartof.com/assets/images/speaker-headshots/large/ChipHeath.jpg" alt="" />
+                        </li>
+                        <li>
+                            <img src="https://i.namu.wiki/i/HAkoBRVZDjrcAN_piKSCY-6nfUIpeRj6fkLGisZD6c4ichJmSztoZD143Q4u655FIivuas1qDq5Q9oN1dpzLBea5BZEahdc-81iujmypt-ywpeUJrScozyEnRcGoQ6lZ3-WDIFYiENTTaJojVUUBTUcBUXIYsTBaE6Jh_PROq3A.jpg" alt="" />
+                        </li>
+                        <li>
+                            <img src="https://www.kyobostory.co.kr/resources/front/images/contents/fs_travel/20191010/img03.png" alt="" />
+                        </li>
+                        <li>
+                            <img src="https://i.namu.wiki/i/HAkoBRVZDjrcAN_piKSCY537tZ-XL2gIGBD-bBee89bMcGM33P18poSbjanO3MSPhBFNEDnNSYdNOLKein00xBoL1MBxsSJDwGL6qy9cPNyTq9XEuS0VL7D-h0KNWXLuEeKSlIp_6gXnCd6j7j3MkDYwMqVwJFDebR2DRWcpQko.webp" alt="" />
+                        </li>
+                    </ul>
+                </article>
+                <article class="left">
+                    <h3>Meet writers <span>여러 작가를 만나다</span></h3>
+                    <ul>
+                        <li>
+                            <img src="https://image.ajunews.com/content/image/2021/12/01/20211201155123634014.jpg" alt="" />
+                        </li>
+                        <li>
+                            <img src="https://i.namu.wiki/i/HAkoBRVZDjrcAN_piKSCY64WZZpYRGYjsTd9vRB1YeQM6gSgEAGSauMJPF81090jrQ7aPQC8UvepudfYdsiPYAMAhcARCU_ap8S5qNCQY5NwGIOEWWr84Ci2VVabcFRwokat2UV-LYc_4VF2k_rTumKTrKBI2TuToNWF6tdX3Tw.webp" alt="" />
+                        </li>
+                        <li>
+                            <img src="https://www.theartof.com/assets/images/speaker-headshots/large/ChipHeath.jpg" alt="" />
+                        </li>
+                        <li>
+                            <img src="https://i.namu.wiki/i/HAkoBRVZDjrcAN_piKSCY-6nfUIpeRj6fkLGisZD6c4ichJmSztoZD143Q4u655FIivuas1qDq5Q9oN1dpzLBea5BZEahdc-81iujmypt-ywpeUJrScozyEnRcGoQ6lZ3-WDIFYiENTTaJojVUUBTUcBUXIYsTBaE6Jh_PROq3A.jpg" alt="" />
+                        </li>
+                        <li>
+                            <img src="https://www.kyobostory.co.kr/resources/front/images/contents/fs_travel/20191010/img03.png" alt="" />
+                        </li>
+                        <li>
+                            <img src="https://i.namu.wiki/i/HAkoBRVZDjrcAN_piKSCY537tZ-XL2gIGBD-bBee89bMcGM33P18poSbjanO3MSPhBFNEDnNSYdNOLKein00xBoL1MBxsSJDwGL6qy9cPNyTq9XEuS0VL7D-h0KNWXLuEeKSlIp_6gXnCd6j7j3MkDYwMqVwJFDebR2DRWcpQko.webp" alt="" />
+                        </li>
                     </ul>
                 </article>
             </div>
@@ -76,8 +116,10 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { createHomeAnimations } from '@/assets/js/animation.js';
+import gsap from 'gsap';
+import ScrollTrigger from 'gsap/ScrollTrigger';
 
 export default {
     name: 'homeComp',
@@ -85,7 +127,7 @@ export default {
     setup() {
         const oilpastelImg = require('@/assets/img/oilpastel.webp');
         const bigTitle = ref(null);
-        const { animations, initAnimation, initMainScrollMotion } = createHomeAnimations();
+        const { animations, initAnimation, initMeritAnimation } = createHomeAnimations();
         const telegramLogo = require('@/assets/img/telegram.svg');
         const bg = require('@/assets/img/home/library.mp4');
         const picture = [
@@ -113,7 +155,17 @@ export default {
 
         onMounted(() => {
             initAnimation();
-            initMainScrollMotion();
+            initMeritAnimation();
+        });
+        onBeforeUnmount(() => {
+            // 모든 GSAP 애니메이션 정리
+            gsap.killTweensOf('*');
+
+            // ScrollTrigger 정리
+            ScrollTrigger.getAll().forEach((st) => st.kill());
+
+            // 또는 모든 ScrollTrigger 정리
+            ScrollTrigger.killAll();
         });
 
         return {
@@ -287,13 +339,28 @@ export default {
     }
 
     &_merit {
+        padding-top: 150px;
         width: 100%;
-        height: 100vh;
+        //height: 100vh;
 
         article {
             height: auto;
             width: 95%;
             margin: 0 auto;
+            margin-bottom: 3vw;
+
+            &.right {
+                h3 {
+                    text-align: right;
+
+                    span {
+                        margin-right: 0.5vw;
+                    }
+                }
+                ul {
+                    flex-direction: row-reverse;
+                }
+            }
 
             h3 {
                 font-size: 3vw;
@@ -301,7 +368,7 @@ export default {
                 color: transparent;
                 -webkit-text-stroke: 1px #000;
                 font-family: 'Bodoni Moda', serif;
-
+                margin-bottom: 1vw;
                 span {
                     font-size: 1vw;
                 }
@@ -312,7 +379,7 @@ export default {
                 li {
                     width: min(600px, 25vw);
                     aspect-ratio: 1/1;
-                    border: 1px solid #000;
+                    //box-shadow: 10px 10px 0 rgba($color: #000000, $alpha: 1);
                     img {
                         width: 100%;
                         height: 100%;

@@ -17,16 +17,16 @@
                 <div class="popupLayout_login_input">
                     <dl>
                         <dt>ID</dt>
-                        <dd><input type="text" /></dd>
+                        <dd><input type="text" v-model="userId" /></dd>
                     </dl>
                     <dl>
                         <dt>PASS</dt>
-                        <dd><input type="password" /></dd>
+                        <dd><input type="password" v-model="password" /></dd>
                     </dl>
                 </div>
 
                 <div class="popupLayout_login_btn">
-                    <button>확인</button>
+                    <button @click="handleLogin">확인</button>
                 </div>
             </div>
 
@@ -56,7 +56,8 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
+import axios from 'axios';
 
 export default {
     name: 'LoginComp',
@@ -111,23 +112,64 @@ export default {
         const isLogin = ref(false);
         const imageSrc = ref('');
         const userName = ref('');
+        const isIdValid = ref(true); //유효성 통과 상태체크
+        const isPasswordValid = ref(true); //유효성 통과 상태체크
+        const userId = ref('');
+        const password = ref('');
 
-        const checkLoginStatus = () => {
-            /* 로그인 상태 체크 */
-            isLogin.value = false;
+        // const checkLoginStatus = () => {
+        //     /* 로그인 상태 체크 */
+        //     isLogin.value = false;
+        // };
+
+        const handleLogin = async () => {
+            if (!isIdValid.value || !isPasswordValid.value) {
+                alert('입력폼을 다시 확인해 주세요');
+            } else {
+                try {
+                    const response = await axios.post(
+                        'http://localhost:3000/api/member/sign-in',
+                        {
+                            account: userId.value,
+                            password: password.value,
+                        },
+                        {
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            withCredentials: true, // 쿠키를 주고받을 수 있게 설정
+                        }
+                    );
+
+                    if (response.data.code === 1) {
+                        alert('로그인 성공!');
+                        isLogin.value = true; // 로그인 상태 업데이트
+                        console.log(document.cookie); // 쿠키 확인
+                    } else {
+                        alert('로그인 실패: ' + response.data.message);
+                    }
+                } catch (error) {
+                    alert('로그인 오류: ' + error.message);
+                }
+            }
         };
 
-        onMounted(() => {
-            checkLoginStatus();
-            imageSrc.value = 'https://common-cdn-api.joycityglobal.com/community/gw/resources/images/content/left_menu/default-profile-after-login.png?v=231029';
-            userName.value = '김기현';
-        });
+        // onMounted(() => {
+        //     checkLoginStatus();
+        //     imageSrc.value = 'https://common-cdn-api.joycityglobal.com/community/gw/resources/images/content/left_menu/default-profile-after-login.png?v=231029';
+        //     userName.value = '김기현';
+        // });
 
         return {
             isLogin,
             imageSrc,
             userName,
             pen,
+            handleLogin,
+            isIdValid,
+            isPasswordValid,
+            userId,
+            password,
         };
     },
 };

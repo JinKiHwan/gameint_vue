@@ -1,11 +1,13 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
 gsap.registerPlugin(ScrollTrigger);
 
 export function createHomeAnimations() {
     const animations = {
         titleAni: null,
         mainScrollAni: null,
+        meritScrollAni: null,
     };
 
     // Intro
@@ -97,42 +99,37 @@ export function createHomeAnimations() {
                 overflow: 'auto',
 
                 onComplete: () => {
+                    const articleWriter = gsap.utils.toArray('.homeComp_merit article.writer ul');
+
                     animations.mainScrollAni = gsap
                         .timeline({
                             scrollTrigger: {
                                 trigger: '.homeComp_main',
                                 start: 'center center',
-                                end: '+=5000',
+                                end: '+=3000',
+                                //end: 'bottom top',
                                 scroller: '.homeComp',
+                                //enter leave enterback leaveback
+                                //toggleActions: 'play none reverse none',
                                 scrub: 1,
-                                markers: true,
+                                //markers: true,
                                 pin: true,
                                 pinSpacing: true,
                             },
                         })
                         .to(booksTop, {
                             yPercent: -100,
-                            //opacity: 0,
+                            opacity: 0,
                             stagger: {
                                 each: 0.1,
                                 from: 'random',
-                            },
-
-                            onComplete: () => {
-                                document.addEventListener('DOMContentLoaded', () => {
-                                    const pinSpacers = document.querySelectorAll('.pin-spacer');
-                                    pinSpacers.forEach((spacer) => {
-                                        spacer.style.backgroundColor = 'red';
-                                        spacer.style.border = '1px solid blue';
-                                    });
-                                });
                             },
                         })
                         .to(
                             booksBottom,
                             {
                                 yPercent: 100,
-                                //opacity: 0,
+                                opacity: 0,
                                 stagger: {
                                     each: 0.1,
                                     from: 'random',
@@ -140,9 +137,6 @@ export function createHomeAnimations() {
                             },
                             '<'
                         )
-                        .to(booksBottom, {
-                            opacity: 0,
-                        })
                         .to(
                             [text_title, text_sub],
                             {
@@ -152,16 +146,35 @@ export function createHomeAnimations() {
                             },
                             '<'
                         );
+
+                    animations.meritScrollAni = gsap
+                        .timeline({
+                            scrollTrigger: {
+                                scroller: '.homeComp',
+                                trigger: '.homeComp_merit .left.writer',
+                                start: 'top center',
+                                end: 'bottom center',
+                                //scrub: true,
+                                markers: true,
+                            },
+                        })
+                        .set(articleWriter, {
+                            x: innerWidth,
+                        })
+                        .to(articleWriter, {
+                            x: 0,
+                        });
                 },
             });
     }
 
+    function initMeritAnimation() {}
+
     //scroll
-    function initMainScrollMotion() {}
 
     return {
         animations,
         initAnimation,
-        initMainScrollMotion,
+        initMeritAnimation,
     };
 }

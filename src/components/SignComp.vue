@@ -245,12 +245,14 @@ export default {
                         {
                             headers: {
                                 'Content-Type': 'multipart/form-data',
+                                withCredentials: true, // 쿠키를 주고받을 수 있게 설정
                             },
                         }
                     );
-                    console.log(response);
                     if (response.data.code === 1) {
                         alert('가입성공!');
+                        console.log(document.cookie); // 쿠키 확인
+                        window.location.href = '/';
                     }
                 } catch (error) {
                     alert(error);

@@ -411,7 +411,7 @@ body {
 
     &_wrap {
         width: min(1300px, 95%);
-        height: 65%;
+        height: 85%;
         //aspect-ratio: 16/9;
         border-radius: 15px;
         background: rgba($color: #dfdfdf, $alpha: 0.8);
