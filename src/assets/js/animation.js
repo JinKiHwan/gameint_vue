@@ -36,6 +36,9 @@ export function createHomeAnimations() {
             .set(homeComp, { overflow: 'hidden' })
             .set(text_DexInt, { yPercent: -200 })
             .set(text_sub_span, { yPercent: -100 })
+            .to(homeCompMain, {
+                height: homeComp.offsetHeight,
+            })
             .to(text_Game, {
                 yPercent: 0,
             })
@@ -83,9 +86,7 @@ export function createHomeAnimations() {
                 },
                 '<'
             )
-            .to(homeCompMain, {
-                height: homeComp.offsetHeight,
-            })
+
             .from(pictureWraps, {
                 duration: 1.5,
                 left: '100%',
