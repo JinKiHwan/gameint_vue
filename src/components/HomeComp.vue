@@ -74,22 +74,23 @@
                     <h3><span>다양한 의견을 나누다</span>Share opinions</h3>
                     <ul>
                         <li>
-                            <img src="https://cdn.pixabay.com/photo/2016/03/31/18/50/angry-1294679_640.png" alt="" />
+                            <img :src="meritShare[0].img" alt="" />
                         </li>
                         <li>
-                            <img src="https://i.namu.wiki/i/HAkoBRVZDjrcAN_piKSCY64WZZpYRGYjsTd9vRB1YeQM6gSgEAGSauMJPF81090jrQ7aPQC8UvepudfYdsiPYAMAhcARCU_ap8S5qNCQY5NwGIOEWWr84Ci2VVabcFRwokat2UV-LYc_4VF2k_rTumKTrKBI2TuToNWF6tdX3Tw.webp" alt="" />
+                            <img :src="meritShare[1].img" alt="" />
                         </li>
                         <li>
-                            <img src="https://www.theartof.com/assets/images/speaker-headshots/large/ChipHeath.jpg" alt="" />
+                            <img :src="meritShare[2].img" alt="" />
                         </li>
                         <li>
-                            <img src="https://i.namu.wiki/i/HAkoBRVZDjrcAN_piKSCY-6nfUIpeRj6fkLGisZD6c4ichJmSztoZD143Q4u655FIivuas1qDq5Q9oN1dpzLBea5BZEahdc-81iujmypt-ywpeUJrScozyEnRcGoQ6lZ3-WDIFYiENTTaJojVUUBTUcBUXIYsTBaE6Jh_PROq3A.jpg" alt="" />
+                            <img :src="meritShare[3].img" alt="" />
                         </li>
                         <li>
-                            <img src="https://www.kyobostory.co.kr/resources/front/images/contents/fs_travel/20191010/img03.png" alt="" />
+                            <img :src="meritShare[0].img" alt="" />
                         </li>
+
                         <li>
-                            <img src="https://i.namu.wiki/i/HAkoBRVZDjrcAN_piKSCY537tZ-XL2gIGBD-bBee89bMcGM33P18poSbjanO3MSPhBFNEDnNSYdNOLKein00xBoL1MBxsSJDwGL6qy9cPNyTq9XEuS0VL7D-h0KNWXLuEeKSlIp_6gXnCd6j7j3MkDYwMqVwJFDebR2DRWcpQko.webp" alt="" />
+                            <img :src="meritShare[1].img" alt="" />
                         </li>
                     </ul>
                 </article>
@@ -175,6 +176,7 @@ export default {
             { img: require('@/assets/img/home/picture20.png') },
         ];
         const meritBg = [{ img: require('@/assets/img/home/merit-bg01.webp') }, { img: require('@/assets/img/home/merit-bg02.webp') }, { img: require('@/assets/img/home/merit-bg03.webp') }];
+        const meritShare = [{ img: require('@/assets/img/home/merit-share01.webp') }, { img: require('@/assets/img/home/merit-share02.webp') }, { img: require('@/assets/img/home/merit-share03.webp') }, { img: require('@/assets/img/home/merit-share04.webp') }];
         const meritExpansion = [{ img: require('@/assets/img/home/merit-expansion01.webp') }, { img: require('@/assets/img/home/merit-expansion02.webp') }, { img: require('@/assets/img/home/merit-expansion03.webp') }, { img: require('@/assets/img/home/merit-expansion04.webp') }];
         const contactImg = require('@/assets/img/home/contact.webp');
 
@@ -201,6 +203,7 @@ export default {
             bg,
             meritBg,
             meritExpansion,
+            meritShare,
             contactImg,
         };
     },
@@ -451,6 +454,7 @@ export default {
         margin-bottom: 50px;
         border-bottom-left-radius: 120px;
         border-bottom-right-radius: 120px;
+        box-shadow: 0 10px 0 rgba($color: #000000, $alpha: 1);
 
         &_inner {
             width: 95%;

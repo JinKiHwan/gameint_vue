@@ -177,6 +177,7 @@ export function createHomeAnimations() {
 
                         .to(meritArticleUl, {
                             xPercent: gsap.utils.wrap([-50, 50]),
+                            ease: 'none',
                         });
 
                     meritArticle.forEach((article, index) => {
