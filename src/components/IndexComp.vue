@@ -129,12 +129,12 @@ export default {
         const wifi = ref(require('@/assets/img/wifi.svg'));
         const browserRef = ref(null);
         const isFullScreen = ref(false);
-        const browserStatus = ref(true);
+        const browserStatus = ref(false);
         const currentTime = ref(new Date());
 
         let timer;
         const menuStatus = reactive({
-            home: true,
+            home: false,
             monthly: false,
             favorite: false,
             history: false,
@@ -419,6 +419,7 @@ body {
         overflow: hidden;
         box-shadow: 0 0 10px rgba($color: #000000, $alpha: 0.5);
         transition: all 0.5s;
+
         .header {
             width: 100%;
             height: 35px;
@@ -432,6 +433,23 @@ body {
         width: 100%;
         height: calc(100% - 35px);
         //overflow: auto;
+
+        > div {
+            &::-webkit-scrollbar {
+                width: 8px; /* 스크롤바의 너비 */
+            }
+
+            &::-webkit-scrollbar-thumb {
+                height: 30%; /* 스크롤바의 길이 */
+                background: #3081f3; /* 스크롤바의 색상 */
+
+                border-radius: 10px;
+            }
+
+            &::-webkit-scrollbar-track {
+                background: rgba(33, 122, 244, 0.1); /*스크롤바 뒷 배경 색상*/
+            }
+        }
     }
 }
 

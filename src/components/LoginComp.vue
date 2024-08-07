@@ -44,7 +44,7 @@
                 </div>
 
                 <p>
-                    반갑습니다 <span>{{ userName }}</span> 님!
+                    반갑습니다 <span>{{ userId }}</span> 님!
                 </p>
 
                 <div class="popupLayout_mypage_btn">
@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
 export default {
@@ -117,10 +117,30 @@ export default {
         const userId = ref('');
         const password = ref('');
 
-        // const checkLoginStatus = () => {
-        //     /* 로그인 상태 체크 */
-        //     isLogin.value = false;
-        // };
+        const checkLoginStatus = async () => {
+            const cookies = document.cookie.split(',');
+            const memberCookie = cookies.find((cookie) => cookie.trim().startsWith('member='));
+
+            console.log(memberCookie, '123');
+
+            if (memberCookie) {
+                isLogin.value = true;
+                try {
+                    // 서버에 쿠키 유효성 검증 요청
+                    const response = await axios.get('http://localhost:3000/api/member/sign-in', {
+                        withCredentials: true,
+                    });
+
+                    if (response.data.code === 1) {
+                        isLogin.value = true;
+                        userName.value = response.data.name;
+                        imageSrc.value = response.data.profileImage || 'https://common-cdn-api.joycityglobal.com/community/gw/resources/images/content/left_menu/default-profile-after-login.png?v=231029';
+                    }
+                } catch (error) {
+                    console.error('로그인 상태 확인 중 오류:', error);
+                }
+            }
+        };
 
         const handleLogin = async () => {
             if (!isIdValid.value || !isPasswordValid.value) {
@@ -144,6 +164,7 @@ export default {
                     if (response.data.code === 1) {
                         alert('로그인 성공!');
                         isLogin.value = true; // 로그인 상태 업데이트
+                        imageSrc.value = response.data.profileImage || 'https://common-cdn-api.joycityglobal.com/community/gw/resources/images/content/left_menu/default-profile-after-login.png?v=231029';
                         console.log(document.cookie); // 쿠키 확인
                     } else {
                         alert('로그인 실패: ' + response.data.message);
@@ -160,6 +181,10 @@ export default {
         //     userName.value = '김기현';
         // });
 
+        onMounted(() => {
+            checkLoginStatus();
+        });
+
         return {
             isLogin,
             imageSrc,
@@ -170,6 +195,7 @@ export default {
             isPasswordValid,
             userId,
             password,
+            checkLoginStatus,
         };
     },
 };

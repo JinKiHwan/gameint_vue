@@ -8,6 +8,8 @@ export function createHomeAnimations() {
         titleAni: null,
         mainScrollAni: null,
         meritScrollAni: null,
+        meritTitleAni: null,
+        contactAni: null,
     };
 
     // Intro
@@ -22,6 +24,23 @@ export function createHomeAnimations() {
         const pictureWraps = gsap.utils.toArray('.homeComp_main_picture ul li');
         const booksTop = gsap.utils.toArray('.homeComp_main_picture.top ul li');
         const booksBottom = gsap.utils.toArray('.homeComp_main_picture.bottom ul li');
+        const meritArticle = gsap.utils.toArray('.homeComp_merit article');
+        const meritArticleUl = gsap.utils.toArray('.homeComp_merit article ul');
+        const meritArticleTitle = gsap.utils.toArray('.homeComp_merit article h3');
+        const meritArticleBg = gsap.utils.toArray('.homeComp_merit_bg img');
+        const contactImg = document.querySelector('.homeComp_contact figure img');
+        const contactBtn = document.querySelector('.homeComp_contact_telegram a');
+
+        gsap.set(meritArticleTitle, {
+            opacity: 0,
+        });
+        gsap.set(meritArticleBg, {
+            opacity: 0,
+            x: gsap.utils.wrap([50, -50]),
+        });
+        gsap.set(contactBtn, {
+            scale: 0,
+        });
 
         animations.titleAni = gsap
             .timeline({
@@ -94,13 +113,13 @@ export function createHomeAnimations() {
                 left: '100%',
                 top: 0,
                 opacity: 1,
-            })
-            .to(homeComp, {
-                overflow: 'auto',
 
                 onComplete: () => {
-                    const articleWriter = gsap.utils.toArray('.homeComp_merit article.writer ul');
+                    gsap.to(homeComp, {
+                        overflow: 'auto',
+                    });
 
+                    /* 메인 스크롤 애니메이션 */
                     animations.mainScrollAni = gsap
                         .timeline({
                             scrollTrigger: {
@@ -137,44 +156,92 @@ export function createHomeAnimations() {
                             },
                             '<'
                         )
-                        .to(
-                            [text_title, text_sub],
-                            {
-                                scale: 1.5,
-                                filter: 'blur(10px)',
-                                opacity: 0,
-                            },
-                            '<'
-                        );
+                        .to([text_title, text_sub], {
+                            scale: 1.5,
+                            filter: 'blur(10px)',
+                            opacity: 0,
+                        });
 
+                    /* 메리트 영역 애니메이션 */
                     animations.meritScrollAni = gsap
                         .timeline({
                             scrollTrigger: {
                                 scroller: '.homeComp',
-                                trigger: '.homeComp_merit .left.writer',
+                                trigger: '.homeComp_merit',
                                 start: 'top center',
                                 end: 'bottom center',
-                                //scrub: true,
-                                markers: true,
+                                scrub: 1,
+                                //markers: true,
                             },
                         })
-                        .set(articleWriter, {
-                            x: innerWidth,
+
+                        .to(meritArticleUl, {
+                            xPercent: gsap.utils.wrap([-50, 50]),
+                        });
+
+                    meritArticle.forEach((article, index) => {
+                        console.log(article, index);
+                        console.log(meritArticleTitle);
+                        animations.meritTitleAni = gsap
+                            .timeline({
+                                scrollTrigger: {
+                                    scroller: '.homeComp',
+                                    trigger: article,
+                                    start: 'top 80%',
+                                    end: 'top center',
+                                },
+                                defaults: {
+                                    ease: 'back(3)',
+                                },
+                            })
+                            .to(meritArticleTitle[index], {
+                                opacity: 1,
+                            })
+                            .to(
+                                meritArticleBg[index],
+                                {
+                                    opacity: 1,
+                                    x: 0,
+                                },
+                                '<'
+                            );
+                    });
+
+                    /* 컨텍트 영역 애니메이션 */
+                    animations.contactAni = gsap
+                        .timeline({
+                            scrollTrigger: {
+                                trigger: '.homeComp_contact',
+                                scroller: '.homeComp',
+                                start: 'top center',
+                                end: 'top center',
+                                //markers: true,
+                            },
                         })
-                        .to(articleWriter, {
-                            x: 0,
+                        .to(contactImg, {
+                            duration: 1,
+                            rotateY: 180,
+                        })
+                        .to(
+                            contactBtn,
+                            {
+                                duration: 0.5,
+                                scale: 1,
+                                ease: 'back(3)',
+                            },
+                            '<'
+                        )
+                        .to(contactImg, {
+                            x: 100,
                         });
                 },
             });
     }
-
-    function initMeritAnimation() {}
 
     //scroll
 
     return {
         animations,
         initAnimation,
-        initMeritAnimation,
     };
 }

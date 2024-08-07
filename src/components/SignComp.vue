@@ -72,7 +72,7 @@
 
         <div class="popupLayout_inner">
             <div class="popupLayout_sign">
-                <h2>회원가입z</h2>
+                <h2>회원가입</h2>
 
                 <div class="popupLayout_sign_profile">
                     <figure>
@@ -161,9 +161,9 @@ export default {
         const passwordError = ref('');
         const passwordConfirm = ref('');
         const isPasswordValid = ref(false); //유효성 통과 상태체크
-
         const username = ref('');
         const telegram = ref('');
+        const profileImageFile = ref(null);
         /* //변수 모음 */
 
         /* 아이디 유효성 검사 */
@@ -218,22 +218,49 @@ export default {
             }
         };
 
+        const handleFileChange = (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                // MIME 타입 검사
+                const validTypes = ['image/png', 'image/webp', 'image/jpeg'];
+                if (!validTypes.includes(file.type)) {
+                    alert('올바른 파일 형식을 선택해주세요 (png, webp, jpg, jpeg)');
+                    event.target.value = ''; // 선택된 파일을 지웁니다
+                    return;
+                }
+
+                // 파일 크기 검사 (3MB 제한)
+                const maxSize = 3 * 1024 * 1024; // 3MB
+                if (file.size > maxSize) {
+                    alert('파일 크기가 너무 큽니다. 최대 3MB까지 업로드할 수 있습니다.');
+                    event.target.value = ''; // 선택된 파일을 지웁니다
+                    return;
+                }
+
+                profileImageFile.value = file;
+
+                // 파일을 읽기 위한 FileReader 객체 생성
+                const reader = new FileReader();
+
+                // 파일이 성공적으로 읽힌 경우
+                reader.onload = (e) => {
+                    profileImg.value = e.target.result; // 선택된 파일을 이미지로 업데이트
+                };
+
+                // 파일을 읽기 시작
+                reader.readAsDataURL(file);
+                ``;
+                console.log(profileImageFile.value);
+            }
+        };
+
         /* 회원가입 버튼 */
-        // const handleSignup = () => {
-        //     console.log(isIdValid.value, isPasswordValid.value);
-
-        //     if (!isIdValid.value || !isPasswordValid.value) {
-        //         alert('입력폼 다시 확인 해주세요');
-        //     } else {
-        //         alert('가입성공!');
-        //     }
-        // };
-
         const handleSignup = async () => {
             if (!isIdValid.value || !isPasswordValid.value) {
                 alert('입력폼을 다시 확인해 주세요');
             } else {
                 try {
+                    //alert(response.data);
                     const response = await axios.post(
                         'http://localhost:3000/api/member/create',
                         {
@@ -241,12 +268,13 @@ export default {
                             account: userId.value,
                             password: password.value,
                             telegram: telegram.value,
+                            profileImage: 'qwer',
                         },
                         {
                             headers: {
                                 'Content-Type': 'multipart/form-data',
-                                withCredentials: true, // 쿠키를 주고받을 수 있게 설정
                             },
+                            withCredentials: true,
                         }
                     );
                     if (response.data.code === 1) {
@@ -288,45 +316,9 @@ export default {
             validateId,
             validatePw,
             handleSignup,
+            handleFileChange,
+            profileImageFile,
         };
-    },
-
-    methods: {
-        //파일 설정 및 용량 제한
-        handleFileChange(event) {
-            const file = event.target.files[0];
-            if (file) {
-                // MIME 타입 검사
-                const validTypes = ['image/png', 'image/webp', 'image/jpeg'];
-                if (!validTypes.includes(file.type)) {
-                    alert('올바른 파일 형식을 선택해주세요 (png, webp, jpg, jpeg)');
-                    event.target.value = ''; // 선택된 파일을 지웁니다
-                    return;
-                }
-
-                // 파일 크기 검사 (5MB 제한 예시)
-                const maxSize = 3 * 1024 * 1024; // 3MB
-                if (file.size > maxSize) {
-                    alert('파일 크기가 너무 큽니다. 최대 3MB까지 업로드할 수 있습니다.');
-                    event.target.value = ''; // 선택된 파일을 지웁니다
-                    return;
-                }
-
-                // 파일을 읽기 위한 FileReader 객체 생성
-                const reader = new FileReader();
-
-                // 파일이 성공적으로 읽힌 경우
-                reader.onload = (e) => {
-                    this.profileImg = e.target.result; // 선택된 파일을 이미지로 업데이트
-                };
-
-                // 파일을 읽기 시작
-                reader.readAsDataURL(file);
-
-                // 파일 처리 로직
-                console.log('선택된 파일:', file);
-            }
-        },
     },
 };
 </script>

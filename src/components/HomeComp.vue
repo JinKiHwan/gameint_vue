@@ -41,7 +41,10 @@
             </div>
 
             <div class="homeComp_merit">
-                <article class="left writer">
+                <article class="left">
+                    <figure class="homeComp_merit_bg">
+                        <img :src="meritBg[0].img" alt="" />
+                    </figure>
                     <h3>Meet writers <span>여러 작가를 만나다</span></h3>
                     <ul>
                         <li>
@@ -65,10 +68,13 @@
                     </ul>
                 </article>
                 <article class="right">
+                    <figure class="homeComp_merit_bg">
+                        <img :src="meritBg[1].img" alt="" />
+                    </figure>
                     <h3><span>다양한 의견을 나누다</span>Share opinions</h3>
                     <ul>
                         <li>
-                            <img src="https://image.ajunews.com/content/image/2021/12/01/20211201155123634014.jpg" alt="" />
+                            <img src="https://cdn.pixabay.com/photo/2016/03/31/18/50/angry-1294679_640.png" alt="" />
                         </li>
                         <li>
                             <img src="https://i.namu.wiki/i/HAkoBRVZDjrcAN_piKSCY64WZZpYRGYjsTd9vRB1YeQM6gSgEAGSauMJPF81090jrQ7aPQC8UvepudfYdsiPYAMAhcARCU_ap8S5qNCQY5NwGIOEWWr84Ci2VVabcFRwokat2UV-LYc_4VF2k_rTumKTrKBI2TuToNWF6tdX3Tw.webp" alt="" />
@@ -88,28 +94,44 @@
                     </ul>
                 </article>
                 <article class="left">
-                    <h3>Meet writers <span>여러 작가를 만나다</span></h3>
+                    <figure class="homeComp_merit_bg">
+                        <img :src="meritBg[2].img" alt="" />
+                    </figure>
+                    <h3>Expansion <span>생각을 확장하다</span></h3>
                     <ul>
                         <li>
-                            <img src="https://image.ajunews.com/content/image/2021/12/01/20211201155123634014.jpg" alt="" />
+                            <img :src="meritExpansion[1].img" alt="" />
                         </li>
                         <li>
-                            <img src="https://i.namu.wiki/i/HAkoBRVZDjrcAN_piKSCY64WZZpYRGYjsTd9vRB1YeQM6gSgEAGSauMJPF81090jrQ7aPQC8UvepudfYdsiPYAMAhcARCU_ap8S5qNCQY5NwGIOEWWr84Ci2VVabcFRwokat2UV-LYc_4VF2k_rTumKTrKBI2TuToNWF6tdX3Tw.webp" alt="" />
+                            <img :src="meritExpansion[0].img" alt="" />
                         </li>
                         <li>
-                            <img src="https://www.theartof.com/assets/images/speaker-headshots/large/ChipHeath.jpg" alt="" />
+                            <img :src="meritExpansion[1].img" alt="" />
                         </li>
                         <li>
-                            <img src="https://i.namu.wiki/i/HAkoBRVZDjrcAN_piKSCY-6nfUIpeRj6fkLGisZD6c4ichJmSztoZD143Q4u655FIivuas1qDq5Q9oN1dpzLBea5BZEahdc-81iujmypt-ywpeUJrScozyEnRcGoQ6lZ3-WDIFYiENTTaJojVUUBTUcBUXIYsTBaE6Jh_PROq3A.jpg" alt="" />
+                            <img :src="meritExpansion[2].img" alt="" />
                         </li>
                         <li>
-                            <img src="https://www.kyobostory.co.kr/resources/front/images/contents/fs_travel/20191010/img03.png" alt="" />
+                            <img :src="meritExpansion[3].img" alt="" />
                         </li>
+
                         <li>
-                            <img src="https://i.namu.wiki/i/HAkoBRVZDjrcAN_piKSCY537tZ-XL2gIGBD-bBee89bMcGM33P18poSbjanO3MSPhBFNEDnNSYdNOLKein00xBoL1MBxsSJDwGL6qy9cPNyTq9XEuS0VL7D-h0KNWXLuEeKSlIp_6gXnCd6j7j3MkDYwMqVwJFDebR2DRWcpQko.webp" alt="" />
+                            <img :src="meritExpansion[0].img" alt="" />
                         </li>
                     </ul>
                 </article>
+            </div>
+
+            <div class="homeComp_contact">
+                <div class="homeComp_contact_inner">
+                    <figure>
+                        <img :src="contactImg" alt="" />
+                    </figure>
+
+                    <div class="homeComp_contact_telegram">
+                        <a href="https://t.me/aps565" target="_blank">With Us!</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -127,7 +149,7 @@ export default {
     setup() {
         const oilpastelImg = require('@/assets/img/oilpastel.webp');
         const bigTitle = ref(null);
-        const { animations, initAnimation, initMeritAnimation } = createHomeAnimations();
+        const { animations, initAnimation } = createHomeAnimations();
         const telegramLogo = require('@/assets/img/telegram.svg');
         const bg = require('@/assets/img/home/library.mp4');
         const picture = [
@@ -152,10 +174,12 @@ export default {
             { img: require('@/assets/img/home/picture19.png') },
             { img: require('@/assets/img/home/picture20.png') },
         ];
+        const meritBg = [{ img: require('@/assets/img/home/merit-bg01.webp') }, { img: require('@/assets/img/home/merit-bg02.webp') }, { img: require('@/assets/img/home/merit-bg03.webp') }];
+        const meritExpansion = [{ img: require('@/assets/img/home/merit-expansion01.webp') }, { img: require('@/assets/img/home/merit-expansion02.webp') }, { img: require('@/assets/img/home/merit-expansion03.webp') }, { img: require('@/assets/img/home/merit-expansion04.webp') }];
+        const contactImg = require('@/assets/img/home/contact.webp');
 
         onMounted(() => {
             initAnimation();
-            initMeritAnimation();
         });
         onBeforeUnmount(() => {
             // 모든 GSAP 애니메이션 정리
@@ -175,6 +199,9 @@ export default {
             telegramLogo,
             picture,
             bg,
+            meritBg,
+            meritExpansion,
+            contactImg,
         };
     },
 };
@@ -343,13 +370,36 @@ export default {
         width: 100%;
         //height: 100vh;
 
+        &_bg {
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: -1;
+            max-width: 50%;
+            height: 70%;
+            transform: translateY(-50%);
+
+            img {
+                height: 100%;
+                object-fit: contain;
+            }
+        }
+
         article {
             height: auto;
             width: 95%;
             margin: 0 auto;
-            margin-bottom: 3vw;
+            margin-bottom: 10vw;
+            position: relative;
+            z-index: 2;
 
             &.right {
+                z-index: 1;
+                .homeComp_merit_bg {
+                    right: auto;
+                    left: 0;
+                }
+
                 h3 {
                     text-align: right;
 
@@ -379,6 +429,8 @@ export default {
                 li {
                     width: min(600px, 25vw);
                     aspect-ratio: 1/1;
+                    background: #fff;
+                    border: 1px solid #000;
                     //box-shadow: 10px 10px 0 rgba($color: #000000, $alpha: 1);
                     img {
                         width: 100%;
@@ -386,6 +438,57 @@ export default {
                         object-fit: cover;
                         filter: grayscale(1);
                     }
+                }
+            }
+        }
+    }
+
+    &_contact {
+        width: 100%;
+        //aspect-ratio: 16/9;
+        padding-bottom: 150px;
+        border-bottom: 1px solid #000;
+        margin-bottom: 50px;
+        border-bottom-left-radius: 120px;
+        border-bottom-right-radius: 120px;
+
+        &_inner {
+            width: 95%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+
+            figure {
+                width: 35%;
+                perspective: 1000px;
+            }
+        }
+
+        &_telegram {
+            width: 25%;
+            aspect-ratio: 1/1;
+            transition: transform 0.3s;
+            a {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background: #000;
+                border-radius: 50%;
+                color: #fff;
+                //transition: all 0.3s;
+            }
+
+            &:hover {
+                transform: translateY(-15px);
+
+                a {
+                    color: #000;
+                    background: #fff;
+                    border: 1px solid #000;
+                    box-shadow: 0 5px 15px rgba($color: #000000, $alpha: 0.3);
                 }
             }
         }
