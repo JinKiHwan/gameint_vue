@@ -60,22 +60,27 @@
                         <ul>
                             <li>
                                 <label for="book_name">책 제목</label>
-                                <input type="text" v-model="bookTitle" placeholder="책 제목을 작성 해주세요.">
+                                <input type="text" v-model.trim="bookTitle" placeholder="책 제목을 작성 해주세요.">
                             </li>
                             <li>
                                 <label for="book_pub">출판사</label>
-                                <input type="email" v-model="bookPub" placeholder="출판사를 작성 해주세요.">
+                                <input type="email" v-model.trim="bookPub" placeholder="출판사를 작성 해주세요.">
+                            </li>
+                            <li>
+                                <label for="book_pub">작가</label>
+                                <input type="email" v-model.trim="author" placeholder="작가명을 작성 해주세요.">
                             </li>
                             <li>
                                 <label for="book_cate">카테고리</label>
-                                <input type="text" v-model="bookCate" placeholder="카테고리를 작성 해주세요.">
+                                <input type="text" v-model.trim="bookCate" placeholder="카테고리를 작성 해주세요.">
                             </li>
                             <li class="hc">
                                 <label for="message">추천 이유</label>
                                 <div class="editerArea">
-                                    <QuillEditor v-model="bookContent"  ref="quillEditor" :options="editorOption"/>
-                                    <div v-if="false" id="preview" class="content ql-editor" v-html="content"></div>
+                                    <QuillEditor v-model:content="bookContent" ref="quillEditor" :options="editorOption"/>
+                                    
                                 </div>
+                                <textarea v-if="false" id="preview" v-html="bookContent"></textarea>
                             </li>
                             <li>
                                 <label for="book_img">책 이미지</label>
@@ -154,14 +159,14 @@
                                             <div contenteditable="true" class="textarea" autofocus spellcheck="false" v-html="review.userReview">
                                                 
                                             </div>
-                                            <button type="button" @click="actComment('edit')">
+                                            <button type="button" @click.once="actComment('edit')">
                                                 등록
                                             </button>
                                         </div>
                                     </div>
                                     <div v-if="true" class="writer_util">
-                                        <button type="button" @click="editComment('edit')">수정</button>
-                                        <span>|</span><button type="button" @click="editComment('del')">삭제</button>
+                                        <button type="button" @click.once="editComment('edit')">수정</button>
+                                        <span>|</span><button type="button" @click.once="editComment('del')">삭제</button>
                                     </div>
                                 </li>
                             </ul>
@@ -178,19 +183,19 @@
         <!-- [s] 버튼 영역 -->
         <div v-if="isFavoriteBookStatus != 2" class="btRightBtn">
             <div v-if="isFavoriteBookStatus === 0" >
-                <button type="button"  @click="changeFavoriteType(1)" class="cool-button btn-blue" >
+                <button type="button"  @click.once="changeFavoriteType(1)" class="cool-button btn-blue" >
                     <span >
                         글쓰기
                     </span>
                 </button>
             </div>
             <div v-else>
-                <button  type="submit" class="cool-button btn-blue" @click="changeFavoriteType(0)">
+                <button  type="submit" class="cool-button btn-blue" @click.once="actFavoriteWrite()">
                     <span>
                         {{chWriteBtnTxt}}
                     </span>
                 </button>
-                <button type="button" class="cool-button btn-black" @click="changeFavoriteType(0)">
+                <button type="button" class="cool-button btn-black" @click.once="changeFavoriteType(0)">
                     <span>
                         취소
                     </span>
@@ -208,6 +213,7 @@
 import { ref, reactive, computed } from 'vue';
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
+import axios from 'axios';
 
 export default {
     name: 'FavoriteBookComp',
@@ -223,8 +229,10 @@ export default {
         const bookPub = ref('');
         const bookCate = ref('');
         const bookContent = ref('');
+        const author = ref('');
         const fileName = ref(null);
         const previewImage = ref(null);
+        const previewImageFile = ref(null);
         const editorOption = {
             modules: {
                 toolbar: [
@@ -236,6 +244,7 @@ export default {
             },
             placeholder: "추천 이유를 작성 해주세요."
         }
+        const quillEditor = ref(null); // QuillEditor 인스턴스 참조
         const favoriteBook = ref(require('@/assets/img/book01.webp'));
 
         let isFavoriteBookList = ref([]);
@@ -269,8 +278,20 @@ export default {
         ///////////////////////////////////////////
         // 추천 책 리스트
         ///////////////////////////////////////////
-        // 북 리스트 Array
-        let bookList = reactive([
+        const initRecomBookList = async () => {
+            const url = 'http://localhost:3000/api/book/monthly/recommend/list'
+            try {
+                const response = await axios.get(url);
+                console.log(response);
+
+            } catch (error) {
+                alert(error);
+            }
+            
+        };
+
+        // 데이터 매핑
+        isFavoriteBookList = reactive([
             {
                 img: require('@/assets/img/favorite/book28.webp'),
                 title: (bookName.value = '제일 긴 책제목은 과연 몇자일까요오오오오오'),
@@ -392,16 +413,17 @@ export default {
                 isHovered: false,
             },
         ])
-        
-        // 데이터 매핑
-        isFavoriteBookList = bookList;
+
+        if (isFavoriteBookStatus.value === 0) {
+            initRecomBookList();
+        }
 
         // 추천 책 설정 창 on/off
         const doMouseOver = (index) => {
-            bookList[index].isHovered = true;
+            isFavoriteBookList[index].isHovered = true;
         };
         const doMouseLeave = (index) => {
-            bookList[index].isHovered = false;
+            isFavoriteBookList[index].isHovered = false;
         };
 
         // 추천 책 리스트/작성,수정 전환
@@ -424,7 +446,6 @@ export default {
             index = index + 1;
             alert('[' + info.title + '] 가(이)\n당선이오  (해당 리스트에 ' + index + '번 책)')
         };
-
         ///////////////////////////////////////////
         // 추천 책 글쓰기
         ///////////////////////////////////////////
@@ -459,12 +480,54 @@ export default {
 
         const handleFileUpload = (event) => {
             const files = event.target.files;
+            previewImageFile.value = event.target.files[0];
             if (files.length > 0) {
                 uploadImg(files);
             } else {
                 emptyImg.value = true; // 이미지가 업로드되었으므로 emptyImg를 false로 설정
             }
         };
+        const logFormData = (formData) => {
+            for (const pair of formData.entries()) {
+            console.log(pair[0]+ ': ' + pair[1]);
+            }
+        };
+        const actFavoriteWrite = async () => {
+            if (bookTitle.value == '' || bookPub.value == '' || bookCate.value == '' || author.value == '') {
+                alert('빈 입력 폼을 작성해 주세요.')
+            } else if (bookContent.value == '') {
+                alert('추천 이유를 작성 해주세요.')
+            } else if (previewImageFile.value == null) {
+                alert('책 이미지를 첨부 해주세요.')
+            } else {
+
+                const jsonPayload = {
+                    bookImage: previewImageFile.value,
+                    bookTitle: bookTitle.value,
+                    publisher: bookPub.value,
+                    category: bookCate.value,
+                    recommendReason: quillEditor.value.getHTML(),
+                    author: author.value,
+                };
+
+                const formData = new FormData();
+                formData.append('json', JSON.stringify(jsonPayload)); // JSON 데이터를 문자열로 추가
+                logFormData(formData)
+                try {
+                    const response = await axios.post(
+                        'http://localhost:3000/api/book/monthly/recommend/create', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    });
+                    console.log('Upload successful:', response.data);
+                    //changeFavoriteType(0);
+                } catch (error) {
+                    console.error('Error uploading file:', error);
+                }
+            }
+        }
+        
 
         ///////////////////////////////////////////
         // 추천 책 글보기
@@ -554,11 +617,15 @@ export default {
             bookPub,
             bookCate,
             bookContent,
+            author,
             fileName,
             previewImage,
+            previewImageFile,
             editorOption,
             writerView,
             userReviewWraps,
+            quillEditor,
+            initRecomBookList,
             doMouseOver,
             doMouseLeave,
             changeFavoriteType,   
@@ -569,6 +636,8 @@ export default {
             editComment,
             actComment,
             selBook,
+            actFavoriteWrite,
+            
         };
     },
     components: {
@@ -1044,7 +1113,7 @@ export default {
         }
 
         .writerCommentArea{
-            height: 35%;
+            height: calc(100% - 400px);
             overflow-y: auto;
             .comment {
                 display: grid;
