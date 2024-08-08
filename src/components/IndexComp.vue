@@ -42,25 +42,25 @@
                 </a>
             </li>
             <li class="mybooks">
-                <router-link to="/">
+                <a href="javascript:void(0)" @click="preparingForService()">
                     <figure>
                         <img :src="mybooks" alt="" />
                     </figure>
-                </router-link>
+                </a>
             </li>
             <li class="bookreviews">
-                <router-link to="/">
+                <a href="javascript:void(0)" @click="preparingForService()">
                     <figure>
                         <img :src="bookreviews" alt="" />
                     </figure>
-                </router-link>
+                </a>
             </li>
             <li class="place">
-                <router-link to="/">
+                <a href="javascript:void(0)" @click="preparingForService()">
                     <figure>
                         <img :src="place" alt="" />
                     </figure>
-                </router-link>
+                </a>
             </li>
             <li class="mypage" @click="popupOpen()">
                 <a href="javascript:void(0)">
@@ -207,6 +207,10 @@ export default {
             }
         };
 
+        const preparingForService = () => {
+            alert('준비중입니다.');
+        };
+
         return {
             home,
             bookreviews,
@@ -229,6 +233,7 @@ export default {
             signal,
             wifi,
             isFullScreen,
+            preparingForService,
         };
     },
 

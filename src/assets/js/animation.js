@@ -125,12 +125,12 @@ export function createHomeAnimations() {
                             scrollTrigger: {
                                 trigger: '.homeComp_main',
                                 start: 'center center',
-                                end: '+=3000',
+                                end: '+=1000',
                                 //end: 'bottom top',
                                 scroller: '.homeComp',
                                 //enter leave enterback leaveback
                                 //toggleActions: 'play none reverse none',
-                                scrub: 1,
+                                scrub: true,
                                 //markers: true,
                                 pin: true,
                                 pinSpacing: true,

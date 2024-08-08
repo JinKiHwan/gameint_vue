@@ -130,7 +130,7 @@
                     </figure>
 
                     <div class="homeComp_contact_telegram">
-                        <a href="https://t.me/aps565" target="_blank">With Us!</a>
+                        <a href="https://t.me/aps565" target="_blank">Let's Talk!</a>
                     </div>
                 </div>
             </div>
