@@ -11,7 +11,8 @@ export default {
 <style lang="scss">
 body {
     margin: 0;
-    background: url('/src/assets/img/bg.png') no-repeat 100% 100% / cover;
+    background: url('/src/assets/img/bg.webp') no-repeat 100% 100% / cover;
+    background-position: center center;
     #app {
         height: 100vh;
     }
