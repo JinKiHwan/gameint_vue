@@ -251,6 +251,11 @@ export default {
                 color: #fff;
                 font-family: 'Bodoni Moda', serif;
 
+                @include mobile {
+                    font-size: 10vw;
+                    height: 10vw;
+                }
+
                 i {
                     //margin-left: 10px;
                     text-align: center;
@@ -258,10 +263,17 @@ export default {
             }
             p {
                 font-size: 1.5vw;
-                height: 1.5vw;
+                height: 2vw;
                 padding-right: 1.5vw;
                 color: #fff;
                 overflow: hidden;
+                line-height: 1.5;
+
+                @include mobile {
+                    font-size: 4vw;
+                    height: 6vw;
+                }
+
                 span {
                     display: block;
                 }
@@ -277,6 +289,10 @@ export default {
             transform: translateX(-50%);
             pointer-events: none;
 
+            @include mobile {
+                aspect-ratio: 1920 / 900;
+            }
+
             ul {
                 width: 100%;
                 height: 100%;
@@ -287,6 +303,10 @@ export default {
                     position: absolute;
                     top: 0;
                     left: 100%;
+                    @include mobile {
+                        width: 45%;
+                    }
+
                     img {
                         width: 100%;
                         object-fit: cover;
@@ -422,8 +442,18 @@ export default {
                 -webkit-text-stroke: 1px #000;
                 font-family: 'Bodoni Moda', serif;
                 margin-bottom: 1vw;
+
+                @include mobile {
+                    font-size: 8vw;
+                    margin-bottom: 2vw;
+                }
+
                 span {
                     font-size: 1vw;
+
+                    @include mobile {
+                        font-size: 2.5vw;
+                    }
                 }
             }
             ul {
@@ -435,6 +465,11 @@ export default {
                     background: #fff;
                     border: 1px solid #000;
                     //box-shadow: 10px 10px 0 rgba($color: #000000, $alpha: 1);
+
+                    @include mobile {
+                        aspect-ratio: 3/4;
+                    }
+
                     img {
                         width: 100%;
                         height: 100%;
@@ -456,6 +491,13 @@ export default {
         border-bottom-right-radius: 120px;
         box-shadow: 0 10px 0 rgba($color: #000000, $alpha: 1);
 
+        @include mobile {
+            border-bottom-left-radius: 25px;
+            border-bottom-right-radius: 25px;
+            aspect-ratio: 1/1;
+            padding-bottom: 30px;
+        }
+
         &_inner {
             width: 95%;
             margin: 0 auto;
@@ -463,9 +505,18 @@ export default {
             justify-content: space-around;
             align-items: center;
 
+            @include mobile {
+                height: 100%;
+                justify-content: space-evenly;
+            }
+
             figure {
                 width: 35%;
                 perspective: 1000px;
+
+                @include mobile {
+                    width: 55%;
+                }
             }
         }
 

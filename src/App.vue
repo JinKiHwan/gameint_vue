@@ -23,6 +23,11 @@ body {
     gap: 0.5vw;
     margin-left: 1vw;
 
+    @include mobile() {
+        gap: 2vw !important;
+        margin-left: 2vw !important;
+    }
+
     li {
         border-radius: 50%;
         overflow: hidden;
@@ -43,6 +48,56 @@ body {
         }
         &.green {
             background: greenyellow;
+        }
+    }
+}
+
+$desktop: 1560px;
+$labtop: 1300px;
+$tablet: 1024px;
+$mobile: 750px;
+$mobile-mini: 450px;
+
+@mixin desktop {
+    @media screen and (max-width: #{$desktop}) {
+        @content;
+    }
+}
+
+@mixin labtop {
+    @media screen and (max-width: #{$labtop}) {
+        @content;
+    }
+}
+
+@mixin tablet {
+    @media screen and (min-width: #{$mobile}) and (max-width: 1024px) {
+        @content;
+    }
+}
+
+@mixin mobile {
+    @media screen and (max-width: 1024px) {
+        @content;
+    }
+}
+
+@mixin mobile-mini {
+    @media screen and (max-width: #{$mobile-mini}) {
+        @content;
+    }
+}
+
+@mixin custom($width) {
+    @media screen and (max-width: #{$width}) {
+        @content;
+    }
+}
+
+@mixin hover {
+    @media (hover: hover) and (pointer: fine) {
+        &:hover {
+            @content;
         }
     }
 }

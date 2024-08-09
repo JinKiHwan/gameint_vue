@@ -257,9 +257,18 @@ body {
     align-items: center;
     pointer-events: none;
 
+    @include mobile {
+        padding: 1vw 3vw !important;
+        height: auto !important;
+    }
+
     .current_time {
         color: #fff;
         font-weight: 500;
+
+        @include mobile {
+            font-size: 3vw;
+        }
     }
 
     .widgets {
@@ -269,6 +278,20 @@ body {
             align-items: center;
             gap: 5px;
             color: #fff;
+
+            @include mobile {
+                font-size: 3vw;
+                gap: 1vw !important;
+
+                li {
+                    height: 3vw;
+
+                    img {
+                        height: 100%;
+                        object-fit: contain;
+                    }
+                }
+            }
         }
     }
 }
@@ -280,10 +303,19 @@ body {
     align-items: center;
     justify-content: center;
 
+    @include mobile {
+        padding-top: 15vw;
+        align-items: flex-start !important;
+    }
+
     ul {
         width: min(550px, 45%);
         display: flex;
         flex-wrap: wrap;
+
+        @include mobile {
+            width: min(90%, 100%) !important;
+        }
 
         li {
             width: calc((100% - 6vw) / 4);
@@ -294,6 +326,17 @@ body {
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center center;
+
+            @include mobile {
+                width: calc((100% - 24vw) / 4) !important;
+                margin-left: 8vw !important;
+                margin-bottom: 12vw !important;
+
+                &:nth-child(1),
+                &:nth-child(5) {
+                    margin-left: 0 !important;
+                }
+            }
 
             &:hover {
                 figure {
@@ -331,6 +374,12 @@ body {
                 transform: translateX(-50%);
                 color: #fff;
                 font-size: 16px;
+
+                @include mobile {
+                    font-size: 3vw !important;
+                    bottom: 0 !important;
+                    top: 17.5vw;
+                }
             }
 
             &.home {
@@ -425,6 +474,10 @@ body {
         box-shadow: 0 0 10px rgba($color: #000000, $alpha: 0.5);
         transition: all 0.5s;
 
+        @include mobile {
+            border-radius: 5px !important;
+        }
+
         .header {
             width: 100%;
             height: 35px;
@@ -446,7 +499,7 @@ body {
 
             &::-webkit-scrollbar-thumb {
                 height: 30%; /* 스크롤바의 길이 */
-                background: #3081f3; /* 스크롤바의 색상 */
+                background: #535353; /* 스크롤바의 색상 */
 
                 border-radius: 10px;
             }

@@ -31,6 +31,8 @@ export function createHomeAnimations() {
         const contactImg = document.querySelector('.homeComp_contact figure img');
         const contactBtn = document.querySelector('.homeComp_contact_telegram a');
 
+        const innerWidth = window.innerWidth;
+
         gsap.set(meritArticleTitle, {
             opacity: 0,
         });
@@ -93,8 +95,8 @@ export function createHomeAnimations() {
                     duration: 1.5,
                     color: 'transparent',
                     webkitTextStroke: '2px #000',
-                    fontSize: '10vw',
-                    height: '10vw',
+                    fontSize: innerWidth > 1024 ? '10vw' : '18vw',
+                    height: innerWidth > 1024 ? '10vw' : '18vw',
                 },
                 '<'
             )
@@ -130,7 +132,7 @@ export function createHomeAnimations() {
                                 scroller: '.homeComp',
                                 //enter leave enterback leaveback
                                 //toggleActions: 'play none reverse none',
-                                scrub: true,
+                                scrub: 1,
                                 //markers: true,
                                 pin: true,
                                 pinSpacing: true,
@@ -216,7 +218,7 @@ export function createHomeAnimations() {
                                 scroller: '.homeComp',
                                 start: 'top center',
                                 end: 'top center',
-                                //markers: true,
+                                markers: true,
                             },
                         })
                         .to(contactImg, {
@@ -233,7 +235,7 @@ export function createHomeAnimations() {
                             '<'
                         )
                         .to(contactImg, {
-                            x: 100,
+                            x: innerWidth > 1024 ? 30 : '10%',
                         });
                 },
             });
@@ -243,6 +245,7 @@ export function createHomeAnimations() {
 
     return {
         animations,
+
         initAnimation,
     };
 }
