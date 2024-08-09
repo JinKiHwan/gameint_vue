@@ -1,11 +1,11 @@
 <template>
     <div class="dim"></div>
-    <div v-show="popupState" class="popupLayout">
+    <div class="popupLayout">
         <div class="popupLayout_header">
             <ul class="btnWraps">
-                <li class="red"><a href="javascript:void(0)" @click="closePopup"></a></li>
+                <li class="red"><a href="javascript:void(0)" @click="emitClosePopup"></a></li>
                 <li class="yellow"><a href="javascript:void(0)"></a></li>
-                <li class="green"><a href="javascript:void(0)" @click="closePopup"></a></li>
+                <li class="green"><a href="javascript:void(0)" @click="emitClosePopup"></a></li>
             </ul>
         </div>
 
@@ -13,7 +13,6 @@
             <!-- 로그인 전 -->
             <div class="popupLayout_login" v-if="!isLogin">
                 <h2>로그인</h2>
-
                 <div class="popupLayout_login_input">
                     <dl>
                         <dt>ID</dt>
@@ -31,7 +30,7 @@
             </div>
 
             <!-- 로그인 후 -->
-            <div class="popupLayout_mypage" v-if="isLogin">
+            <div class="popupLayout_mypage" v-else>
                 <div class="popupLayout_mypage_profile">
                     <figure>
                         <img :src="imageSrc" :alt="userName" />
@@ -61,86 +60,24 @@ import axios from 'axios';
 
 export default {
     name: 'LoginComp',
+
     props: {
-        popupState: Boolean,
-    },
-    emits: ['update:popupState'],
-
-    methods: {
-        handleFileChange(event) {
-            const file = event.target.files[0];
-            if (file) {
-                // MIME 타입 검사
-                const validTypes = ['image/png', 'image/webp', 'image/jpeg'];
-                if (!validTypes.includes(file.type)) {
-                    alert('올바른 파일 형식을 선택해주세요 (png, webp, jpg, jpeg)');
-                    event.target.value = ''; // 선택된 파일을 지웁니다
-                    return;
-                }
-
-                // 파일 크기 검사 (5MB 제한 예시)
-                const maxSize = 3 * 1024 * 1024; // 3MB
-                if (file.size > maxSize) {
-                    alert('파일 크기가 너무 큽니다. 최대 5MB까지 업로드할 수 있습니다.');
-                    event.target.value = ''; // 선택된 파일을 지웁니다
-                    return;
-                }
-
-                // 파일을 읽기 위한 FileReader 객체 생성
-                const reader = new FileReader();
-
-                // 파일이 성공적으로 읽힌 경우
-                reader.onload = (e) => {
-                    this.imageSrc = e.target.result; // 선택된 파일을 이미지로 업데이트
-                };
-
-                // 파일을 읽기 시작
-                reader.readAsDataURL(file);
-
-                // 파일 처리 로직
-                console.log('선택된 파일:', file);
-            }
-        },
-
-        closePopup() {
-            this.$emit('update:popupState', false);
+        isLogin: {
+            type: Boolean,
+            required: true,
         },
     },
 
-    setup() {
+    emits: ['login-success', 'close-popup'], // 여기에 emits 옵션을 추가합니다
+
+    setup(props, { emit }) {
         const pen = ref('https://cdn-icons-png.flaticon.com/512/227/227104.png');
-        const isLogin = ref(false);
         const imageSrc = ref('');
         const userName = ref('');
-        const isIdValid = ref(true); //유효성 통과 상태체크
-        const isPasswordValid = ref(true); //유효성 통과 상태체크
+        const isIdValid = ref(true);
+        const isPasswordValid = ref(true);
         const userId = ref('');
         const password = ref('');
-
-        const checkLoginStatus = async () => {
-            const cookies = document.cookie.split(',');
-            const memberCookie = cookies.find((cookie) => cookie.trim().startsWith('member='));
-
-            console.log(memberCookie, '123');
-
-            if (memberCookie) {
-                isLogin.value = true;
-                try {
-                    // 서버에 쿠키 유효성 검증 요청
-                    const response = await axios.get('http://localhost:3000/api/member/sign-in', {
-                        withCredentials: true,
-                    });
-
-                    if (response.data.code === 1) {
-                        isLogin.value = true;
-                        userName.value = response.data.name;
-                        imageSrc.value = response.data.profileImage || 'https://common-cdn-api.joycityglobal.com/community/gw/resources/images/content/left_menu/default-profile-after-login.png?v=231029';
-                    }
-                } catch (error) {
-                    console.error('로그인 상태 확인 중 오류:', error);
-                }
-            }
-        };
 
         const handleLogin = async () => {
             if (!isIdValid.value || !isPasswordValid.value) {
@@ -160,12 +97,12 @@ export default {
                             withCredentials: true, // 쿠키를 주고받을 수 있게 설정
                         }
                     );
+                    console.log(response.data);
 
                     if (response.data.code === 1) {
                         alert('로그인 성공!');
-                        isLogin.value = true; // 로그인 상태 업데이트
                         imageSrc.value = response.data.profileImage || 'https://common-cdn-api.joycityglobal.com/community/gw/resources/images/content/left_menu/default-profile-after-login.png?v=231029';
-                        console.log(document.cookie); // 쿠키 확인
+                        emit('login-success', true); // 여기서 emit 함수 호출
                     } else {
                         alert('로그인 실패: ' + response.data.message);
                     }
@@ -181,12 +118,15 @@ export default {
         //     userName.value = '김기현';
         // });
 
+        const emitClosePopup = () => {
+            emit('close-popup');
+        };
+
         onMounted(() => {
-            checkLoginStatus();
+            //checkLoginStatus();
         });
 
         return {
-            isLogin,
             imageSrc,
             userName,
             pen,
@@ -195,7 +135,8 @@ export default {
             isPasswordValid,
             userId,
             password,
-            checkLoginStatus,
+            emitClosePopup,
+            //checkLoginStatus,
         };
     },
 };

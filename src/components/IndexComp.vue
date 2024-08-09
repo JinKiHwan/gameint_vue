@@ -62,7 +62,7 @@
                     </figure>
                 </a>
             </li>
-            <li class="mypage" @click="popupOpen()">
+            <li class="mypage" @click="popupOpen">
                 <a href="javascript:void(0)">
                     <figure>
                         <img :src="mypage" alt="" />
@@ -72,7 +72,9 @@
         </ul>
     </div>
 
-    <LoginComp v-if="popupState" v-model:popupState="popupState"></LoginComp>
+    <div class="login" v-if="popupState">
+        <LoginComp :is-login="isLogin" @login-success="updateLoginStatus" @close-popup="closePopup"></LoginComp>
+    </div>
 
     <Transition name="fade">
         <div class="browser" v-if="browserStatus">
@@ -115,7 +117,7 @@ export default {
     },
 
     setup() {
-        const popupState = ref(false);
+        //const popupState = ref(false);
         const home = ref(require('@/assets/img/home.webp'));
         const bookreviews = ref(require('@/assets/img/bookreviews.webp'));
         const history = ref(require('@/assets/img/history.webp'));
@@ -131,6 +133,23 @@ export default {
         const isFullScreen = ref(false);
         const browserStatus = ref(false);
         const currentTime = ref(new Date());
+        const popupState = ref(false);
+
+        const isLogin = ref(false);
+
+        const updateLoginStatus = (status) => {
+            isLogin.value = status;
+        };
+
+        const checkLoginStatus = () => {
+            const cookies = document.cookie.split(';');
+            const memberCookie = cookies.find((cookie) => cookie.trim().startsWith('member='));
+            isLogin.value = !!memberCookie;
+        };
+
+        const closePopup = () => {
+            popupState.value = false;
+        };
 
         let timer;
         const menuStatus = reactive({
@@ -160,14 +179,16 @@ export default {
 
         onMounted(() => {
             timer = setInterval(updateTime, 1000); // 1초마다 업데이트
+
+            checkLoginStatus();
         });
         onUnmounted(() => {
             clearInterval(timer); // 컴포넌트 소멸 시 타이머 정리
         });
         // Toggle the popup state
-        function popupOpen() {
+        const popupOpen = () => {
             popupState.value = true;
-        }
+        };
 
         const browserOpen = (page) => {
             //console.log(`Opening browser with page: ${page}`);
@@ -220,7 +241,6 @@ export default {
             mypage,
             place,
             recommend,
-            popupState,
             popupOpen,
             browserStatus,
             browserOpen,
@@ -234,6 +254,11 @@ export default {
             wifi,
             isFullScreen,
             preparingForService,
+            popupState,
+            isLogin,
+            closePopup,
+            updateLoginStatus,
+            checkLoginStatus,
         };
     },
 
