@@ -101,7 +101,7 @@ export default {
 
                     if (response.data.code === 1) {
                         alert('로그인 성공!');
-                        imageSrc.value = response.data.profileImage || 'https://common-cdn-api.joycityglobal.com/community/gw/resources/images/content/left_menu/default-profile-after-login.png?v=231029';
+                        imageSrc.value = response.data.profileImage;
                         emit('login-success', true); // 여기서 emit 함수 호출
                     } else {
                         alert('로그인 실패: ' + response.data.message);

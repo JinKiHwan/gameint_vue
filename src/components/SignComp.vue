@@ -249,7 +249,7 @@ export default {
 
                 // 파일을 읽기 시작
                 reader.readAsDataURL(file);
-                ``;
+
                 console.log(profileImageFile.value);
             }
         };
@@ -260,7 +260,12 @@ export default {
                 alert('입력폼을 다시 확인해 주세요');
             } else {
                 try {
-                    //alert(response.data);
+                    const formData = new FormData();
+                    if (profileImageFile.value) {
+                        formData.append('profileImage', profileImageFile.value);
+                    }
+
+                    console.log(formData);
                     const response = await axios.post(
                         'http://localhost:3000/api/member/create',
                         {
@@ -268,7 +273,7 @@ export default {
                             account: userId.value,
                             password: password.value,
                             telegram: telegram.value,
-                            profileImage: 'qwer',
+                            profileImage: formData,
                         },
                         {
                             headers: {
@@ -283,7 +288,7 @@ export default {
                         window.location.href = '/';
                     }
                 } catch (error) {
-                    alert(error);
+                    alert('가입실패임');
                 }
             }
         };
