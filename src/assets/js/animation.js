@@ -218,7 +218,7 @@ export function createHomeAnimations() {
                                 scroller: '.homeComp',
                                 start: 'top center',
                                 end: 'top center',
-                                markers: true,
+                                //markers: true,
                             },
                         })
                         .to(contactImg, {
