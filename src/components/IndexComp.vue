@@ -21,21 +21,24 @@
                 </a>
             </li>
             <li class="monthly">
-                <a href="javascript:void(0)" @click="browserOpen('monthly')">
+                <!-- <a href="javascript:void(0)" @click="browserOpen('monthly')"> -->
+                <a href="javascript:void(0)" @click="preparingForService()">
                     <figure>
                         <img :src="monthly" alt="" />
                     </figure>
                 </a>
             </li>
             <li class="recommend">
-                <a href="javascript:void(0)" @click="browserOpen('favorite')">
+                <!-- <a href="javascript:void(0)" @click="browserOpen('favorite')"> -->
+                <a href="javascript:void(0)" @click="preparingForService()">
                     <figure>
                         <img :src="recommend" alt="" />
                     </figure>
                 </a>
             </li>
             <li class="history">
-                <a href="javascript:void(0)" @click="browserOpen('history')">
+                <!-- <a href="javascript:void(0)" @click="browserOpen('history')"> -->
+                <a href="javascript:void(0)" @click="preparingForService()">
                     <figure>
                         <img :src="history" alt="" />
                     </figure>
@@ -62,8 +65,9 @@
                     </figure>
                 </a>
             </li>
-            <li class="mypage" @click="popupOpen()">
-                <a href="javascript:void(0)">
+            <li class="mypage">
+                <!-- <a href="javascript:void(0)" @click="popupOpen()"> -->
+                <a href="javascript:void(0)" @click="preparingForService()">
                     <figure>
                         <img :src="mypage" alt="" />
                     </figure>
