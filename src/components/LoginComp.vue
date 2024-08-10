@@ -48,6 +48,7 @@
 
                 <div class="popupLayout_mypage_btn">
                     <button>수정하기</button>
+                    <button @click="logOut">로그아웃</button>
                 </div>
             </div>
         </div>
@@ -131,6 +132,14 @@ export default {
             }
         };
 
+        const logOut = () => {
+            // 쿠키(member) 삭제
+            document.cookie = 'member=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+
+            // 페이지 리로드
+            window.location.reload();
+        };
+
         // onMounted(() => {
         //     checkLoginStatus();
         //     imageSrc.value = 'https://common-cdn-api.joycityglobal.com/community/gw/resources/images/content/left_menu/default-profile-after-login.png?v=231029';
@@ -157,6 +166,7 @@ export default {
             emitClosePopup,
             userStore,
             loginInputStore,
+            logOut,
             //checkLoginStatus,
         };
     },
@@ -305,6 +315,8 @@ export default {
             bottom: 15px;
             transform: translateX(-50%);
             font-weight: 600;
+            display: flex;
+            gap: 15px;
         }
     }
 }
