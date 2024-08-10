@@ -106,6 +106,11 @@ import FavoriteBookComp from '@/components/FavoriteBookComp.vue';
 import HistoryComp from '@/components/HistoryComp.vue';
 
 import { ref, onMounted, reactive, computed, onUnmounted } from 'vue';
+import axios from 'axios';
+
+import { useUserStore } from '@/store/user';
+import { userLoginInput } from '@/store/loginInput';
+
 export default {
     name: 'IndexComp',
     components: {
@@ -117,6 +122,8 @@ export default {
     },
 
     setup() {
+        const userStore = useUserStore();
+        const loginInputStore = userLoginInput();
         //const popupState = ref(false);
         const home = ref(require('@/assets/img/home.webp'));
         const bookreviews = ref(require('@/assets/img/bookreviews.webp'));
@@ -134,17 +141,39 @@ export default {
         const browserStatus = ref(false);
         const currentTime = ref(new Date());
         const popupState = ref(false);
-
         const isLogin = ref(false);
 
-        const updateLoginStatus = (status) => {
+        console.log(loginInputStore.pw);
+
+        const updateLoginStatus = async (status) => {
             isLogin.value = status;
         };
 
-        const checkLoginStatus = () => {
+        const checkLoginStatus = async () => {
+            console.log('Checking login status...');
+
             const cookies = document.cookie.split(';');
             const memberCookie = cookies.find((cookie) => cookie.trim().startsWith('member='));
             isLogin.value = !!memberCookie;
+
+            if (isLogin.value === true) {
+                try {
+                    const response = await axios.post('http://localhost:3000/api/member/sign-in', {
+                        withCredentials: true,
+                        account: 'eljsh95',
+                        password: 'qwer',
+                    });
+
+                    if (response) {
+                        userStore.memberIdx = response.data.data.memberIdx;
+                        userStore.name = response.data.data.name;
+                    }
+                } catch (error) {
+                    console.error('Error fetching user info:', error);
+                }
+            } else {
+                console.log('User is not logged in.');
+            }
         };
 
         const closePopup = () => {
@@ -233,6 +262,8 @@ export default {
         };
 
         return {
+            userStore,
+            loginInputStore,
             home,
             bookreviews,
             history,

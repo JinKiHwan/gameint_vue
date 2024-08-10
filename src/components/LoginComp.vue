@@ -33,7 +33,7 @@
             <div class="popupLayout_mypage" v-else>
                 <div class="popupLayout_mypage_profile">
                     <figure>
-                        <img :src="imageSrc" :alt="userName" />
+                        <img :src="userStore.profileImg" :alt="userName" />
                     </figure>
 
                     <input type="file" id="editProfile" accept="image/png, image/webp, image/jpeg" @change="handleFileChange" />
@@ -43,7 +43,7 @@
                 </div>
 
                 <p>
-                    반갑습니다 <span>{{ userId }}</span> 님!
+                    반갑습니다 <span>{{ userStore.name }}</span> 님!
                 </p>
 
                 <div class="popupLayout_mypage_btn">
@@ -58,6 +58,9 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
+import { useUserStore } from '@/store/user';
+import { userLoginInput } from '@/store/loginInput';
+
 export default {
     name: 'LoginComp',
 
@@ -71,6 +74,9 @@ export default {
     emits: ['login-success', 'close-popup'], // 여기에 emits 옵션을 추가합니다
 
     setup(props, { emit }) {
+        const userStore = useUserStore();
+        const loginInputStore = userLoginInput();
+
         const pen = ref('https://cdn-icons-png.flaticon.com/512/227/227104.png');
         const imageSrc = ref('');
         const userName = ref('');
@@ -97,11 +103,24 @@ export default {
                             withCredentials: true, // 쿠키를 주고받을 수 있게 설정
                         }
                     );
-                    console.log(response.data);
 
                     if (response.data.code === 1) {
                         alert('로그인 성공!');
+                        loginInputStore.id = userId.value;
+                        loginInputStore.pw = password.value;
+
+                        console.log(userStore.profileImg);
+
+                        userStore.memberIdx = response.data.data.memberIdx;
+                        userStore.name = response.data.data.name;
+
+                        if (response.data.data.profileImg) {
+                            userStore.profileImg = response.data.data.profileImg;
+                        }
+
                         imageSrc.value = response.data.profileImage;
+
+                        console.log(loginInputStore.id, loginInputStore.pw);
                         emit('login-success', true); // 여기서 emit 함수 호출
                     } else {
                         alert('로그인 실패: ' + response.data.message);
@@ -136,6 +155,8 @@ export default {
             userId,
             password,
             emitClosePopup,
+            userStore,
+            loginInputStore,
             //checkLoginStatus,
         };
     },
