@@ -1,42 +1,47 @@
 <template>
     <div class="monthly">
         <div class="monthly_inner" v-if="monthlyStatus === 0">
-            <div class="monthly_book_img">
+            <div class="monthly_book">
                 <p>{{ currentMonthBook }}</p>
-                <figure>
-                    <img :src="monthlyBook" alt="" />
-                </figure>
-            </div>
 
-            <div class="monthly_book_info">
-                <dl>
-                    <dt>책 제목</dt>
-                    <dd>{{ bookName }}</dd>
-                </dl>
+                <div class="monthly_book_wrap">
+                    <div class="book_figure">
+                        <figure>
+                            <img :src="monthlyBook" alt="" />
+                        </figure>
+                    </div>
 
-                <dl>
-                    <dt>출판사</dt>
-                    <dd>{{ publisher }}</dd>
-                </dl>
+                    <div class="monthly_book_info">
+                        <ul class="monthly_book_tab">
+                            <li v-for="tab in tabs" :key="tab.id" @click="activeTab = tab.id" :class="{ active: activeTab === tab.id }">{{ tab.name }}</li>
+                        </ul>
 
-                <dl>
-                    <dt>카테고리</dt>
-                    <dd>{{ category }}</dd>
-                </dl>
+                        <div class="tab-content">
+                            <div v-if="activeTab === 'book'">
+                                <h3>{{ bookName }}</h3>
+                                <ul>
+                                    <li><b>작가</b> {{ bookWriter }}</li>
+                                    <li><b>출판사</b> {{ publisher }}</li>
+                                    <li><b>카테고리</b> {{ category }}</li>
+                                </ul>
+                            </div>
 
-                <dl>
-                    <dt>추천인</dt>
-                    <dd>{{ recommendUser }}</dd>
-                </dl>
-
-                <dl>
-                    <dt>추천이유</dt>
-                    <dd>{{ recommendReason }}</dd>
-                </dl>
+                            <div v-else-if="activeTab === 'recommend'">
+                                <ul>
+                                    <li><b>추천인 </b> {{ recommendUser }}</li>
+                                    <li class="recommend_reason">
+                                        <b>추천이유 </b>
+                                        <i>{{ recommendReason }}</i>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <button class="view_review" @click="viewReview">작성글보기→</button>
-            <button class="write_review" @click="writeReview">리뷰 작성하기</button>
+            <button class="write_review" @click="writeReview">리뷰 작성</button>
             <Transition name="opacity">
                 <div class="monthly_review" v-if="reviewPopup">
                     <form action="">
@@ -60,30 +65,26 @@
         </div>
 
         <div class="monthly_inner" v-if="monthlyStatus === 1">
-            <div class="monthly_book_img">
-                <p>{{ currentMonthBook }}</p>
-                <figure>
-                    <img :src="monthlyBook" alt="" />
-                </figure>
+            <div class="monthly_book">
+                <p>GameInt 리뷰</p>
             </div>
 
-            <div class="monthly_book_reviews">
-                <div class=""></div>
-                <ul class="review_item">
-                    <li v-for="(review, index) in userReviewWraps" :key="index">
-                        <div class="user_profile">
-                            <figure>
-                                <img :src="review.userProfile" :alt="review.userName" />
-                            </figure>
+            <div class="monthly_book_wrap">
+                <div class="member_profile">
+                    <ul>
+                        <li v-for="(user, index) in userReviewWraps" :key="index" @click="selectUser(index)">
+                            <img :src="user.userProfile" alt="" :class="{ active: selectedIndex === index }" />
+                        </li>
+                    </ul>
+                </div>
 
-                            <span>{{ review.userName }}</span>
-                        </div>
-                        <div class="user_review">
-                            <p>{{ review.userReview }}</p>
-                        </div>
-                        <div class="user_point">{{ review.userPoint }}</div>
-                    </li>
-                </ul>
+                <div class="member_review" v-if="selectedUser">
+                    <ul>
+                        <li>{{ selectedUser.userName }}의 리뷰</li>
+                        <li>{{ selectedUser.userReview }}</li>
+                        <li class="user-rating">평점: {{ selectedUser.userPoint }} / 5</li>
+                    </ul>
+                </div>
             </div>
 
             <button class="history_back" @click="monthlyBack">←뒤로가기</button>
@@ -102,15 +103,16 @@ export default {
         const monthlyBook = ref(require('@/assets/img/book01.webp'));
         const currentMonthBook = computed(() => {
             const now = new Date();
-            const year = now.getFullYear();
+            //const year = now.getFullYear();
             const month = now.getMonth() + 1;
-            return `${year}년 ${month}월의 책`;
+            return `${month}월의 책`;
         });
 
         const data = ref('');
         const error = ref('');
 
         const bookName = ref('');
+        const bookWriter = ref('');
         const publisher = ref('');
         const category = ref('');
         const recommendUser = ref('');
@@ -169,8 +171,24 @@ export default {
             },
         ]);
 
+        const selectedIndex = ref(0);
+
+        const selectUser = (index) => {
+            selectedIndex.value = index;
+        };
+
+        const selectedUser = computed(() => {
+            return selectedIndex.value !== null ? userReviewWraps.value[selectedIndex.value] : null;
+        });
+        const tabs = [
+            { id: 'book', name: '책 정보' },
+            { id: 'recommend', name: '추천 정보' },
+        ];
+        const activeTab = ref('book');
+
         //데이터 여기에 넣으면 됩니당
         bookName.value = '심판';
+        bookWriter.value = '베르베르';
         publisher.value = '열린책들';
         category.value = '희곡';
         recommendUser.value = '진기환';
@@ -187,6 +205,8 @@ export default {
                 } else if (response.data.code === -1) {
                     // 책 리스트가 비어있는 경우
                     error.value = '추천 책 리스트가 비어있습니다.';
+                } else if (response.data.code === -2) {
+                    console.log('이거 왜 안돼');
                 } else {
                     // 기타 오류
                     error.value = response.data.message || '알 수 없는 오류가 발생했습니다.';
@@ -221,6 +241,7 @@ export default {
             monthlyBook,
             currentMonthBook,
             bookName,
+            bookWriter,
             publisher,
             category,
             recommendUser,
@@ -235,6 +256,10 @@ export default {
             monthlyBookDetail,
             data,
             error,
+            tabs,
+            activeTab,
+            selectUser,
+            selectedUser,
         };
     },
 };
@@ -242,71 +267,138 @@ export default {
 
 <style lang="scss" scoped>
 .monthly {
+    background: #e4e6e7;
     height: 100%;
+    overflow: auto;
     &_inner {
         box-sizing: border-box;
         width: 100%;
-        height: 100%;
         overflow: auto;
-        display: flex;
-        justify-content: center;
         position: relative;
-        padding: 10px;
-        gap: 20px;
     }
 
-    &_book_img {
-        max-width: 45%;
+    &_book {
         p {
             text-align: center;
-            font-size: 18px;
-            margin-block: 10px;
+            font-size: 22px;
+            font-weight: 800;
+            margin-top: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #000;
         }
-        figure {
-            height: 90%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            img {
-                object-fit: contain;
+    }
+    &_book_wrap {
+        display: flex;
+        border-bottom: 1px solid #000;
+        height: 505px;
+
+        .book_figure {
+            width: 50%;
+            border-right: 1px solid #000;
+            figure {
+                width: auto;
                 height: 100%;
+                margin: 0 auto;
+                max-width: 55%;
+                display: flex;
+                justify-content: center;
+
+                img {
+                    height: 100%;
+                }
             }
+        }
+
+        .member_profile {
+            width: 50%;
+            border-right: 1px solid #000;
+            padding: 15px;
+            ul {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 20px;
+                li {
+                    width: calc((100% - (20px * 5)) / 6);
+                    border-radius: 50%;
+                    overflow: hidden;
+                    cursor: pointer;
+                    aspect-ratio: 1/1;
+                    border: 1px solid #000;
+                    box-shadow: 0 0 15px rgba($color: #000000, $alpha: 0.3);
+                }
+            }
+        }
+        .member_review {
+            width: 50%;
         }
     }
     &_book_info {
-        max-width: 40%;
+        width: 50%;
         height: 100%;
         overflow: auto;
         display: flex;
         flex-direction: column;
-        gap: 15px;
-        padding-top: 40px;
-        dl {
+
+        .monthly_book_tab {
+            width: 100%;
             display: flex;
-            font-size: 18px;
-            font-weight: 600;
-            line-height: 1.3;
+            border-bottom: 1px solid #000;
+            li {
+                height: 32px;
+                width: 110px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.1s;
+                border-right: 1px solid #000;
 
-            dt {
-                width: 100px;
-            }
-
-            dd {
-                width: calc(100% - 100px);
-                white-space: pre-wrap;
-                position: relative;
-
-                &::before {
-                    content: ':';
-                    position: absolute;
-                    left: -10px;
-                    top: 0;
+                &.active,
+                &:hover {
+                    background: #000;
+                    color: #fff;
                 }
             }
+        }
 
-            &:last-child {
-                dd {
-                    font-weight: 400;
+        .tab-content {
+            display: flex;
+
+            > div {
+                width: 100%;
+                b {
+                    font-weight: 800;
+                }
+                h3 {
+                    font-size: 45px;
+                    font-weight: 800;
+                    letter-spacing: -1px;
+                    padding: 10px;
+                    border-bottom: 1px solid #000;
+                }
+                h4 {
+                    padding: 10px;
+                }
+
+                ul {
+                    li {
+                        max-width: 100%;
+                        padding: 10px;
+                        border-bottom: 1px solid #000;
+                        &.recommend_reason {
+                            border-bottom: 0;
+
+                            i {
+                                line-height: 1.5;
+                            }
+
+                            p {
+                                line-height: 1.5;
+                                margin-top: 15px;
+                                width: 80%;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -319,7 +411,7 @@ export default {
     }
 
     .write_review {
-        position: absolute;
+        position: fixed;
         right: 10px;
         bottom: 10px;
         width: 150px;
@@ -384,67 +476,6 @@ export default {
                     &.write {
                         background: #00f;
                     }
-                }
-            }
-        }
-    }
-
-    &_book_reviews {
-        width: min(650px, 45%);
-
-        .review_item {
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            padding-top: 30px;
-            height: 100%;
-            overflow: auto;
-
-            li {
-                display: flex;
-                align-items: flex-start;
-                gap: 15px;
-
-                .user_profile {
-                    position: relative;
-                    border-radius: 50%;
-                    overflow: hidden;
-                    figure {
-                        width: 100px;
-                        aspect-ratio: 1/1;
-                        border-radius: 50%;
-                        overflow: hidden;
-                    }
-
-                    span {
-                        position: absolute;
-                        left: 0;
-                        top: 0;
-                        width: 100%;
-                        height: 100%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        background: #000;
-                        opacity: 0;
-                        color: #fff;
-                    }
-
-                    &:hover {
-                        span {
-                            opacity: 1;
-                        }
-                    }
-                }
-
-                .user_review {
-                    width: 70%;
-                    line-height: 1.3;
-                }
-                .user_point {
-                    flex-grow: 1;
-                    text-align: center;
-                    align-self: center;
                 }
             }
         }

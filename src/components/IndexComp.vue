@@ -197,7 +197,7 @@ export default {
 
                 text01.value.push(text01.value.shift());
 
-                gsap.delayedCall(7, welcomeText01, [text01.value]);
+                gsap.delayedCall(5, welcomeText01, [text01.value]);
             } else {
                 gsap.timeline().to('.welcome_txt h3.loginAfter', {
                     duration: 2.5,
@@ -209,7 +209,7 @@ export default {
 
                 text02.value.push(text02.value.shift());
 
-                gsap.delayedCall(6, welcomeText01, [text02.value]);
+                gsap.delayedCall(5, welcomeText01, [text02.value]);
             }
         };
 
