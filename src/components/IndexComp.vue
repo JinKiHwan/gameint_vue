@@ -13,8 +13,10 @@
 
     <div class="menu">
         <div class="welcome_txt">
-            <h3 v-if="isLogin"></h3>
-            <h3 v-else></h3>
+            <h3 class="loginBefore" v-if="!userStore.isLogin"></h3>
+            <h3 class="loginAfter" v-else></h3>
+
+            <span class="cursor"></span>
         </div>
         <ul>
             <li class="home">
@@ -76,9 +78,7 @@
         </ul>
     </div>
 
-    <div class="login" v-if="popupState">
-        <LoginComp :is-login="isLogin" @login-success="updateLoginStatus" @close-popup="closePopup"></LoginComp>
-    </div>
+    <LoginComp v-if="userStore.loginPopup"></LoginComp>
 
     <Transition name="fade">
         <div class="browser" v-if="browserStatus">
@@ -109,8 +109,7 @@ import MonthlyComp from '@/components/MonthlyComp.vue';
 import FavoriteBookComp from '@/components/FavoriteBookComp.vue';
 import HistoryComp from '@/components/HistoryComp.vue';
 
-import { ref, onMounted, reactive, computed, onUnmounted } from 'vue';
-import axios from 'axios';
+import { ref, onMounted, reactive, computed, onUnmounted, watch } from 'vue';
 
 import { useUserStore } from '@/store/user';
 import { userLoginInput } from '@/store/loginInput';
@@ -131,7 +130,6 @@ export default {
     setup() {
         const userStore = useUserStore();
         const loginInputStore = userLoginInput();
-        //const popupState = ref(false);
         const home = ref(require('@/assets/img/home.webp'));
         const bookreviews = ref(require('@/assets/img/bookreviews.webp'));
         const history = ref(require('@/assets/img/history.webp'));
@@ -148,45 +146,13 @@ export default {
         const browserStatus = ref(false);
         const currentTime = ref(new Date());
         const popupState = ref(false);
-        const isLogin = ref(false);
+        const text01 = ref(['GameInt에 오신걸 환영합니다!', '동호회 가입시 컨텐츠 이용이 가능합니다!']);
+        const text02 = ref([`반갑습니다 ` + userStore.name + `님!`, 'GameInt에 오신걸 환영합니다!']);
 
-        const text = [`반갑습니다 ` + userStore.setName + `님!`, 'GameInt에 오신걸 환영합니다!'];
+        /* //////////////////// */
+        /* ///컴포넌트 스테이터스/ */
+        /* /////////////////// */
 
-        const updateLoginStatus = async (status) => {
-            isLogin.value = status;
-        };
-
-        const checkLoginStatus = async () => {
-            //console.log('Checking login status...');
-
-            const cookies = document.cookie.split(';');
-            const memberCookie = cookies.find((cookie) => cookie.trim().startsWith('member='));
-            isLogin.value = !!memberCookie;
-
-            if (isLogin.value === true) {
-                try {
-                    const response = await axios.post('http://localhost:3000/api/member/sign-in', {
-                        withCredentials: true,
-                        account: loginInputStore.id,
-                        password: loginInputStore.pw,
-                    });
-
-                    if (response) {
-                        userStore.setName = response.data.data.name;
-                    }
-                } catch (error) {
-                    //console.error('Error fetching user info:', error);
-                }
-            } else {
-                console.log('User is not logged in.');
-            }
-        };
-
-        const closePopup = () => {
-            popupState.value = false;
-        };
-
-        let timer;
         const menuStatus = reactive({
             home: false,
             monthly: false,
@@ -195,6 +161,9 @@ export default {
             // 추가 메뉴들...
         });
 
+        /* ////////////////// */
+        /* ///시간 표기/////// */
+        /* ///////////////// */
         const formattedTime = computed(() => {
             const date = currentTime.value;
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -208,36 +177,58 @@ export default {
             return `${month} ${day} ${weekday} ${hours}:${minutes}`;
         });
 
+        let timer;
         const updateTime = () => {
             currentTime.value = new Date();
         };
 
-        /* WelcomeText 애니메이션 */
-        const welcomeText01 = () => {
-            gsap.timeline().to('.welcome_txt h3', {
-                duration: 1.5,
-                text: text[0],
-                yoyo: true,
-                repeat: 1,
-            });
+        /* //////////////////////////////// */
+        /* ///Welcome Text 애니메이션/////// */
+        /* /////////////////////////////// */
+        let welcomeText01 = () => {
+            if (!userStore.isLogin) {
+                gsap.timeline().to('.welcome_txt h3.loginBefore', {
+                    duration: 2.5,
+                    text: text01.value[0],
+                    yoyo: true,
+                    repeat: 1,
+                    ease: 'power(3)',
+                });
 
-            text.push(text.shift());
+                text01.value.push(text01.value.shift());
 
-            gsap.delayedCall(3, welcomeText01, [text]);
+                gsap.delayedCall(7, welcomeText01, [text01.value]);
+            } else {
+                gsap.timeline().to('.welcome_txt h3.loginAfter', {
+                    duration: 2.5,
+                    text: text02.value[0],
+                    yoyo: true,
+                    repeat: 1,
+                    ease: 'power(3)',
+                });
+
+                text02.value.push(text02.value.shift());
+
+                gsap.delayedCall(6, welcomeText01, [text02.value]);
+            }
         };
 
         onMounted(() => {
-            timer = setInterval(updateTime, 1000); // 1초마다 업데이트
-
-            checkLoginStatus();
+            timer = setInterval(updateTime, 1000);
             welcomeText01();
         });
+
         onUnmounted(() => {
             clearInterval(timer); // 컴포넌트 소멸 시 타이머 정리
         });
-        // Toggle the popup state
+
+        /* //////////////////////////////// */
+        /* ///컴포넌트 On/Off/////////////// */
+        /* /////////////////////////////// */
         const popupOpen = () => {
-            popupState.value = true;
+            console.log(userStore.loginPopup);
+
+            userStore.loginPopup = true;
         };
 
         const browserOpen = (page) => {
@@ -282,6 +273,22 @@ export default {
             alert('준비중입니다.');
         };
 
+        watch(
+            /* //////////////////////////////// */
+            /* ///watch 사용할 곳이 있을까?////// */
+            /* /////////////////////////////// */
+            () => userStore.isLogin,
+            (newValue, oldValue) => {
+                console.log('isLogin changed:', oldValue, '->', newValue);
+                if (newValue === true) {
+                    console.log('로그인');
+                } else {
+                    // 로그아웃 되었을 때의 로직
+                    console.log('로그아웃');
+                }
+            }
+        );
+
         return {
             userStore,
             loginInputStore,
@@ -307,15 +314,9 @@ export default {
             isFullScreen,
             preparingForService,
             popupState,
-            isLogin,
-            closePopup,
-            updateLoginStatus,
-            checkLoginStatus,
             welcomeText01,
         };
     },
-
-    methods: {},
 };
 </script>
 
@@ -395,6 +396,20 @@ body {
         border-radius: 10px;
         backdrop-filter: blur(10px);
         height: 36px;
+        display: flex;
+        gap: 3px;
+
+        h3 {
+            color: rgba($color: #fff, $alpha: 0.8);
+        }
+        .cursor {
+            display: block;
+            height: 100%;
+            width: 1px;
+            background: rgba($color: #fff, $alpha: 0.8);
+            animation: cursor 1s infinite;
+            animation-timing-function: steps(1, end);
+        }
     }
 
     ul {
@@ -572,7 +587,7 @@ body {
             height: 35px;
             display: flex;
             align-items: center;
-            background: #333333;
+            background: linear-gradient(180deg, rgba(62, 62, 62, 1) 0%, rgba(51, 51, 51, 1) 40%, rgba(51, 51, 51, 1) 60%, rgba(62, 62, 62, 1) 100%);
         }
     }
 
@@ -612,5 +627,17 @@ body {
     transform: scale(0);
     transform-origin: center bottom;
     /* transform-origin: center bottom; */
+}
+
+@keyframes cursor {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
 }
 </style>

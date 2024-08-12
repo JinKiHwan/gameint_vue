@@ -6,6 +6,7 @@ import axios from 'axios';
 
 const app = createApp(App);
 const pinia = createPinia();
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 
 // axios를 글로벌 속성으로 등록
 app.config.globalProperties.$axios = axios;
@@ -13,6 +14,8 @@ app.config.globalProperties.$axios = axios;
 // Pinia와 Router를 사용하도록 앱 설정
 app.use(pinia);
 app.use(router);
+
+pinia.use(piniaPluginPersistedstate);
 
 // 애플리케이션 마운트
 app.mount('#app');

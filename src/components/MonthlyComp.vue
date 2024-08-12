@@ -93,6 +93,7 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue';
+import axios from 'axios';
 
 export default {
     name: 'MonthlyComp',
@@ -106,6 +107,9 @@ export default {
             return `${year}년 ${month}월의 책`;
         });
 
+        const data = ref('');
+        const error = ref('');
+
         const bookName = ref('');
         const publisher = ref('');
         const category = ref('');
@@ -113,7 +117,6 @@ export default {
         const recommendReason = ref('');
         const reviewPopup = ref(false); //팝업 on/off
         const monthlyStatus = ref(0);
-
         const userReviewWraps = ref([
             {
                 userName: '안승필',
@@ -173,6 +176,26 @@ export default {
         recommendUser.value = '진기환';
         recommendReason.value = `계속 소설이 채택된다는 목소리가 나왔기에 다른 장르의 책을 추천해봅니다.읽은지 오래되어 자세히 기억이 나지는 않습니다만,뇌를 연구하는 물리학자 정재승이 인간의 뇌 구조를 기반으로 이런 저런 이야기를 적어놓은 책입니다.오늘 점심 뭐 먹지? 결정장애가 생기는 이유에서부터 사람이 미신에 빠져드는 이유까지흥미로운 주제를 한 사람의 주관이 아닌 인간의 뇌구조를 기반으로 설명해주니이런 장르에 관심이 없는 저도 굉장히 재밌게 읽을 수 있었습니다.계속 소설이 채택된다는 목소리가 나왔기에 다른 장르의 책을 추천해봅니다.읽은지 오래되어 자세히 기억이 나지는 않습니다만,뇌를 연구하는 물리학자 정재승이 인간의 뇌 구조를 기반으로 이런 저런 이야기를 적어놓은 책입니다.오늘 점심 뭐 먹지? 결정장애가 생기는 이유에서부터 사람이 미신에 빠져드는 이유까지흥미로운 주제를 한 사람의 주관이 아닌 인간의 뇌구조를 기반으로 설명해주니이런 장르에 관심이 없는 저도 굉장히 재밌게 읽을 수 있었습니다.계속 소설이 채택된다는 목소리가 나왔기에 다른 장르의 책을 추천해봅니다.읽은지 오래되어 자세히 기억이 나지는 않습니다만,뇌를 연구하는 물리학자 정재승이 인간의 뇌 구조를 기반으로 이런 저런 이야기를 적어놓은 책입니다.오늘 점심 뭐 먹지? 결정장애가 생기는 이유에서부터 사람이 미신에 빠져드는 이유까지흥미로운 주제를 한 사람의 주관이 아닌 인간의 뇌구조를 기반으로 설명해주니이런 장르에 관심이 없는 저도 굉장히 재밌게 읽을 수 있었습니다.계속 소설이 채택된다는 목소리가 나왔기에 다른 장르의 책을 추천해봅니다.읽은지 오래되어 자세히 기억이 나지는 않습니다만,뇌를 연구하는 물리학자 정재승이 인간의 뇌 구조를 기반으로 이런 저런 이야기를 적어놓은 책입니다.오늘 점심 뭐 먹지? 결정장애가 생기는 이유에서부터 사람이 미신에 빠져드는 이유까지흥미로운 주제를 한 사람의 주관이 아닌 인간의 뇌구조를 기반으로 설명해주니이런 장르에 관심이 없는 저도 굉장히 재밌게 읽을 수 있었습니다.`;
 
+        const monthlyBookDetail = async () => {
+            try {
+                const response = await axios.get('http://localhost:3000/api/book/monthly/recommend/1');
+                data.value = response.data;
+                console.log(response.data);
+
+                if (response.data.code === 1) {
+                    console.log(response.data.data);
+                } else if (response.data.code === -1) {
+                    // 책 리스트가 비어있는 경우
+                    error.value = '추천 책 리스트가 비어있습니다.';
+                } else {
+                    // 기타 오류
+                    error.value = response.data.message || '알 수 없는 오류가 발생했습니다.';
+                }
+            } catch (err) {
+                error.value = '서버 오류가 발생했습니다. 나중에 다시 시도해주세요.';
+            }
+        };
+
         const writeReview = () => {
             reviewPopup.value = true;
         };
@@ -190,6 +213,8 @@ export default {
 
         onMounted(() => {
             monthlyStatus.value = 0; //초기 화면 값
+
+            monthlyBookDetail();
         });
 
         return {
@@ -207,6 +232,9 @@ export default {
             viewReview,
             userReviewWraps,
             monthlyBack,
+            monthlyBookDetail,
+            data,
+            error,
         };
     },
 };

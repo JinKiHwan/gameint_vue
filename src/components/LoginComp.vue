@@ -3,15 +3,15 @@
     <div class="popupLayout">
         <div class="popupLayout_header">
             <ul class="btnWraps">
-                <li class="red"><a href="javascript:void(0)" @click="emitClosePopup"></a></li>
+                <li class="red" @click="closePopup"><a href="javascript:void(0)"></a></li>
                 <li class="yellow"><a href="javascript:void(0)"></a></li>
-                <li class="green"><a href="javascript:void(0)" @click="emitClosePopup"></a></li>
+                <li class="green" @click="closePopup"><a href="javascript:void(0)"></a></li>
             </ul>
         </div>
 
         <div class="popupLayout_inner">
             <!-- 로그인 전 -->
-            <div class="popupLayout_login" v-if="!isLogin">
+            <div class="popupLayout_login" v-if="!userStore.isLogin">
                 <h2>로그인</h2>
                 <div class="popupLayout_login_input">
                     <dl>
@@ -65,19 +65,9 @@ import { userLoginInput } from '@/store/loginInput';
 export default {
     name: 'LoginComp',
 
-    props: {
-        isLogin: {
-            type: Boolean,
-            required: true,
-        },
-    },
-
-    emits: ['login-success', 'close-popup'], // 여기에 emits 옵션을 추가합니다
-
-    setup(props, { emit }) {
+    setup() {
         const userStore = useUserStore();
         const loginInputStore = userLoginInput();
-
         const pen = ref('https://cdn-icons-png.flaticon.com/512/227/227104.png');
         const imageSrc = ref('');
         const userName = ref('');
@@ -86,6 +76,9 @@ export default {
         const userId = ref('');
         const password = ref('');
 
+        /* //////////////////// */
+        /* ///로그인////////// */
+        /* /////////////////// */
         const handleLogin = async () => {
             if (!isIdValid.value || !isPasswordValid.value) {
                 alert('입력폼을 다시 확인해 주세요');
@@ -110,18 +103,20 @@ export default {
                         loginInputStore.id = userId.value;
                         loginInputStore.pw = password.value;
 
-                        console.log(userStore.profileImg);
+                        userStore.setLoginStatus(true); //로그인 상태 true
 
-                        userStore.setMemberIdx(response.data.data.memberIdx);
+                        //user 상태 변경
                         userStore.setName(response.data.data.name);
+                        userStore.setMemberIdx(response.data.data.memberIdx);
+
+                        // 페이지 리로드
+                        window.location.reload();
 
                         if (response.data.data.profileImg) {
-                            userStore.setProfileImg = response.data.data.profileImg;
+                            userStore.setProfileImg(response.data.data.profileImg);
                         }
 
-                        imageSrc.value = response.data.profileImage;
-
-                        emit('login-success', true); // 여기서 emit 함수 호출
+                        //imageSrc.value = response.data.profileImage;
                     } else {
                         alert('로그인 실패: ' + response.data.message);
                     }
@@ -131,27 +126,31 @@ export default {
             }
         };
 
+        /* //////////////////// */
+        /* ///로그아웃////////// */
+        /* /////////////////// */
         const logOut = () => {
             // 쿠키(member) 삭제
             document.cookie = 'member=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+
+            // Pinia 스토어 초기화
+            userStore.$reset();
+
+            // 로컬 스토리지에서 Pinia 상태 삭제
+            localStorage.removeItem('user');
 
             // 페이지 리로드
             window.location.reload();
         };
 
-        // onMounted(() => {
-        //     checkLoginStatus();
-        //     imageSrc.value = 'https://common-cdn-api.joycityglobal.com/community/gw/resources/images/content/left_menu/default-profile-after-login.png?v=231029';
-        //     userName.value = '김기현';
-        // });
-
-        const emitClosePopup = () => {
-            emit('close-popup');
+        /* //////////////////// */
+        /* ///팝업창 닫기/////// */
+        /* /////////////////// */
+        const closePopup = () => {
+            userStore.loginPopup = false;
         };
 
-        onMounted(() => {
-            //checkLoginStatus();
-        });
+        onMounted(() => {});
 
         return {
             imageSrc,
@@ -162,11 +161,10 @@ export default {
             isPasswordValid,
             userId,
             password,
-            emitClosePopup,
             userStore,
             loginInputStore,
             logOut,
-            //checkLoginStatus,
+            closePopup,
         };
     },
 };
