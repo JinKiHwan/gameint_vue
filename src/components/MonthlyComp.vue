@@ -7,7 +7,7 @@
                 <div class="monthly_book_wrap">
                     <div class="book_figure">
                         <figure>
-                            <img :src="monthlyBook" alt="" />
+                            <img :src="monthlyBook" alt="" ref="figure" />
                         </figure>
                     </div>
 
@@ -18,11 +18,19 @@
 
                         <div class="tab-content">
                             <div v-if="activeTab === 'book'">
-                                <h3>{{ bookName }}</h3>
+                                <h3>
+                                    <span class="gsap-text-ani">{{ bookName }}</span>
+                                </h3>
                                 <ul>
-                                    <li><b>작가</b> {{ bookWriter }}</li>
-                                    <li><b>출판사</b> {{ publisher }}</li>
-                                    <li><b>카테고리</b> {{ category }}</li>
+                                    <li>
+                                        <span class="gsap-text-ani"><b>작가</b> {{ bookWriter }}</span>
+                                    </li>
+                                    <li>
+                                        <span class="gsap-text-ani"><b>출판사</b> {{ publisher }}</span>
+                                    </li>
+                                    <li>
+                                        <span class="gsap-text-ani"><b>카테고리</b> {{ category }}</span>
+                                    </li>
                                 </ul>
                             </div>
 
@@ -40,7 +48,7 @@
                 </div>
             </div>
 
-            <button class="view_review" @click="viewReview">작성글보기→</button>
+            <button class="view_review" @click="monthlyAnimationLeave">작성글보기→</button>
             <button class="write_review" @click="writeReview">리뷰 작성</button>
             <Transition name="opacity">
                 <div class="monthly_review" v-if="reviewPopup">
@@ -73,14 +81,14 @@
                 <div class="member_profile">
                     <ul>
                         <li v-for="(user, index) in userReviewWraps" :key="index" @click="selectUser(index)">
-                            <img :src="user.userProfile" alt="" :class="{ active: selectedIndex === index }" />
+                            <img :src="user.userProfile" alt="" />
                         </li>
                     </ul>
                 </div>
 
                 <div class="member_review" v-if="selectedUser">
                     <ul>
-                        <li>{{ selectedUser.userName }}의 리뷰</li>
+                        <li>{{ selectedUser.userName }}님의 리뷰</li>
                         <li>{{ selectedUser.userReview }}</li>
                         <li class="user-rating">평점: {{ selectedUser.userPoint }} / 5</li>
                     </ul>
@@ -93,14 +101,17 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch, nextTick } from 'vue';
 import axios from 'axios';
+import { gsap } from 'gsap';
+import { CSSPlugin } from 'gsap/CSSPlugin';
+gsap.registerPlugin(CSSPlugin);
 
 export default {
     name: 'MonthlyComp',
 
     setup() {
-        const monthlyBook = ref(require('@/assets/img/book01.webp'));
+        const monthlyBook = ref('https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791188331796.jpg');
         const currentMonthBook = computed(() => {
             const now = new Date();
             //const year = now.getFullYear();
@@ -170,7 +181,6 @@ export default {
                 userPoint: 1,
             },
         ]);
-
         const selectedIndex = ref(0);
 
         const selectUser = (index) => {
@@ -231,8 +241,69 @@ export default {
             monthlyStatus.value = 0;
         };
 
+        /* //////////////////////////////// */
+        /* ///Monthly Component 애니메이션/// */
+        /* /////////////////////////////// */
+        const monthlyAnimation = () => {
+            const figure = document.querySelector('.book_figure figure img');
+            const text = gsap.utils.toArray('.gsap-text-ani');
+            gsap.set(figure, { xPercent: 150 });
+            gsap.set(text, { yPercent: 200 });
+            gsap.timeline({ defaults: { duration: 0.3 } })
+                .to(figure, { xPercent: 0, delay: 0.5 })
+                .to(text, {
+                    yPercent: 0,
+                    stagger: { each: 0.1 },
+                });
+        };
+
+        const monthlyAnimationLeave = () => {
+            const figure = document.querySelector('.book_figure figure img');
+            const text = gsap.utils.toArray('.gsap-text-ani');
+
+            gsap.timeline({ defaults: { duration: 0.3 } })
+                .to(figure, { xPercent: -150 })
+                .to(text, {
+                    yPercent: -200,
+                    stagger: { each: 0.1 },
+
+                    onComplete: () => {
+                        monthlyStatus.value = 1;
+
+                        const profile = gsap.utils.toArray('.member_profile ul li');
+
+                        console.log(profile);
+                    },
+                });
+        };
+
+        const monthlyAnimation2 = () => {
+            const profile = gsap.utils.toArray('.member_profile ul li');
+            const review = gsap.utils.toArray('.member_review ul li');
+
+            gsap.set(profile, { scale: 0 });
+            gsap.set(review, { opacity: 0, y: 50 });
+
+            gsap.timeline({ defaults: { duration: 0.3 } })
+                .to(profile, { scale: 1, stagger: { each: 0.1 } })
+                .to(review, { opacity: 1, y: 0, stagger: { each: 0.1 } }, '<');
+        };
+
         onMounted(() => {
             monthlyStatus.value = 0; //초기 화면 값
+
+            monthlyAnimation();
+            watch(monthlyStatus, (newValue) => {
+                if (newValue === 1) {
+                    nextTick(() => {
+                        monthlyAnimation2();
+                    });
+                } else if (newValue === 0) {
+                    nextTick(() => {
+                        monthlyAnimation();
+                    });
+                }
+            });
 
             monthlyBookDetail();
         });
@@ -260,6 +331,9 @@ export default {
             activeTab,
             selectUser,
             selectedUser,
+            monthlyAnimation,
+            monthlyAnimationLeave,
+            monthlyAnimation2,
         };
     },
 };
@@ -267,6 +341,10 @@ export default {
 
 <style lang="scss" scoped>
 .monthly {
+    .gsap-text-ani {
+        display: block;
+    }
+
     background: #e4e6e7;
     height: 100%;
     overflow: auto;
@@ -302,8 +380,10 @@ export default {
                 max-width: 55%;
                 display: flex;
                 justify-content: center;
+                overflow: hidden;
 
                 img {
+                    object-fit: contain;
                     height: 100%;
                 }
             }
@@ -330,6 +410,13 @@ export default {
         }
         .member_review {
             width: 50%;
+
+            ul {
+                li {
+                    padding: 10px;
+                    line-height: 1.2;
+                }
+            }
         }
     }
     &_book_info {
@@ -375,13 +462,16 @@ export default {
                     letter-spacing: -1px;
                     padding: 10px;
                     border-bottom: 1px solid #000;
+                    overflow: hidden;
                 }
                 h4 {
                     padding: 10px;
+                    overflow: hidden;
                 }
 
                 ul {
                     li {
+                        overflow: hidden;
                         max-width: 100%;
                         padding: 10px;
                         border-bottom: 1px solid #000;
