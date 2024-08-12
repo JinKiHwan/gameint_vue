@@ -112,16 +112,15 @@ export default {
 
                         console.log(userStore.profileImg);
 
-                        userStore.memberIdx = response.data.data.memberIdx;
-                        userStore.name = response.data.data.name;
+                        userStore.setMemberIdx(response.data.data.memberIdx);
+                        userStore.setName(response.data.data.name);
 
                         if (response.data.data.profileImg) {
-                            userStore.profileImg = response.data.data.profileImg;
+                            userStore.setProfileImg = response.data.data.profileImg;
                         }
 
                         imageSrc.value = response.data.profileImage;
 
-                        console.log(loginInputStore.id, loginInputStore.pw);
                         emit('login-success', true); // 여기서 emit 함수 호출
                     } else {
                         alert('로그인 실패: ' + response.data.message);

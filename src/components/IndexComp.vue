@@ -12,6 +12,10 @@
     </div>
 
     <div class="menu">
+        <div class="welcome_txt">
+            <h3 v-if="isLogin"></h3>
+            <h3 v-else></h3>
+        </div>
         <ul>
             <li class="home">
                 <a href="javascript:void(0)" @click="browserOpen('home')">
@@ -110,6 +114,9 @@ import axios from 'axios';
 
 import { useUserStore } from '@/store/user';
 import { userLoginInput } from '@/store/loginInput';
+import { gsap } from 'gsap';
+import { TextPlugin } from 'gsap/TextPlugin';
+gsap.registerPlugin(TextPlugin);
 
 export default {
     name: 'IndexComp',
@@ -143,14 +150,14 @@ export default {
         const popupState = ref(false);
         const isLogin = ref(false);
 
-        console.log(loginInputStore.pw);
+        const text = [`반갑습니다 ` + userStore.setName + `님!`, 'GameInt에 오신걸 환영합니다!'];
 
         const updateLoginStatus = async (status) => {
             isLogin.value = status;
         };
 
         const checkLoginStatus = async () => {
-            console.log('Checking login status...');
+            //console.log('Checking login status...');
 
             const cookies = document.cookie.split(';');
             const memberCookie = cookies.find((cookie) => cookie.trim().startsWith('member='));
@@ -160,16 +167,15 @@ export default {
                 try {
                     const response = await axios.post('http://localhost:3000/api/member/sign-in', {
                         withCredentials: true,
-                        account: 'eljsh95',
-                        password: 'qwer',
+                        account: loginInputStore.id,
+                        password: loginInputStore.pw,
                     });
 
                     if (response) {
-                        userStore.memberIdx = response.data.data.memberIdx;
-                        userStore.name = response.data.data.name;
+                        userStore.setName = response.data.data.name;
                     }
                 } catch (error) {
-                    console.error('Error fetching user info:', error);
+                    //console.error('Error fetching user info:', error);
                 }
             } else {
                 console.log('User is not logged in.');
@@ -206,10 +212,25 @@ export default {
             currentTime.value = new Date();
         };
 
+        /* WelcomeText 애니메이션 */
+        const welcomeText01 = () => {
+            gsap.timeline().to('.welcome_txt h3', {
+                duration: 1.5,
+                text: text[0],
+                yoyo: true,
+                repeat: 1,
+            });
+
+            text.push(text.shift());
+
+            gsap.delayedCall(3, welcomeText01, [text]);
+        };
+
         onMounted(() => {
             timer = setInterval(updateTime, 1000); // 1초마다 업데이트
 
             checkLoginStatus();
+            welcomeText01();
         });
         onUnmounted(() => {
             clearInterval(timer); // 컴포넌트 소멸 시 타이머 정리
@@ -290,6 +311,7 @@ export default {
             closePopup,
             updateLoginStatus,
             checkLoginStatus,
+            welcomeText01,
         };
     },
 
@@ -358,10 +380,21 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
+    gap: 15px;
 
     @include mobile {
         padding-top: 15vw;
         align-items: flex-start !important;
+    }
+
+    .welcome_txt {
+        width: min(550px, 45%);
+        padding: 10px;
+        background: rgba($color: #fff, $alpha: 0.2);
+        border-radius: 10px;
+        backdrop-filter: blur(10px);
+        height: 36px;
     }
 
     ul {

@@ -2,8 +2,8 @@ import { defineStore } from 'pinia';
 
 export const userLoginInput = defineStore('loginInput', {
     state: () => ({
-        id: '123',
-        pw: '456',
+        id: '',
+        pw: '',
     }),
     actions: {
         inputId(value) {

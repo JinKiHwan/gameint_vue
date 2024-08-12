@@ -241,11 +241,8 @@ export function createHomeAnimations() {
             });
     }
 
-    //scroll
-
     return {
         animations,
-
         initAnimation,
     };
 }
