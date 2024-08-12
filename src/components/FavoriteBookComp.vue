@@ -210,7 +210,7 @@
 ///////////////////////////////////////////
 // import
 ///////////////////////////////////////////
-import { ref, reactive, computed } from 'vue';
+import { ref, computed } from 'vue';
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import axios from 'axios';
@@ -220,11 +220,11 @@ export default {
     setup() {
         // 변수
         const isFavoriteBookStatus = ref(0); // List : 0, Write/Edit : 1, View : 2
-        const bookName = ref('');
-        const publisher = ref('');
-        const writer = ref('');
-        const category = ref('');
-        const commentNum = ref('');
+        // const bookName = ref('');
+        // const publisher = ref('');
+        // const writer = ref('');
+        // const category = ref('');
+        // const commentNum = ref('');
         const bookTitle = ref('');
         const bookPub = ref('');
         const bookCate = ref('');
@@ -281,9 +281,9 @@ export default {
         const initRecomBookList = async () => {
             const url = 'http://localhost:3000/api/book/monthly/recommend/list'
             try {
-                const response = await axios.get(url);
-                console.log(response);
-
+                const response = await axios.get(url,);
+                console.log(response.data);
+                isFavoriteBookList = response.data;
             } catch (error) {
                 alert(error);
             }
@@ -291,128 +291,128 @@ export default {
         };
 
         // 데이터 매핑
-        isFavoriteBookList = reactive([
-            {
-                img: require('@/assets/img/favorite/book28.webp'),
-                title: (bookName.value = '제일 긴 책제목은 과연 몇자일까요오오오오오'),
-                publisher: (publisher.value = '민음사'),
-                writer: (writer.value = '김동동'),
-                category: (category.value = '에세이'),
-                commentNum: (commentNum.value = '10'),
-                recommender: require('@/assets/img/profile/test.jpg'),
-                edit,
-                master,
-                isHovered: false,
-            },
-            {
-                img: require('@/assets/img/favorite/book28.webp'),
-                title: (bookName.value = '제일 긴 책제목은 과연'),
-                publisher: (publisher.value = '민음사'),
-                writer: (writer.value = '김동동'),
-                category: (category.value = '에세이'),
-                commentNum: (commentNum.value = '10'),
-                recommender: require('@/assets/img/profile/test.jpg'),
-                edit,
-                master,
-                isHovered: false,
-            },
-            {
-                img: require('@/assets/img/favorite/book28.webp'),
-                title: (bookName.value = '몇자일까요오오오오오'),
-                publisher: (publisher.value = '민음사'),
-                writer: (writer.value = '김동동'),
-                category: (category.value = '에세이'),
-                commentNum: (commentNum.value = '2'),
-                recommender: require('@/assets/img/profile/test.jpg'),
-                edit,
-                master,
-                isHovered: false,
-            },
-            {
-                img: require('@/assets/img/favorite/book28.webp'),
-                title: (bookName.value = '효자손으로도 때리지 말라'),
-                publisher: (publisher.value = '민음사'),
-                writer: (writer.value = '김동동'),
-                category: (category.value = '에세이'),
-                commentNum: (commentNum.value = '3'),
-                recommender: require('@/assets/img/profile/test.jpg'),
-                edit,
-                master,
-                isHovered: false,
-            },
-            {
-                img: require('@/assets/img/favorite/book28.webp'),
-                title: (bookName.value = '임금 인상을 요청하기 위해 과장에게 접근하는 기술과 방법'),
-                publisher: (publisher.value = '민음사'),
-                writer: (writer.value = '김동동'),
-                category: (category.value = '에세이'),
-                commentNum: (commentNum.value = '4'),
-                recommender: require('@/assets/img/profile/test.jpg'),
-                edit,
-                master,
-                isHovered: false,
-            },
-            {
-                img: require('@/assets/img/favorite/book28.webp'),
-                title: (bookName.value = '에피쿠로스 쾌락 6'),
-                publisher: (publisher.value = '민음사'),
-                writer: (writer.value = '김동동'),
-                category: (category.value = '에세이'),
-                commentNum: (commentNum.value = '4'),
-                recommender: require('@/assets/img/profile/test.jpg'),
-                edit,
-                master,
-                isHovered: false,
-            },
-            {
-                img: require('@/assets/img/favorite/book28.webp'),
-                title: (bookName.value = '에피쿠로스 쾌락 7'),
-                publisher: (publisher.value = '민음사'),
-                writer: (writer.value = '김동동'),
-                category: (category.value = '에세이'),
-                commentNum: (commentNum.value = '5'),
-                recommender: require('@/assets/img/profile/test.jpg'),
-                edit,
-                master,
-                isHovered: false,
-            },
-            {
-                img: require('@/assets/img/favorite/book28.webp'),
-                title: (bookName.value = '에피쿠로스 쾌락 7'),
-                publisher: (publisher.value = '민음사'),
-                writer: (writer.value = '김동동'),
-                category: (category.value = '에세이'),
-                commentNum: (commentNum.value = '5'),
-                recommender: require('@/assets/img/profile/test.jpg'),
-                edit,
-                master,
-                isHovered: false,
-            },
-            {
-                img: require('@/assets/img/favorite/book28.webp'),
-                title: (bookName.value = '에피쿠로스 쾌락 7'),
-                publisher: (publisher.value = '민음사'),
-                writer: (writer.value = '김동동'),
-                category: (category.value = '에세이'),
-                commentNum: (commentNum.value = '5'),
-                recommender: require('@/assets/img/profile/test.jpg'),
-                edit,
-                master,
-                isHovered: false,
-            },
-            {
-                img: require('@/assets/img/favorite/book28.webp'),
-                title: (bookName.value = '에피쿠로스 쾌락 7'),
-                publisher: (publisher.value = '민음사'),
-                writer: (writer.value = '김동동'),
-                category: (category.value = '에세이'),
-                commentNum: (commentNum.value = '5'),
-                recommender: require('@/assets/img/profile/test.jpg'),
-                edit,
-                master,
-                isHovered: false,
-            },
-        ])
+        // isFavoriteBookList = reactive([
+        //     {
+        //         img: require('@/assets/img/favorite/book28.webp'),
+        //         title: (bookName.value = '제일 긴 책제목은 과연 몇자일까요오오오오오'),
+        //         publisher: (publisher.value = '민음사'),
+        //         writer: (writer.value = '김동동'),
+        //         category: (category.value = '에세이'),
+        //         commentNum: (commentNum.value = '10'),
+        //         recommender: require('@/assets/img/profile/test.jpg'),
+        //         edit,
+        //         master,
+        //         isHovered: false,
+        //     },
+        //     {
+        //         img: require('@/assets/img/favorite/book28.webp'),
+        //         title: (bookName.value = '제일 긴 책제목은 과연'),
+        //         publisher: (publisher.value = '민음사'),
+        //         writer: (writer.value = '김동동'),
+        //         category: (category.value = '에세이'),
+        //         commentNum: (commentNum.value = '10'),
+        //         recommender: require('@/assets/img/profile/test.jpg'),
+        //         edit,
+        //         master,
+        //         isHovered: false,
+        //     },
+        //     {
+        //         img: require('@/assets/img/favorite/book28.webp'),
+        //         title: (bookName.value = '몇자일까요오오오오오'),
+        //         publisher: (publisher.value = '민음사'),
+        //         writer: (writer.value = '김동동'),
+        //         category: (category.value = '에세이'),
+        //         commentNum: (commentNum.value = '2'),
+        //         recommender: require('@/assets/img/profile/test.jpg'),
+        //         edit,
+        //         master,
+        //         isHovered: false,
+        //     },
+        //     {
+        //         img: require('@/assets/img/favorite/book28.webp'),
+        //         title: (bookName.value = '효자손으로도 때리지 말라'),
+        //         publisher: (publisher.value = '민음사'),
+        //         writer: (writer.value = '김동동'),
+        //         category: (category.value = '에세이'),
+        //         commentNum: (commentNum.value = '3'),
+        //         recommender: require('@/assets/img/profile/test.jpg'),
+        //         edit,
+        //         master,
+        //         isHovered: false,
+        //     },
+        //     {
+        //         img: require('@/assets/img/favorite/book28.webp'),
+        //         title: (bookName.value = '임금 인상을 요청하기 위해 과장에게 접근하는 기술과 방법'),
+        //         publisher: (publisher.value = '민음사'),
+        //         writer: (writer.value = '김동동'),
+        //         category: (category.value = '에세이'),
+        //         commentNum: (commentNum.value = '4'),
+        //         recommender: require('@/assets/img/profile/test.jpg'),
+        //         edit,
+        //         master,
+        //         isHovered: false,
+        //     },
+        //     {
+        //         img: require('@/assets/img/favorite/book28.webp'),
+        //         title: (bookName.value = '에피쿠로스 쾌락 6'),
+        //         publisher: (publisher.value = '민음사'),
+        //         writer: (writer.value = '김동동'),
+        //         category: (category.value = '에세이'),
+        //         commentNum: (commentNum.value = '4'),
+        //         recommender: require('@/assets/img/profile/test.jpg'),
+        //         edit,
+        //         master,
+        //         isHovered: false,
+        //     },
+        //     {
+        //         img: require('@/assets/img/favorite/book28.webp'),
+        //         title: (bookName.value = '에피쿠로스 쾌락 7'),
+        //         publisher: (publisher.value = '민음사'),
+        //         writer: (writer.value = '김동동'),
+        //         category: (category.value = '에세이'),
+        //         commentNum: (commentNum.value = '5'),
+        //         recommender: require('@/assets/img/profile/test.jpg'),
+        //         edit,
+        //         master,
+        //         isHovered: false,
+        //     },
+        //     {
+        //         img: require('@/assets/img/favorite/book28.webp'),
+        //         title: (bookName.value = '에피쿠로스 쾌락 7'),
+        //         publisher: (publisher.value = '민음사'),
+        //         writer: (writer.value = '김동동'),
+        //         category: (category.value = '에세이'),
+        //         commentNum: (commentNum.value = '5'),
+        //         recommender: require('@/assets/img/profile/test.jpg'),
+        //         edit,
+        //         master,
+        //         isHovered: false,
+        //     },
+        //     {
+        //         img: require('@/assets/img/favorite/book28.webp'),
+        //         title: (bookName.value = '에피쿠로스 쾌락 7'),
+        //         publisher: (publisher.value = '민음사'),
+        //         writer: (writer.value = '김동동'),
+        //         category: (category.value = '에세이'),
+        //         commentNum: (commentNum.value = '5'),
+        //         recommender: require('@/assets/img/profile/test.jpg'),
+        //         edit,
+        //         master,
+        //         isHovered: false,
+        //     },
+        //     {
+        //         img: require('@/assets/img/favorite/book28.webp'),
+        //         title: (bookName.value = '에피쿠로스 쾌락 7'),
+        //         publisher: (publisher.value = '민음사'),
+        //         writer: (writer.value = '김동동'),
+        //         category: (category.value = '에세이'),
+        //         commentNum: (commentNum.value = '5'),
+        //         recommender: require('@/assets/img/profile/test.jpg'),
+        //         edit,
+        //         master,
+        //         isHovered: false,
+        //     },
+        // ])
 
         if (isFavoriteBookStatus.value === 0) {
             initRecomBookList();
@@ -609,6 +609,8 @@ export default {
             favoriteBook,
             isFavoriteBookStatus,
             isFavoriteBookList,
+            master,
+            edit,
             editMode,
             commnetEdit,
             chWriteBtnTxt,
