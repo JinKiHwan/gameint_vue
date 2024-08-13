@@ -2,14 +2,13 @@
     <div class="monthly">
         <div class="monthly_inner" v-if="monthlyStatus === 0">
             <div class="monthly_book">
-                <p>{{ currentMonthBook }}</p>
-
                 <div class="monthly_book_wrap">
-                    <div class="book_figure">
-                        <figure>
-                            <img :src="monthlyBook" alt="" ref="figure" />
-                        </figure>
-                    </div>
+                    <div class="monthly_book_bg"><img :src="monthlyBook" alt="" /></div>
+
+                    <figure class="monthly_book_img">
+                        <img :src="monthlyBook" alt="" />
+                        <figcaption>{{ currentMonthBook }}</figcaption>
+                    </figure>
 
                     <div class="monthly_book_info">
                         <ul class="monthly_book_tab">
@@ -41,7 +40,8 @@
                                     </li>
                                     <li class="recommend_reason">
                                         <b>추천이유 </b>
-                                        <i>{{ recommendReason }}</i>
+
+                                        <i> {{ recommendReason }}</i>
                                     </li>
                                 </ul>
                             </div>
@@ -50,8 +50,16 @@
                 </div>
             </div>
 
-            <button class="view_review" @click="monthlyAnimationLeave">작성글보기→</button>
-            <button class="write_review" @click="writeReview" v-if="userStore.isLogin">리뷰 작성</button>
+            <div class="monthly_book_btn">
+                <div class="monthly_book_btn_wrap">
+                    <a href="javascript:void(0)" @click="menuStatusChange"> <span></span><span></span><span></span> <i class="x1"></i><i class="x2"></i></a>
+                    <button class="view_review" @click="monthlyAnimationLeave"></button>
+                    <button class="write_review" @click="writeReview"></button>
+                </div>
+            </div>
+
+            <!-- <button class="view_review" @click="monthlyAnimationLeave">작성글보기→</button> -->
+            <!-- <button class="write_review" @click="writeReview" v-if="userStore.isLogin">리뷰 작성</button> -->
             <div class="monthly_review" v-if="reviewPopup">
                 <form action="">
                     <h3>리뷰 작성</h3>
@@ -141,7 +149,7 @@ export default {
             const now = new Date();
             //const year = now.getFullYear();
             const month = now.getMonth() + 1;
-            return `${month}월의 책`;
+            return `${month} 월의 책`;
         });
 
         const data = ref('');
@@ -219,6 +227,7 @@ export default {
         const selectedIndex = ref(0);
         const value = ref(null);
         const reviewContents = ref('');
+        let menuStatus = ref(false);
 
         const selectUser = (index) => {
             selectedIndex.value = index;
@@ -238,15 +247,15 @@ export default {
         /* /////////////////////////////// */
         const monthlyBookDetail = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/api/book/monthly/this-month');
-                //data.value = response.data;
+                const response = await axios.get('http://localhost:3000/api/book/monthly/this-month', { withCredentials: true });
+                console.log(response.data.data);
 
                 if (response.data.code === 1) {
                     bookIdx.value = response.data.data.bookIdx;
                     bookName.value = response.data.data.bookTitle; //책제목
                     category.value = response.data.data.bookCategory; //카테고리
                     publisher.value = response.data.data.bookPublisher; //출판사
-                    //bookWriter.value //작가명
+                    bookWriter.value = response.data.data.author; //작가명
                     recommendUser.value = response.data.data.memberName; //추천인
                     recommendReason.value = response.data.data.recommendReason; //추천이유
                 } else if (response.data.code === -1) {
@@ -310,7 +319,7 @@ export default {
         };
 
         /* //////////////////////////////// */
-        /* //리뷰작성 & 수정하기 팝업 On&Off// */
+        /* //리뷰작성 & 수정하기 팝업 On&Off/// */
         /* /////////////////////////////// */
         const writeReview = () => {
             reviewPopup.value = true;
@@ -324,6 +333,107 @@ export default {
         };
         const closeEditReview = () => {
             reviewEditPopup.value = false;
+        };
+
+        /* //////////////////////////////// */
+        /* //리뷰작성 메뉴 애니메이션//////////// */
+        /* /////////////////////////////// */
+
+        let isAnimating = false;
+
+        const menuStatusChange = () => {
+            if (isAnimating) return; // 애니메이션 중이면 함수 실행을 중단
+
+            isAnimating = true;
+            menuStatus.value = !menuStatus.value;
+
+            const timeline = gsap.timeline({
+                defaults: { ease: 'back(3)' },
+                onComplete: () => {
+                    isAnimating = false; // 애니메이션이 완료되면 플래그를 false로 설정
+                },
+            });
+
+            if (menuStatus.value) {
+                menuOpen(timeline);
+            } else {
+                menuClose(timeline);
+            }
+        };
+
+        const menuOpen = (timeline) => {
+            const menuHamburger = gsap.utils.toArray('.monthly_book_btn_wrap > a > span');
+            const menuX = gsap.utils.toArray('.monthly_book_btn_wrap > a > i');
+            const viewReview = document.querySelector('.view_review');
+            const writeReview = document.querySelector('.write_review');
+
+            timeline
+                .to(menuHamburger, {
+                    opacity: 0,
+                    scale: 0,
+                })
+                .to(menuX, {
+                    opacity: 1,
+                    scale: 1,
+                })
+                .to(
+                    viewReview,
+                    {
+                        x: -60,
+                    },
+                    '<'
+                )
+                .to(
+                    writeReview,
+                    {
+                        x: -30,
+                        y: -60,
+                        delay: 0.1,
+                    },
+                    '<'
+                )
+                .to(menuX, {
+                    rotate: gsap.utils.wrap([45, -45]),
+                });
+        };
+
+        const menuClose = (timeline) => {
+            const menuHamburger = gsap.utils.toArray('.monthly_book_btn_wrap > a > span');
+            const menuX = gsap.utils.toArray('.monthly_book_btn_wrap > a > i');
+            const viewReview = document.querySelector('.view_review');
+            const writeReview = document.querySelector('.write_review');
+
+            timeline
+                .to(menuX, {
+                    rotate: 0,
+                })
+                .to(
+                    viewReview,
+                    {
+                        x: 0,
+                        ease: 'back.in(1.7)',
+                    },
+                    '<'
+                )
+                .to(
+                    writeReview,
+                    {
+                        delay: 0.1,
+                        x: 0,
+                        y: 0,
+                        ease: 'back.in(1.7)',
+                    },
+                    '<'
+                )
+                .to(menuX, {
+                    opacity: 0,
+                    scale: 0,
+                })
+
+                .to(menuHamburger, {
+                    opacity: 1,
+                    scale: 1,
+                });
         };
 
         /* //////////////////////////////// */
@@ -354,6 +464,7 @@ export default {
 
                     onComplete: () => {
                         monthlyStatus.value = 1;
+                        menuStatus.value = false;
                     },
                 });
         };
@@ -422,6 +533,7 @@ export default {
             // 소수점 둘째자리까지 반올림하고 다시 숫자로 변환
             value.value = Number(Number(value.value).toFixed(2));
         });
+
         return {
             userStore,
             monthlyBook,
@@ -456,6 +568,10 @@ export default {
             editReview,
             closeEditReview,
             bookIdx,
+            menuOpen,
+            menuClose,
+            menuStatus,
+            menuStatusChange,
         };
     },
 };
@@ -463,6 +579,8 @@ export default {
 
 <style lang="scss" scoped>
 .monthly {
+    position: relative;
+    height: 100%;
     .gsap-text-ani {
         display: block;
     }
@@ -472,165 +590,218 @@ export default {
     &_inner {
         box-sizing: border-box;
         width: 100%;
-        overflow: auto;
+        height: 100%;
+        overflow: hidden;
     }
 
     &_book {
-        p {
-            text-align: center;
-            font-size: 22px;
-            font-weight: 800;
-            margin-top: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #000;
-        }
-    }
-    &_book_wrap {
+        height: 100%;
         display: flex;
-        border-bottom: 1px solid #000;
-        height: 505px;
+        align-items: center;
+        justify-content: center;
 
-        .book_figure {
-            width: 50%;
-            border-right: 1px solid #000;
-            figure {
-                width: auto;
-                height: 100%;
-                margin: 0 auto;
-                max-width: 55%;
-                display: flex;
-                justify-content: center;
-                overflow: hidden;
-
-                img {
-                    object-fit: contain;
-                    height: 100%;
-                }
+        &_bg {
+            position: fixed;
+            z-index: -1;
+            width: 100%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            filter: blur(15px) brightness(0.5);
+            img {
+                width: 100%;
+                object-fit: cover;
             }
         }
 
-        .member_profile {
-            width: 50%;
-            border-right: 1px solid #000;
-            padding: 15px;
-            ul {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 20px;
-                perspective: 1000px;
+        > p {
+            text-align: center;
+            font-size: 15px;
+            color: #fff;
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+        }
 
-                li {
-                    width: calc((100% - (20px * 5)) / 6);
-                    border-radius: 50%;
-                    overflow: hidden;
-                    cursor: pointer;
-                    aspect-ratio: 1/1;
-                    border: 1px solid #000;
-                    box-shadow: 0 0 15px rgba($color: #000000, $alpha: 0.3);
-                    transition: border 0.3s, box-shadow 0.3s;
+        &_wrap {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 70%;
+            gap: 25px;
 
-                    &.active {
-                        border-width: 3px;
-                        border-color: #29ca6b;
-                        box-shadow: 0 0 15px rgba($color: #29ca6b, $alpha: 0.3);
+            .member_review {
+                width: 50%;
+
+                ul {
+                    li {
+                        padding: 10px;
+                        line-height: 1.2;
                     }
                 }
             }
         }
-        .member_review {
-            width: 50%;
+        &_img {
+            height: 100%;
+            position: relative;
 
-            ul {
-                li {
-                    padding: 10px;
+            img {
+                height: 100%;
+                object-fit: contain;
+                box-shadow: 0 0 15px rgba($color: #fff, $alpha: 1);
+            }
+
+            figcaption {
+                position: absolute;
+                font-size: 15px;
+                left: -26px;
+                top: 0;
+                writing-mode: vertical-rl;
+                text-orientation: upright;
+                color: #eee;
+            }
+        }
+
+        &_info {
+            width: min(300px, 45%);
+            color: #ededed;
+        }
+
+        &_tab {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+
+            li {
+                font-size: 18px;
+                padding: 3px 15px;
+                position: relative;
+                z-index: 0;
+                cursor: pointer;
+                opacity: 0.7;
+                &::after {
+                    content: '';
+                    width: 0;
+                    height: 8px;
+                    background: #30d158;
+                    z-index: -1;
+                    display: block;
+                    position: absolute;
+                    left: 50%;
+                    bottom: -1px;
+                    transform: translateX(-50%);
+                    transition: width 0.3s;
+                }
+
+                &:hover {
+                    opacity: 1;
+                }
+                &.active {
+                    color: #fff;
+                    opacity: 1;
+                    &::after {
+                        width: 100%;
+                    }
+                }
+            }
+        }
+
+        &_btn {
+            position: fixed;
+            right: 25px;
+            bottom: 25px;
+            width: 50px;
+            aspect-ratio: 1/1;
+
+            &_wrap {
+                position: relative;
+                width: 100%;
+                height: 100%;
+            }
+
+            a {
+                display: block;
+                width: 100%;
+                height: 100%;
+                background: #c79707;
+                border-radius: 50%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 5px;
+                position: relative;
+
+                span {
+                    display: block;
+                    height: 2px;
+                    width: 50%;
+                    background: #fff;
+                    transform-origin: center center;
+                }
+
+                i {
+                    position: absolute;
+                    display: block;
+                    width: 50%;
+                    height: 2px;
+                    background: #fff;
+                    scale: 0;
+                    opacity: 0;
+
+                    &.x1 {
+                        transform: rotate(45deg);
+                    }
+                    &.x2 {
+                        transform: rotate(-45deg);
+                    }
+                }
+            }
+
+            .view_review,
+            .write_review {
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+                background: #f00;
+                position: absolute;
+                left: 0;
+                top: 0;
+                z-index: -1;
+            }
+        }
+    }
+
+    .tab-content {
+        h3 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        ul {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            li {
+                display: flex;
+
+                b {
+                    display: inline-block;
+                    width: 65px;
+                    opacity: 0.8;
+                }
+
+                i {
+                    display: inline-block;
+                    width: calc(100% - 65px);
                     line-height: 1.2;
                 }
             }
         }
     }
-    &_book_info {
-        width: 50%;
-        height: 100%;
-        overflow: auto;
-        display: flex;
-        flex-direction: column;
 
-        .monthly_book_tab {
-            width: 100%;
-            display: flex;
-            border-bottom: 1px solid #000;
-            li {
-                height: 32px;
-                width: 110px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                transition: all 0.1s;
-                border-right: 1px solid #000;
-
-                &.active,
-                &:hover {
-                    background: #000;
-                    color: #fff;
-                }
-            }
-        }
-
-        .tab-content {
-            display: flex;
-
-            > div {
-                width: 100%;
-                b {
-                    font-weight: 800;
-                }
-                h3 {
-                    font-size: 45px;
-                    font-weight: 800;
-                    letter-spacing: -1px;
-                    padding: 10px;
-                    border-bottom: 1px solid #000;
-                    overflow: hidden;
-                }
-                h4 {
-                    padding: 10px;
-                    overflow: hidden;
-                }
-
-                ul {
-                    li {
-                        overflow: hidden;
-                        max-width: 100%;
-                        padding: 10px;
-                        border-bottom: 1px solid #000;
-                        &.recommend_reason {
-                            border-bottom: 0;
-
-                            i {
-                                line-height: 1.5;
-                            }
-
-                            p {
-                                line-height: 1.5;
-                                margin-top: 15px;
-                                width: 80%;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    .view_review {
-        height: 48px;
-        position: absolute;
-        right: 10px;
-        top: 35px;
-    }
-
-    .write_review,
     .edit_review {
         position: fixed;
         right: 10px;

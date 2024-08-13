@@ -143,7 +143,7 @@ export default {
         const wifi = ref(require('@/assets/img/wifi.svg'));
         const browserRef = ref(null);
         const isFullScreen = ref(false);
-        const browserStatus = ref(false);
+        const browserStatus = ref(true);
         const currentTime = ref(new Date());
         const popupState = ref(false);
         const text01 = ref(['GameInt에 오신걸 환영합니다!', '동호회 가입시 컨텐츠 이용이 가능합니다!']);
@@ -155,7 +155,7 @@ export default {
 
         const menuStatus = reactive({
             home: false,
-            monthly: false,
+            monthly: true,
             favorite: false,
             history: false,
             // 추가 메뉴들...
