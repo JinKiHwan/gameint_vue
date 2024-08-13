@@ -322,7 +322,13 @@ export default {
         /* //리뷰작성 & 수정하기 팝업 On&Off/// */
         /* /////////////////////////////// */
         const writeReview = () => {
-            reviewPopup.value = true;
+            console.log(userStore.isLogin);
+            if (!userStore.isLogin) {
+                alert('로그인이 필요한 컨텐츠입니다');
+                return;
+            } else {
+                reviewPopup.value = true;
+            }
         };
         const closeReview = () => {
             event.preventDefault(); // 기본 동작 방지
@@ -746,7 +752,6 @@ export default {
                     width: 50%;
                     height: 2px;
                     background: #fff;
-                    scale: 0;
                     opacity: 0;
 
                     &.x1 {
