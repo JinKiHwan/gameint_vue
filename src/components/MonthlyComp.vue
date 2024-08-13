@@ -36,7 +36,9 @@
 
                             <div v-else-if="activeTab === 'recommend'">
                                 <ul>
-                                    <li><b>추천인 </b> {{ recommendUser }}</li>
+                                    <li>
+                                        <span class="gsap-text-ani"><b>추천인 </b> {{ recommendUser }}</span>
+                                    </li>
                                     <li class="recommend_reason">
                                         <b>추천이유 </b>
                                         <i>{{ recommendReason }}</i>
@@ -49,27 +51,26 @@
             </div>
 
             <button class="view_review" @click="monthlyAnimationLeave">작성글보기→</button>
-            <button class="write_review" @click="writeReview">리뷰 작성</button>
-            <Transition name="opacity">
-                <div class="monthly_review" v-if="reviewPopup">
-                    <form action="">
-                        <dl>
-                            <dt>평점</dt>
-                            <dd></dd>
-                        </dl>
+            <button class="write_review" @click="writeReview" v-if="userStore.isLogin">리뷰 작성</button>
+            <div class="monthly_review" v-if="reviewPopup">
+                <form action="">
+                    <h3>리뷰 작성</h3>
+                    <dl>
+                        <dt>평점</dt>
+                        <dd><input type="number" max="5" min="1" v-model.number="value" step="0.01" placeholder="1~5점을 입력해 주세요" /></dd>
+                    </dl>
 
-                        <dl>
-                            <dt>리뷰</dt>
-                            <dd><textarea name="" id=""></textarea></dd>
-                        </dl>
+                    <dl>
+                        <dt>리뷰</dt>
+                        <dd><textarea v-model="reviewContents" placeholder="책을 읽고 느낀점을 자유롭게 적어주세요"></textarea></dd>
+                    </dl>
 
-                        <div class="btn_wrap">
-                            <button class="close" @click="closeReview">닫기</button>
-                            <button class="write">작성하기</button>
-                        </div>
-                    </form>
-                </div>
-            </Transition>
+                    <div class="btn_wrap">
+                        <button class="close" @click="closeReview">닫기</button>
+                        <button class="write" @click="monthlyBookReview">작성하기</button>
+                    </div>
+                </form>
+            </div>
         </div>
 
         <div class="monthly_inner" v-if="monthlyStatus === 1">
@@ -80,7 +81,7 @@
             <div class="monthly_book_wrap">
                 <div class="member_profile">
                     <ul>
-                        <li v-for="(user, index) in userReviewWraps" :key="index" @click="selectUser(index)">
+                        <li v-for="(user, index) in userReviewWraps" :key="index" @click="selectUser(index)" :class="{ active: selectedIndex === index }">
                             <img :src="user.userProfile" alt="" />
                         </li>
                     </ul>
@@ -92,10 +93,31 @@
                         <li>{{ selectedUser.userReview }}</li>
                         <li class="user-rating">평점: {{ selectedUser.userPoint }} / 5</li>
                     </ul>
+                    <button v-if="selectedUser.userId == userStore.memberIdx" class="edit_review" @click="editReview">수정하기</button>
                 </div>
             </div>
 
-            <button class="history_back" @click="monthlyBack">←뒤로가기</button>
+            <button class="history_back" @click="monthlyAnimation2Leave">←뒤로가기</button>
+
+            <div class="monthly_review_edit" v-if="reviewEditPopup">
+                <form action="">
+                    <h3>리뷰 수정</h3>
+                    <dl>
+                        <dt>평점</dt>
+                        <dd><input type="number" max="5" min="1" v-model.number="value" step="0.01" placeholder="1~5점을 입력해 주세요" /></dd>
+                    </dl>
+
+                    <dl>
+                        <dt>리뷰</dt>
+                        <dd><textarea name="" id="" placeholder="책을 읽고 느낀점을 자유롭게 적어주세요"></textarea></dd>
+                    </dl>
+
+                    <div class="btn_wrap">
+                        <button class="close" @click="closeEditReview">닫기</button>
+                        <button class="write">수정하기</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </template>
@@ -107,11 +129,14 @@ import { gsap } from 'gsap';
 import { CSSPlugin } from 'gsap/CSSPlugin';
 gsap.registerPlugin(CSSPlugin);
 
+import { useUserStore } from '@/store/user';
+
 export default {
     name: 'MonthlyComp',
 
     setup() {
-        const monthlyBook = ref('https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791188331796.jpg');
+        const userStore = useUserStore();
+        const monthlyBook = ref('https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791193044162.jpg');
         const currentMonthBook = computed(() => {
             const now = new Date();
             //const year = now.getFullYear();
@@ -122,6 +147,7 @@ export default {
         const data = ref('');
         const error = ref('');
 
+        const bookIdx = ref(null);
         const bookName = ref('');
         const bookWriter = ref('');
         const publisher = ref('');
@@ -129,51 +155,60 @@ export default {
         const recommendUser = ref('');
         const recommendReason = ref('');
         const reviewPopup = ref(false); //팝업 on/off
+        const reviewEditPopup = ref(false);
         const monthlyStatus = ref(0);
         const userReviewWraps = ref([
             {
+                userId: '1',
                 userName: '안승필',
                 userProfile: require('@/assets/img/profile/profile_df.webp'),
                 userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
                 userPoint: 4,
             },
             {
+                userId: '2',
                 userName: '김효종',
                 userProfile: require('@/assets/img/profile/profile_df.webp'),
                 userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
                 userPoint: 3,
             },
             {
+                userId: '3',
                 userName: '진기환',
                 userProfile: require('@/assets/img/profile/profile_df.webp'),
                 userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
                 userPoint: 2,
             },
             {
+                userId: '4',
                 userName: '맹주영',
                 userProfile: require('@/assets/img/profile/profile_df.webp'),
                 userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
                 userPoint: 1,
             },
             {
+                userId: '5',
                 userName: '안승필',
                 userProfile: require('@/assets/img/profile/profile_df.webp'),
                 userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
                 userPoint: 4,
             },
             {
+                userId: '6',
                 userName: '김효종',
                 userProfile: require('@/assets/img/profile/profile_df.webp'),
                 userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
                 userPoint: 3,
             },
             {
+                userId: '7',
                 userName: '진기환',
                 userProfile: require('@/assets/img/profile/profile_df.webp'),
                 userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
                 userPoint: 2,
             },
             {
+                userId: '8',
                 userName: '맹주영',
                 userProfile: require('@/assets/img/profile/profile_df.webp'),
                 userReview:
@@ -182,6 +217,8 @@ export default {
             },
         ]);
         const selectedIndex = ref(0);
+        const value = ref(null);
+        const reviewContents = ref('');
 
         const selectUser = (index) => {
             selectedIndex.value = index;
@@ -196,22 +233,22 @@ export default {
         ];
         const activeTab = ref('book');
 
-        //데이터 여기에 넣으면 됩니당
-        bookName.value = '심판';
-        bookWriter.value = '베르베르';
-        publisher.value = '열린책들';
-        category.value = '희곡';
-        recommendUser.value = '진기환';
-        recommendReason.value = `계속 소설이 채택된다는 목소리가 나왔기에 다른 장르의 책을 추천해봅니다.읽은지 오래되어 자세히 기억이 나지는 않습니다만,뇌를 연구하는 물리학자 정재승이 인간의 뇌 구조를 기반으로 이런 저런 이야기를 적어놓은 책입니다.오늘 점심 뭐 먹지? 결정장애가 생기는 이유에서부터 사람이 미신에 빠져드는 이유까지흥미로운 주제를 한 사람의 주관이 아닌 인간의 뇌구조를 기반으로 설명해주니이런 장르에 관심이 없는 저도 굉장히 재밌게 읽을 수 있었습니다.계속 소설이 채택된다는 목소리가 나왔기에 다른 장르의 책을 추천해봅니다.읽은지 오래되어 자세히 기억이 나지는 않습니다만,뇌를 연구하는 물리학자 정재승이 인간의 뇌 구조를 기반으로 이런 저런 이야기를 적어놓은 책입니다.오늘 점심 뭐 먹지? 결정장애가 생기는 이유에서부터 사람이 미신에 빠져드는 이유까지흥미로운 주제를 한 사람의 주관이 아닌 인간의 뇌구조를 기반으로 설명해주니이런 장르에 관심이 없는 저도 굉장히 재밌게 읽을 수 있었습니다.계속 소설이 채택된다는 목소리가 나왔기에 다른 장르의 책을 추천해봅니다.읽은지 오래되어 자세히 기억이 나지는 않습니다만,뇌를 연구하는 물리학자 정재승이 인간의 뇌 구조를 기반으로 이런 저런 이야기를 적어놓은 책입니다.오늘 점심 뭐 먹지? 결정장애가 생기는 이유에서부터 사람이 미신에 빠져드는 이유까지흥미로운 주제를 한 사람의 주관이 아닌 인간의 뇌구조를 기반으로 설명해주니이런 장르에 관심이 없는 저도 굉장히 재밌게 읽을 수 있었습니다.계속 소설이 채택된다는 목소리가 나왔기에 다른 장르의 책을 추천해봅니다.읽은지 오래되어 자세히 기억이 나지는 않습니다만,뇌를 연구하는 물리학자 정재승이 인간의 뇌 구조를 기반으로 이런 저런 이야기를 적어놓은 책입니다.오늘 점심 뭐 먹지? 결정장애가 생기는 이유에서부터 사람이 미신에 빠져드는 이유까지흥미로운 주제를 한 사람의 주관이 아닌 인간의 뇌구조를 기반으로 설명해주니이런 장르에 관심이 없는 저도 굉장히 재밌게 읽을 수 있었습니다.`;
-
+        /* //////////////////////////////// */
+        /* //MonthlyBook 데이터 받아오기///// */
+        /* /////////////////////////////// */
         const monthlyBookDetail = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/api/book/monthly/recommend/1');
-                data.value = response.data;
-                console.log(response.data);
+                const response = await axios.get('http://localhost:3000/api/book/monthly/this-month');
+                //data.value = response.data;
 
                 if (response.data.code === 1) {
-                    console.log(response.data.data);
+                    bookIdx.value = response.data.data.bookIdx;
+                    bookName.value = response.data.data.bookTitle; //책제목
+                    category.value = response.data.data.bookCategory; //카테고리
+                    publisher.value = response.data.data.bookPublisher; //출판사
+                    //bookWriter.value //작가명
+                    recommendUser.value = response.data.data.memberName; //추천인
+                    recommendReason.value = response.data.data.recommendReason; //추천이유
                 } else if (response.data.code === -1) {
                     // 책 리스트가 비어있는 경우
                     error.value = '추천 책 리스트가 비어있습니다.';
@@ -226,6 +263,55 @@ export default {
             }
         };
 
+        /* //////////////////////////////// */
+        /* //MonthlyBook 리뷰 데이터 전달//// */
+        /* /////////////////////////////// */
+        const monthlyBookReview = async () => {
+            event.preventDefault(); // 기본 동작 방지
+
+            console.log('별점:', value.value);
+            console.log('리뷰 내용:', reviewContents.value);
+
+            if (!value.value || !reviewContents.value) {
+                alert('입력을 하시죠');
+            } else {
+                try {
+                    const reviewData = {
+                        contents: reviewContents.value,
+                        star: value.value,
+                    };
+
+                    const response = await axios.post(`http://localhost:3000/api/book/monthly/${bookIdx.value}/evaluate`, reviewData);
+                    switch (response.data.code) {
+                        case 1:
+                            console.log('평가 성공:', response.data.message);
+
+                            break;
+                        case -1:
+                            console.log('오류: 로그인이 필요합니다.');
+                            // 로그인 페이지로 리다이렉트 또는 로그인 모달 표시
+                            break;
+                        case -2:
+                            console.log('오류: 당선된 책 평가가 아닙니다.');
+                            // 사용자에게 알림 표시
+                            break;
+                        case -99:
+                            console.log('서버 오류 발생');
+                            // 일반적인 오류 메시지 표시
+                            break;
+                        default:
+                            console.log('알 수 없는 오류 발생:', response.data);
+                        // 예상치 못한 응답에 대한 처리
+                    }
+                } catch (error) {
+                    console.error('Error uploading file:', error);
+                }
+            }
+        };
+
+        /* //////////////////////////////// */
+        /* //리뷰작성 & 수정하기 팝업 On&Off// */
+        /* /////////////////////////////// */
         const writeReview = () => {
             reviewPopup.value = true;
         };
@@ -233,16 +319,15 @@ export default {
             event.preventDefault(); // 기본 동작 방지
             reviewPopup.value = false;
         };
-        const viewReview = () => {
-            monthlyStatus.value = 1;
+        const editReview = () => {
+            reviewEditPopup.value = true;
         };
-
-        const monthlyBack = () => {
-            monthlyStatus.value = 0;
+        const closeEditReview = () => {
+            reviewEditPopup.value = false;
         };
 
         /* //////////////////////////////// */
-        /* ///Monthly Component 애니메이션/// */
+        /* ///Monthly Component 애니메이션// */
         /* /////////////////////////////// */
         const monthlyAnimation = () => {
             const figure = document.querySelector('.book_figure figure img');
@@ -269,10 +354,6 @@ export default {
 
                     onComplete: () => {
                         monthlyStatus.value = 1;
-
-                        const profile = gsap.utils.toArray('.member_profile ul li');
-
-                        console.log(profile);
                     },
                 });
         };
@@ -287,6 +368,29 @@ export default {
             gsap.timeline({ defaults: { duration: 0.3 } })
                 .to(profile, { scale: 1, stagger: { each: 0.1 } })
                 .to(review, { opacity: 1, y: 0, stagger: { each: 0.1 } }, '<');
+        };
+
+        const monthlyAnimation2Leave = () => {
+            const profile = gsap.utils.toArray('.member_profile ul li');
+            const review = gsap.utils.toArray('.member_review ul li');
+
+            gsap.timeline({ defaults: { duration: 0.3 } })
+                .to(profile, { scale: 0 })
+                .to(
+                    review,
+                    {
+                        transformOrigin: 'center left',
+                        scale: 0,
+                        stagger: {
+                            each: 0.2,
+                            from: 'end',
+                        },
+                        onComplete: () => {
+                            monthlyStatus.value = 0;
+                        },
+                    },
+                    '<'
+                );
         };
 
         onMounted(() => {
@@ -308,7 +412,18 @@ export default {
             monthlyBookDetail();
         });
 
+        /* //////////////////////////////// */
+        /* ///리뷰 점수 1~5점만 입력 가능하게// */
+        /* /////////////////////////////// */
+        watch(value, (newValue) => {
+            if (newValue > 5) {
+                value.value = 5;
+            }
+            // 소수점 둘째자리까지 반올림하고 다시 숫자로 변환
+            value.value = Number(Number(value.value).toFixed(2));
+        });
         return {
+            userStore,
             monthlyBook,
             currentMonthBook,
             bookName,
@@ -318,13 +433,13 @@ export default {
             recommendUser,
             recommendReason,
             reviewPopup,
+            reviewEditPopup,
             writeReview,
             closeReview,
             monthlyStatus,
-            viewReview,
             userReviewWraps,
-            monthlyBack,
             monthlyBookDetail,
+            monthlyBookReview,
             data,
             error,
             tabs,
@@ -334,6 +449,13 @@ export default {
             monthlyAnimation,
             monthlyAnimationLeave,
             monthlyAnimation2,
+            monthlyAnimation2Leave,
+            selectedIndex,
+            value,
+            reviewContents,
+            editReview,
+            closeEditReview,
+            bookIdx,
         };
     },
 };
@@ -345,14 +467,12 @@ export default {
         display: block;
     }
 
-    background: #e4e6e7;
     height: 100%;
     overflow: auto;
     &_inner {
         box-sizing: border-box;
         width: 100%;
         overflow: auto;
-        position: relative;
     }
 
     &_book {
@@ -397,6 +517,8 @@ export default {
                 display: flex;
                 flex-wrap: wrap;
                 gap: 20px;
+                perspective: 1000px;
+
                 li {
                     width: calc((100% - (20px * 5)) / 6);
                     border-radius: 50%;
@@ -405,6 +527,13 @@ export default {
                     aspect-ratio: 1/1;
                     border: 1px solid #000;
                     box-shadow: 0 0 15px rgba($color: #000000, $alpha: 0.3);
+                    transition: border 0.3s, box-shadow 0.3s;
+
+                    &.active {
+                        border-width: 3px;
+                        border-color: #29ca6b;
+                        box-shadow: 0 0 15px rgba($color: #29ca6b, $alpha: 0.3);
+                    }
                 }
             }
         }
@@ -495,12 +624,14 @@ export default {
     }
 
     .view_review {
+        height: 48px;
         position: absolute;
         right: 10px;
-        top: 10px;
+        top: 35px;
     }
 
-    .write_review {
+    .write_review,
+    .edit_review {
         position: fixed;
         right: 10px;
         bottom: 10px;
@@ -510,11 +641,11 @@ export default {
         color: #fff;
     }
 
-    &_review {
+    &_review,
+    &_review_edit {
         position: absolute;
         left: 0;
         top: 0;
-
         width: 100%;
         height: 100%;
         background: rgba($color: #000000, $alpha: 0.5);
@@ -525,46 +656,88 @@ export default {
         form {
             width: min(500px, 95%);
             aspect-ratio: 16/9;
-            background: #fff;
-            padding: 10px;
-            padding-top: 35px;
+            background: #eee;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+
+            h3 {
+                text-align: center;
+                padding: 10px 0;
+                border-bottom: 1px solid #000;
+                font-weight: 800;
+                font-size: 18px;
+            }
+
             dl {
                 display: flex;
                 dt {
                     width: 50px;
+                    display: flex;
+                    justify-content: center;
+                    padding-top: 10px;
+                    border-right: 1px solid #000;
+                    border-bottom: 1px solid #000;
                 }
 
                 dd {
                     flex-grow: 1;
+                    padding: 10px;
+                    border-bottom: 1px solid #000;
+
+                    input {
+                        padding-left: 5px;
+                        width: 100%;
+                        border: 0;
+                        background: 0;
+
+                        &::-webkit-outer-spin-button,
+                        &::-webkit-inner-spin-button {
+                            -webkit-appearance: none;
+                            margin: 0;
+                        }
+
+                        &:focus {
+                            outline: none;
+                        }
+                    }
+
                     textarea {
                         width: 100%;
                         aspect-ratio: 3/1;
                         resize: none;
-                        padding: 10px;
+                        padding: 0 10px;
                         line-height: 1.5;
+                        background-color: transparent;
+                        color: #000;
+                        border: 0;
+
+                        &:focus {
+                            outline: none;
+                        }
                     }
                 }
             }
 
             .btn_wrap {
-                margin-top: auto;
-                margin-left: auto;
                 display: flex;
-                gap: 10px;
+                justify-content: flex-end;
+                flex-grow: 1;
 
                 button {
                     width: 100px;
-                    height: 30px;
-                    color: #fff;
+                    height: 100%;
+                    border-left: 1px solid #000;
 
                     &.close {
-                        background: #f00;
+                        //background: #f00;
+                        &:hover {
+                            background: #ff453a;
+                        }
                     }
                     &.write {
-                        background: #00f;
+                        &:hover {
+                            background: #30d158;
+                        }
                     }
                 }
             }
@@ -572,21 +745,10 @@ export default {
     }
 
     .history_back {
+        height: 48px;
         position: absolute;
         left: 10px;
-        top: 10px;
+        top: 35px;
     }
-}
-.opacity-enter-active,
-.opacity-leave-active {
-    transition: opacity 0.3s ease;
-    /* transform-origin: center bottom; */
-}
-
-.opacity-enter-from,
-.opacity-leave-to {
-    opacity: 0;
-
-    /* transform-origin: center bottom; */
 }
 </style>

@@ -249,8 +249,6 @@ export default {
 
                 // 파일을 읽기 시작
                 reader.readAsDataURL(file);
-
-                console.log(profileImageFile.value);
             }
         };
 
@@ -265,7 +263,6 @@ export default {
                         formData.append('profileImage', profileImageFile.value);
                     }
 
-                    console.log(formData);
                     const response = await axios.post(
                         'http://localhost:3000/api/member/create',
                         {
@@ -284,7 +281,6 @@ export default {
                     );
                     if (response.data.code === 1) {
                         alert('가입성공!');
-                        console.log(document.cookie); // 쿠키 확인
                         window.location.href = '/';
                     }
                 } catch (error) {

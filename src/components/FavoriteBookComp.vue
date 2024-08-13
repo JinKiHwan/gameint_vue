@@ -1,8 +1,6 @@
 <template>
     <div class="favorite">
-
         <div class="favorite_inner" v-bind:class="{ '-view': isFavoriteBookStatus !== 0 }">
-
             <!--[s] 책 추천 리스트-->
             <div class="favorite_list" v-if="isFavoriteBookStatus == 0">
                 <ul>
@@ -52,7 +50,7 @@
                 </ul>
             </div>
             <!--[e] 책 추천 리스트-->
-            
+
             <!--[s] 책 추천 작성/수정-->
             <div class="favorite_form" v-if="isFavoriteBookStatus == 1">
                 <div class="form-container">
@@ -60,31 +58,30 @@
                         <ul>
                             <li>
                                 <label for="book_name">책 제목</label>
-                                <input type="text" v-model.trim="bookTitle" placeholder="책 제목을 작성 해주세요.">
+                                <input type="text" v-model.trim="bookTitle" placeholder="책 제목을 작성 해주세요." />
                             </li>
                             <li>
                                 <label for="book_pub">출판사</label>
-                                <input type="email" v-model.trim="bookPub" placeholder="출판사를 작성 해주세요.">
+                                <input type="email" v-model.trim="bookPub" placeholder="출판사를 작성 해주세요." />
                             </li>
                             <li>
                                 <label for="book_pub">작가</label>
-                                <input type="email" v-model.trim="author" placeholder="작가명을 작성 해주세요.">
+                                <input type="email" v-model.trim="author" placeholder="작가명을 작성 해주세요." />
                             </li>
                             <li>
                                 <label for="book_cate">카테고리</label>
-                                <input type="text" v-model.trim="bookCate" placeholder="카테고리를 작성 해주세요.">
+                                <input type="text" v-model.trim="bookCate" placeholder="카테고리를 작성 해주세요." />
                             </li>
                             <li class="hc">
                                 <label for="message">추천 이유</label>
                                 <div class="editerArea">
-                                    <QuillEditor v-model:content="bookContent" ref="quillEditor" :options="editorOption"/>
-                                    
+                                    <QuillEditor v-model:content="bookContent" ref="quillEditor" :options="editorOption" />
                                 </div>
                                 <textarea v-if="false" id="preview" v-html="bookContent"></textarea>
                             </li>
                             <li>
                                 <label for="book_img">책 이미지</label>
-                                <input type="file" id="upload-image" hidden @change="handleFileUpload"/>
+                                <input type="file" id="upload-image" hidden @change="handleFileUpload" />
                             </li>
                         </ul>
                     </div>
@@ -101,7 +98,6 @@
             <!--[s] 책 추천 글 보기-->
             <div class="favorite_view" v-if="isFavoriteBookStatus == 2">
                 <div class="favorite_area">
-
                     <div class="favorite_book_img">
                         <figure>
                             <img :src="favoriteBook" alt="" />
@@ -128,19 +124,16 @@
                                     <div class="block-header">
                                         <div class="title">
                                             <h2>댓글</h2>
-                                            <div class="tag">{{userReviewWraps.length}}</div> 개
+                                            <div class="tag">{{ userReviewWraps.length }}</div>
+                                            개
                                         </div>
                                     </div>
                                     <div class="writing">
-                                        <div contenteditable="true" class="textarea" autofocus spellcheck="false">
-                                            
-                                        </div>
-                                        <button type="button">
-                                            등록
-                                        </button>
+                                        <div contenteditable="true" class="textarea" autofocus spellcheck="false"></div>
+                                        <button type="button">등록</button>
                                     </div>
                                 </div>
-                            </div>                                                
+                            </div>
                         </div>
                         <div class="writerCommentArea">
                             <ul class="review_item">
@@ -156,12 +149,8 @@
                                     <div class="content">
                                         <p v-if="commnetEdit != true">{{ review.userReview }}</p>
                                         <div v-else class="writing">
-                                            <div contenteditable="true" class="textarea" autofocus spellcheck="false" v-html="review.userReview">
-                                                
-                                            </div>
-                                            <button type="button" @click.once="actComment('edit')">
-                                                등록
-                                            </button>
+                                            <div contenteditable="true" class="textarea" autofocus spellcheck="false" v-html="review.userReview"></div>
+                                            <button type="button" @click.once="actComment('edit')">등록</button>
                                         </div>
                                     </div>
                                     <div v-if="true" class="writer_util">
@@ -172,33 +161,27 @@
                             </ul>
                         </div>
                     </div>
-
                 </div>
                 <button class="history_back" @click="changeFavoriteType(0)">←뒤로가기</button>
             </div>
             <!--[e] 책 추천 글 보기-->
-
         </div>
 
         <!-- [s] 버튼 영역 -->
         <div v-if="isFavoriteBookStatus != 2" class="btRightBtn">
-            <div v-if="isFavoriteBookStatus === 0" >
-                <button type="button"  @click.once="changeFavoriteType(1)" class="cool-button btn-blue" >
-                    <span >
-                        글쓰기
-                    </span>
+            <div v-if="isFavoriteBookStatus === 0">
+                <button type="button" @click.once="changeFavoriteType(1)" class="cool-button btn-blue">
+                    <span> 글쓰기 </span>
                 </button>
             </div>
             <div v-else>
-                <button  type="submit" class="cool-button btn-blue" @click.once="actFavoriteWrite()">
+                <button type="submit" class="cool-button btn-blue" @click.once="actFavoriteWrite()">
                     <span>
-                        {{chWriteBtnTxt}}
+                        {{ chWriteBtnTxt }}
                     </span>
                 </button>
                 <button type="button" class="cool-button btn-black" @click.once="changeFavoriteType(0)">
-                    <span>
-                        취소
-                    </span>
+                    <span> 취소 </span>
                 </button>
             </div>
         </div>
@@ -211,7 +194,7 @@
 // import
 ///////////////////////////////////////////
 import { ref, computed } from 'vue';
-import { QuillEditor } from '@vueup/vue-quill'
+import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import axios from 'axios';
 
@@ -235,15 +218,10 @@ export default {
         const previewImageFile = ref(null);
         const editorOption = {
             modules: {
-                toolbar: [
-                    [{ header: [1, 2, 3, false] }],
-                    ['bold', 'italic', 'underline'],
-                    ['code-block'],
-                    [{ list: 'ordered' }, 'blockquote']
-                ],
+                toolbar: [[{ header: [1, 2, 3, false] }], ['bold', 'italic', 'underline'], ['code-block'], [{ list: 'ordered' }, 'blockquote']],
             },
-            placeholder: "추천 이유를 작성 해주세요."
-        }
+            placeholder: '추천 이유를 작성 해주세요.',
+        };
         const quillEditor = ref(null); // QuillEditor 인스턴스 참조
         const favoriteBook = ref(require('@/assets/img/book01.webp'));
 
@@ -279,15 +257,14 @@ export default {
         // 추천 책 리스트
         ///////////////////////////////////////////
         const initRecomBookList = async () => {
-            const url = 'http://localhost:3000/api/book/monthly/recommend/list'
+            const url = 'http://localhost:3000/api/book/monthly/recommend/list';
             try {
-                const response = await axios.get(url,);
+                const response = await axios.get(url);
                 console.log(response.data);
                 isFavoriteBookList = response.data;
             } catch (error) {
                 alert(error);
             }
-            
         };
 
         // 데이터 매핑
@@ -429,22 +406,19 @@ export default {
         // 추천 책 리스트/작성,수정 전환
         const changeFavoriteType = (index, type, data) => {
             if (type == 'edit') {
-                
                 bookTitle.value = data.title;
                 bookPub.value = data.publisher;
                 bookCate.value = data.category;
-                
+
                 editMode.value = true;
-
             } else {
-                resetInputs();  
-
+                resetInputs();
             }
             isFavoriteBookStatus.value = index;
-        }
-        const selBook = (index,info) => {
+        };
+        const selBook = (index, info) => {
             index = index + 1;
-            alert('[' + info.title + '] 가(이)\n당선이오  (해당 리스트에 ' + index + '번 책)')
+            alert('[' + info.title + '] 가(이)\n당선이오  (해당 리스트에 ' + index + '번 책)');
         };
         ///////////////////////////////////////////
         // 추천 책 글쓰기
@@ -455,7 +429,7 @@ export default {
             bookPub.value = '';
             bookCate.value = '';
         };
-    
+
         // 추천 책 이미지 업로드
         const base64 = (file) => {
             return new Promise((resolve) => {
@@ -466,7 +440,6 @@ export default {
                         previewImage.value.src = e.target.result;
                         emptyImg.value = false; // 이미지가 업로드되었으므로 emptyImg를 false로 설정
                     }
-                    
                 };
                 reader.readAsDataURL(file);
             });
@@ -474,9 +447,9 @@ export default {
 
         const uploadImg = async (files) => {
             fileName.value = files[0];
-            
+
             await base64(fileName.value);
-        }
+        };
 
         const handleFileUpload = (event) => {
             const files = event.target.files;
@@ -489,18 +462,17 @@ export default {
         };
         const logFormData = (formData) => {
             for (const pair of formData.entries()) {
-            console.log(pair[0]+ ': ' + pair[1]);
+                console.log(pair[0] + ': ' + pair[1]);
             }
         };
         const actFavoriteWrite = async () => {
             if (bookTitle.value == '' || bookPub.value == '' || bookCate.value == '' || author.value == '') {
-                alert('빈 입력 폼을 작성해 주세요.')
+                alert('빈 입력 폼을 작성해 주세요.');
             } else if (bookContent.value == '') {
-                alert('추천 이유를 작성 해주세요.')
+                alert('추천 이유를 작성 해주세요.');
             } else if (previewImageFile.value == null) {
-                alert('책 이미지를 첨부 해주세요.')
+                alert('책 이미지를 첨부 해주세요.');
             } else {
-
                 const jsonPayload = {
                     bookImage: previewImageFile.value,
                     bookTitle: bookTitle.value,
@@ -512,13 +484,12 @@ export default {
 
                 const formData = new FormData();
                 formData.append('json', JSON.stringify(jsonPayload)); // JSON 데이터를 문자열로 추가
-                logFormData(formData)
+                logFormData(formData);
                 try {
-                    const response = await axios.post(
-                        'http://localhost:3000/api/book/monthly/recommend/create', formData, {
+                    const response = await axios.post('http://localhost:3000/api/book/monthly/recommend/create', formData, {
                         headers: {
-                            'Content-Type': 'multipart/form-data'
-                        }
+                            'Content-Type': 'multipart/form-data',
+                        },
                     });
                     console.log('Upload successful:', response.data);
                     //changeFavoriteType(0);
@@ -526,8 +497,7 @@ export default {
                     console.error('Error uploading file:', error);
                 }
             }
-        }
-        
+        };
 
         ///////////////////////////////////////////
         // 추천 책 글보기
@@ -537,7 +507,7 @@ export default {
             writer: '김기현',
             userProfile: require('@/assets/img/profile/profile_df.webp'),
             userReview: '다윗의 진화론을 바탕으로 한 과학이야기. 어떻게 인간은 진화해 왔는가 왜 매미는 큰 울음소리를 갖게되었는가 왜 나무늘보는 느리지만 끝까지 살아남았는가',
-        })
+        });
         // 책 추천 글보기 리뷰
         const userReviewWraps = ref([
             {
@@ -549,60 +519,54 @@ export default {
                 userName: '김효종',
                 userProfile: require('@/assets/img/profile/profile_df.webp'),
                 userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-                
             },
             {
                 userName: '진기환',
                 userProfile: require('@/assets/img/profile/profile_df.webp'),
                 userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-                
             },
             {
                 userName: '맹주영',
                 userProfile: require('@/assets/img/profile/profile_df.webp'),
                 userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-                
             },
             {
                 userName: '안승필',
                 userProfile: require('@/assets/img/profile/profile_df.webp'),
                 userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-                
             },
             {
                 userName: '김효종',
                 userProfile: require('@/assets/img/profile/profile_df.webp'),
                 userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-                
             },
             {
                 userName: '진기환',
                 userProfile: require('@/assets/img/profile/profile_df.webp'),
                 userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-                
             },
             {
                 userName: '맹주영',
                 userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview:'세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-                
+                userReview:
+                    '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
             },
         ]);
         // 댓글 등록
         const actComment = (type) => {
-            if(type == 'edit'){
-                alert('댓글 수정 등록')
+            if (type == 'edit') {
+                alert('댓글 수정 등록');
             } else {
-                alert('댓글 등록')
+                alert('댓글 등록');
             }
         };
         // 댓글 수정 / 삭제
         const editComment = (type) => {
-           if(type == 'edit'){
-               commnetEdit.value = true;
-           } else if (type == 'del') {
-                alert('댓글 삭제')
-           }
+            if (type == 'edit') {
+                commnetEdit.value = true;
+            } else if (type == 'del') {
+                alert('댓글 삭제');
+            }
         };
 
         return {
@@ -630,22 +594,21 @@ export default {
             initRecomBookList,
             doMouseOver,
             doMouseLeave,
-            changeFavoriteType,   
+            changeFavoriteType,
             resetInputs,
-            uploadImg, 
+            uploadImg,
             base64,
             handleFileUpload,
             editComment,
             actComment,
             selBook,
             actFavoriteWrite,
-            
         };
     },
     components: {
-        QuillEditor
-    }
-}
+        QuillEditor,
+    },
+};
 </script>
 
 <style lang="scss">
@@ -672,7 +635,7 @@ export default {
         position: relative;
         box-sizing: content-box;
         gap: 20px;
-        &.-view{
+        &.-view {
             height: 100%;
         }
         /* 스크롤바 설정*/
@@ -681,11 +644,11 @@ export default {
         }
 
         /* 스크롤바 막대 설정*/
-        &::-webkit-scrollbar-thumb{
-        background-color: #333333;
-        /* 스크롤바 둥글게 설정    */
-        border-radius: 10px; 
-        border: 7px solid #333;
+        &::-webkit-scrollbar-thumb {
+            background-color: #333333;
+            /* 스크롤바 둥글게 설정    */
+            border-radius: 10px;
+            border: 7px solid #333;
         }
 
         /* 스크롤바 뒷 배경 설정*/
@@ -693,10 +656,10 @@ export default {
             background-color: rgba(0, 0, 0, 0);
         }
     }
-    &_view{
+    &_view {
         width: 100%;
     }
-    &_area{
+    &_area {
         box-sizing: border-box;
         width: 100%;
         height: 100%;
@@ -783,11 +746,10 @@ export default {
                             bottom: 15px;
                             z-index: 1;
                         }
-                        
                     }
-                    &:before{
+                    &:before {
                         position: absolute;
-                        content:'';
+                        content: '';
                         z-index: 1;
                         top: 0;
                         left: 0;
@@ -799,9 +761,9 @@ export default {
                         justify-content: center;
                         align-items: center;
                         border-radius: 18px;
-                        content: "";
+                        content: '';
                         display: block;
-                        background: rgba(0,0,0,.8)
+                        background: rgba(0, 0, 0, 0.8);
                     }
                 }
                 .fav_recommender {
@@ -813,7 +775,6 @@ export default {
                     backdrop-filter: blur(15px);
                     padding: 8px 0 0 8px;
                     border-radius: 32.5px 0 14.5px 0;
-
                 }
                 .fav_profile {
                     width: 48px;
@@ -861,7 +822,7 @@ export default {
             }
         }
     }
-    &_form{
+    &_form {
         width: 100%;
         .form-container {
             max-width: 100%;
@@ -872,7 +833,7 @@ export default {
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: row;
-            & .form-left{
+            & .form-left {
                 width: 70%;
                 height: 100%;
                 > ul {
@@ -880,7 +841,7 @@ export default {
                     > li {
                         width: 100%;
                         margin-bottom: 10px;
-                        &.hc{
+                        &.hc {
                             height: 55%;
                         }
                         label {
@@ -890,7 +851,7 @@ export default {
                             color: #bbb; /* Label color for dark mode */
                         }
                         input,
-                        .editerArea{
+                        .editerArea {
                             display: inline-block;
                             vertical-align: middle;
                             width: 85%;
@@ -899,20 +860,20 @@ export default {
                     }
                 }
             }
-            
-            & .form-right{
+
+            & .form-right {
                 width: 30%;
                 height: 100%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                
-                .uploadImg{
-                    > img{
+
+                .uploadImg {
+                    > img {
                         max-width: 210px;
                     }
                 }
-                & .dfTxt{
+                & .dfTxt {
                     font-size: 16px;
                     color: #fff;
                     text-align: center;
@@ -932,8 +893,8 @@ export default {
             box-sizing: border-box;
         }
 
-        input[type="checkbox"],
-        input[type="radio"] {
+        input[type='checkbox'],
+        input[type='radio'] {
             display: none;
         }
 
@@ -954,24 +915,24 @@ export default {
             border-radius: 3px;
         }
 
-        input[type="checkbox"]:checked + .checkmark,
-        input[type="radio"]:checked + .checkmark {
+        input[type='checkbox']:checked + .checkmark,
+        input[type='radio']:checked + .checkmark {
             background-color: #007aff;
             border: 2px solid #007aff;
         }
 
         .checkmark:after {
-        content: "";
+            content: '';
             position: absolute;
             display: none;
         }
 
-        input[type="checkbox"]:checked + .checkmark:after,
-        input[type="radio"]:checked + .checkmark:after {
+        input[type='checkbox']:checked + .checkmark:after,
+        input[type='radio']:checked + .checkmark:after {
             display: block;
         }
 
-        input[type="checkbox"]:checked + .checkmark:after {
+        input[type='checkbox']:checked + .checkmark:after {
             left: 6px;
             top: 2px;
             width: 4px;
@@ -981,7 +942,7 @@ export default {
             transform: rotate(45deg);
         }
 
-        input[type="radio"]:checked + .checkmark:after {
+        input[type='radio']:checked + .checkmark:after {
             left: 5px;
             top: 5px;
             width: 8px;
@@ -1025,7 +986,7 @@ export default {
     }
     &_book_reviews {
         width: min(650px, 45%);
-        .writerArea{
+        .writerArea {
             .review_item {
                 display: flex;
                 flex-direction: column;
@@ -1081,7 +1042,7 @@ export default {
                     }
                 }
             }
-            .block{
+            .block {
                 margin-top: 20px;
                 &-header {
                     display: flex;
@@ -1110,11 +1071,10 @@ export default {
                         }
                     }
                 }
-                
             }
         }
 
-        .writerCommentArea{
+        .writerCommentArea {
             height: calc(100% - 400px);
             overflow-y: auto;
             .comment {
@@ -1123,7 +1083,7 @@ export default {
                 padding-bottom: 12px;
                 margin-bottom: 12px;
                 border-bottom: 1px solid #e8e8e8;
-                
+
                 .user-banner {
                     display: flex;
                     justify-content: space-between;
@@ -1169,18 +1129,18 @@ export default {
                         }
                     }
                 }
-                .writer_util{
-                    display:flex;
+                .writer_util {
+                    display: flex;
                     justify-content: flex-end;
                     align-items: center;
-                    > span{
+                    > span {
                         font-size: 10px;
                         color: #fff;
                     }
                     button {
                         font-size: 12px;
                         padding: 0 8px;
-                        &:hover{
+                        &:hover {
                             color: #0085ff;
                         }
                     }
@@ -1191,7 +1151,7 @@ export default {
                 }
             }
         }
-    
+
         .writing {
             display: flex;
             align-items: center;
@@ -1218,7 +1178,7 @@ export default {
                     box-shadow: 0px 0px 2px 2px rgba(0, 133, 255, 0.15);
                 }
             }
-            button{
+            button {
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -1229,30 +1189,30 @@ export default {
                 font-weight: 600;
                 width: 15%;
                 height: 80px;
-                &:hover{
+                &:hover {
                     background-color: #0085ff;
                 }
             }
         }
     }
-    .btRightBtn{
-        position:absolute;
+    .btRightBtn {
+        position: absolute;
         bottom: 5px;
         right: 10px;
         z-index: 1;
-        > div{
+        > div {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
         }
     }
-    .cool-button{
+    .cool-button {
         border: none;
         cursor: pointer;
         border-radius: 5px;
         box-sizing: border-box;
-        background: #6E6D70;
+        background: #6e6d70;
         border: 0.5px solid rgba(0, 0, 0, 0.12);
         box-shadow: 0px 0.5px 1px rgba(0, 0, 0, 0.1), inset 0px 0.5px 0.5px rgba(255, 255, 255, 0.5);
         border-radius: 6px;
@@ -1263,45 +1223,45 @@ export default {
         font-size: 14px;
         color: #fff;
         &:hover,
-        &.-active{
-            &.btn-blue{
-                background: #4B91F7;
+        &.-active {
+            &.btn-blue {
+                background: #4b91f7;
             }
-            &.btn-green{
-                background: #0CBB7C;
+            &.btn-green {
+                background: #0cbb7c;
             }
-            &.btn-red{
-                background: #FC0C0C;
+            &.btn-red {
+                background: #fc0c0c;
             }
-            &.btn-black{
+            &.btn-black {
                 background: #000;
             }
         }
     }
     .ql-toolbar,
-    .ql-container{
+    .ql-container {
         display: inline-block;
         width: 100%;
         background-color: #dddddd;
         box-sizing: border-box;
-        strong{
+        strong {
             font-weight: bold;
         }
-        em{
+        em {
             font-style: italic;
         }
     }
-    .ql-toolbar{
+    .ql-toolbar {
         height: 13%;
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
-        &.ql-snow{
+        &.ql-snow {
             border-left-width: 0;
             border-right-width: 0;
             border-color: #555;
         }
     }
-    .ql-container{
+    .ql-container {
         height: 87%;
         border-top-left-radius: 0;
         border-top-right-radius: 0;
@@ -1313,6 +1273,4 @@ export default {
         top: 10px;
     }
 }
-
-
 </style>

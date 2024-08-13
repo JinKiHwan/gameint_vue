@@ -183,8 +183,6 @@ export function createHomeAnimations() {
                         });
 
                     meritArticle.forEach((article, index) => {
-                        console.log(article, index);
-                        console.log(meritArticleTitle);
                         animations.meritTitleAni = gsap
                             .timeline({
                                 scrollTrigger: {

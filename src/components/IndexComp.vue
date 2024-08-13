@@ -226,13 +226,10 @@ export default {
         /* ///컴포넌트 On/Off/////////////// */
         /* /////////////////////////////// */
         const popupOpen = () => {
-            console.log(userStore.loginPopup);
-
             userStore.loginPopup = true;
         };
 
         const browserOpen = (page) => {
-            //console.log(`Opening browser with page: ${page}`);
             browserStatus.value = true;
 
             Object.keys(menuStatus).forEach((key) => {
