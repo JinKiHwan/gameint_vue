@@ -27,10 +27,6 @@
                 <div class="popupLayout_login_btn">
                     <button @click="handleLogin">확인</button>
                 </div>
-
-                <!-- <figure class="faceId">
-                    <img :src="faceId" alt="" />
-                </figure> -->
             </div>
 
             <!-- 로그인 후 -->
@@ -73,7 +69,7 @@ export default {
         const userStore = useUserStore();
         const loginInputStore = userLoginInput();
         const pen = ref('https://cdn-icons-png.flaticon.com/512/227/227104.png');
-        const faceId = ref(require('@/assets/img/faceid.gif'));
+        //const faceId = ref(require('@/assets/img/faceid.gif'));
         const imageSrc = ref('');
         const userName = ref('');
         const isIdValid = ref(true);
@@ -158,7 +154,6 @@ export default {
         onMounted(() => {});
 
         return {
-            faceId,
             imageSrc,
             userName,
             pen,
@@ -265,15 +260,6 @@ export default {
                 height: 35px;
                 background: #ddd;
             }
-        }
-
-        .faceId {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: #fff;
         }
     }
 

@@ -7,7 +7,7 @@
 
                     <figure class="monthly_book_img">
                         <img :src="monthlyBook" alt="" />
-                        <figcaption>{{ currentMonthBook }}</figcaption>
+                        <figcaption><i></i><span></span></figcaption>
                     </figure>
 
                     <div class="monthly_book_info">
@@ -22,13 +22,13 @@
                                 </h3>
                                 <ul>
                                     <li>
-                                        <span class="gsap-text-ani"><b>작가</b> {{ bookWriter }}</span>
+                                        <span class="gsap-text-ani"><b>작가</b>{{ bookWriter }}</span>
                                     </li>
                                     <li>
-                                        <span class="gsap-text-ani"><b>출판사</b> {{ publisher }}</span>
+                                        <span class="gsap-text-ani"><b>출판사</b>{{ publisher }}</span>
                                     </li>
                                     <li>
-                                        <span class="gsap-text-ani"><b>카테고리</b> {{ category }}</span>
+                                        <span class="gsap-text-ani"><b>카테고리</b>{{ category }}</span>
                                     </li>
                                 </ul>
                             </div>
@@ -36,12 +36,13 @@
                             <div v-else-if="activeTab === 'recommend'">
                                 <ul>
                                     <li>
-                                        <span class="gsap-text-ani"><b>추천인 </b> {{ recommendUser }}</span>
+                                        <span class="gsap-text-ani"><b>추천인</b>{{ recommendUser }}님</span>
                                     </li>
                                     <li class="recommend_reason">
-                                        <b>추천이유 </b>
-
-                                        <i> {{ recommendReason }}</i>
+                                        <span class="gsap-text-ani">
+                                            <b>추천이유 </b>
+                                            <i>{{ recommendReason }}</i>
+                                        </span>
                                     </li>
                                 </ul>
                             </div>
@@ -53,8 +54,10 @@
             <div class="monthly_book_btn">
                 <div class="monthly_book_btn_wrap">
                     <a href="javascript:void(0)" @click="menuStatusChange"> <span></span><span></span><span></span> <i class="x1"></i><i class="x2"></i></a>
-                    <button class="view_review" @click="monthlyAnimationLeave"></button>
-                    <button class="write_review" @click="writeReview"></button>
+                    <button class="view_review" @click="monthlyAnimationLeave"><img :src="menuImg[0].img" alt="" /></button>
+                    <button class="write_review" @click="writeReview()">
+                        <img :src="menuImg[1].img" alt="" />
+                    </button>
                 </div>
             </div>
 
@@ -82,30 +85,37 @@
         </div>
 
         <div class="monthly_inner" v-if="monthlyStatus === 1">
-            <div class="monthly_book">
-                <p>GameInt 리뷰</p>
+            <div class="monthly_book_bg" style="filter: blur(10px) brightness(0.5)"><img :src="monthlyBook" alt="" /></div>
+            <div class="monthly_book_review">
+                <Flicking :options="{ circular: false, horizontal: true, adaptive: false }" :plugins="plugins" @ready="updateTransform">
+                    <div class="card-panel" v-for="(member, index) in userReviewWraps" :key="index">
+                        <div class="review_text">
+                            <div class="review_text_wrap">
+                                {{ member.evaluateContents }}
+                            </div>
+                        </div>
+                        <div class="review_user">
+                            <div class="profile">
+                                <figure>
+                                    <img :src="member.profile" alt="" />
+                                </figure>
+                                <p>{{ member.name }} 님</p>
+                            </div>
+
+                            <b>{{ member.evaluateStar }}점</b>
+                        </div>
+
+                        <button v-if="member.name == userStore.name" class="edit_review" @click="editReview">수정</button>
+                    </div>
+                </Flicking>
             </div>
 
-            <div class="monthly_book_wrap">
-                <div class="member_profile">
-                    <ul>
-                        <li v-for="(user, index) in userReviewWraps" :key="index" @click="selectUser(index)" :class="{ active: selectedIndex === index }">
-                            <img :src="user.userProfile" alt="" />
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="member_review" v-if="selectedUser">
-                    <ul>
-                        <li>{{ selectedUser.userName }}님의 리뷰</li>
-                        <li>{{ selectedUser.userReview }}</li>
-                        <li class="user-rating">평점: {{ selectedUser.userPoint }} / 5</li>
-                    </ul>
-                    <button v-if="selectedUser.userId == userStore.memberIdx" class="edit_review" @click="editReview">수정하기</button>
-                </div>
-            </div>
-
-            <button class="history_back" @click="monthlyAnimation2Leave">←뒤로가기</button>
+            <button class="history_back" @click="monthlyAnimation2Leave">
+                <img :src="menuImg[2].img" alt="" />
+            </button>
+            <button class="review_copy" @click="reviewCopy">
+                <img :src="menuImg[3].img" alt="" />
+            </button>
 
             <div class="monthly_review_edit" v-if="reviewEditPopup">
                 <form action="">
@@ -134,14 +144,20 @@
 import { ref, computed, onMounted, watch, nextTick } from 'vue';
 import axios from 'axios';
 import { gsap } from 'gsap';
-import { CSSPlugin } from 'gsap/CSSPlugin';
-gsap.registerPlugin(CSSPlugin);
+import { TextPlugin } from 'gsap/TextPlugin';
+gsap.registerPlugin(TextPlugin);
+
+import Flicking from '@egjs/vue3-flicking';
+import { Perspective } from '@egjs/flicking-plugins';
+import '@/assets/css/monthlyFlicking.css';
 
 import { useUserStore } from '@/store/user';
 
 export default {
     name: 'MonthlyComp',
-
+    components: {
+        Flicking: Flicking,
+    },
     setup() {
         const userStore = useUserStore();
         const monthlyBook = ref('https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791193044162.jpg');
@@ -152,7 +168,6 @@ export default {
             return `${month} 월의 책`;
         });
 
-        const data = ref('');
         const error = ref('');
 
         const bookIdx = ref(null);
@@ -165,65 +180,10 @@ export default {
         const reviewPopup = ref(false); //팝업 on/off
         const reviewEditPopup = ref(false);
         const monthlyStatus = ref(0);
-        const userReviewWraps = ref([
-            {
-                userId: '1',
-                userName: '안승필',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-                userPoint: 4,
-            },
-            {
-                userId: '2',
-                userName: '김효종',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-                userPoint: 3,
-            },
-            {
-                userId: '3',
-                userName: '진기환',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-                userPoint: 2,
-            },
-            {
-                userId: '4',
-                userName: '맹주영',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-                userPoint: 1,
-            },
-            {
-                userId: '5',
-                userName: '안승필',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-                userPoint: 4,
-            },
-            {
-                userId: '6',
-                userName: '김효종',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-                userPoint: 3,
-            },
-            {
-                userId: '7',
-                userName: '진기환',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-                userPoint: 2,
-            },
-            {
-                userId: '8',
-                userName: '맹주영',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview:
-                    '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-                userPoint: 1,
-            },
-        ]);
+        const menuImg = ref([{ img: require('@/assets/img/ico-view.webp') }, { img: require('@/assets/img/ico-write.webp') }, { img: require('@/assets/img/ico-back.webp') }, { img: require('@/assets/img/ico-copy.webp') }]);
+        const defaultProfileUrl = require('@/assets/img/profile/profile_df.webp'); // 기본 프로필 이미지 경로
+
+        const userReviewWraps = ref(null);
         const selectedIndex = ref(0);
         const value = ref(null);
         const reviewContents = ref('');
@@ -248,7 +208,6 @@ export default {
         const monthlyBookDetail = async () => {
             try {
                 const response = await axios.get('http://localhost:3000/api/book/monthly/this-month', { withCredentials: true });
-                console.log(response.data.data);
 
                 if (response.data.code === 1) {
                     bookIdx.value = response.data.data.bookIdx;
@@ -319,6 +278,36 @@ export default {
         };
 
         /* //////////////////////////////// */
+        /* //MonthlyBook 리뷰 받아오기////// */
+        /* /////////////////////////////// */
+        const monthlyBookReviewWrap = async () => {
+            console.log(bookIdx.value);
+
+            try {
+                const response = await axios.get(`http://localhost:3000/api/book/monthly/${bookIdx.value}/evaluate/list`, { withCredentials: true });
+
+                if (response.data.code === 1) {
+                    userReviewWraps.value = response.data.data;
+
+                    userReviewWraps.value = response.data.data.map((user) => ({
+                        ...user,
+                        profile: user.profile || defaultProfileUrl,
+                    }));
+                } else if (response.data.code === -1) {
+                    // 리뷰가 비어있는 경우
+                    error.value = '리뷰가 없어요';
+                } else if (response.data.code === -2) {
+                    console.log('이거 왜 안돼');
+                } else {
+                    // 기타 오류
+                    error.value = response.data.message || '알 수 없는 오류가 발생했습니다.';
+                }
+            } catch (err) {
+                error.value = '서버 오류가 발생했습니다. 나중에 다시 시도해주세요.';
+            }
+        };
+
+        /* //////////////////////////////// */
         /* //리뷰작성 & 수정하기 팝업 On&Off/// */
         /* /////////////////////////////// */
         const writeReview = () => {
@@ -368,42 +357,57 @@ export default {
         };
 
         const menuOpen = (timeline) => {
+            const menu = document.querySelector('.monthly_book_btn_wrap > a');
             const menuHamburger = gsap.utils.toArray('.monthly_book_btn_wrap > a > span');
             const menuX = gsap.utils.toArray('.monthly_book_btn_wrap > a > i');
             const viewReview = document.querySelector('.view_review');
             const writeReview = document.querySelector('.write_review');
-
+            gsap.set([viewReview, writeReview], {
+                opacity: 0,
+            });
+            gsap.set(menu, {
+                //backgroundPosition: 'bottom 0 center',
+                backgroundColor: '#30d158',
+            });
             timeline
                 .to(menuHamburger, {
-                    opacity: 0,
                     scale: 0,
                 })
-                .to(menuX, {
-                    opacity: 1,
-                    scale: 1,
-                })
                 .to(
-                    viewReview,
+                    menu,
                     {
-                        x: -60,
+                        duration: 1,
+                        //backgroundPosition: 'bottom -25px center',
+                        ease: 'none',
+                        backgroundColor: '#ff9f0a',
                     },
                     '<'
                 )
+                .to(viewReview, {
+                    x: -60,
+                    opacity: 1,
+                })
                 .to(
                     writeReview,
                     {
                         x: -30,
                         y: -60,
                         delay: 0.1,
+                        opacity: 1,
                     },
                     '<'
                 )
+                .to(menuX, {
+                    opacity: 1,
+                    scale: 1,
+                })
                 .to(menuX, {
                     rotate: gsap.utils.wrap([45, -45]),
                 });
         };
 
         const menuClose = (timeline) => {
+            const menu = document.querySelector('.monthly_book_btn_wrap > a');
             const menuHamburger = gsap.utils.toArray('.monthly_book_btn_wrap > a > span');
             const menuX = gsap.utils.toArray('.monthly_book_btn_wrap > a > i');
             const viewReview = document.querySelector('.view_review');
@@ -414,10 +418,21 @@ export default {
                     rotate: 0,
                 })
                 .to(
+                    menu,
+                    {
+                        duration: 1,
+                        //backgroundPosition: 'bottom -25px center',
+                        ease: 'none',
+                        backgroundColor: '#30d158',
+                    },
+                    '<'
+                )
+                .to(
                     viewReview,
                     {
                         x: 0,
                         ease: 'back.in(1.7)',
+                        opacity: 0,
                     },
                     '<'
                 )
@@ -427,6 +442,7 @@ export default {
                         delay: 0.1,
                         x: 0,
                         y: 0,
+                        opacity: 0,
                         ease: 'back.in(1.7)',
                     },
                     '<'
@@ -446,68 +462,102 @@ export default {
         /* ///Monthly Component 애니메이션// */
         /* /////////////////////////////// */
         const monthlyAnimation = () => {
-            const figure = document.querySelector('.book_figure figure img');
-            const text = gsap.utils.toArray('.gsap-text-ani');
-            gsap.set(figure, { xPercent: 150 });
-            gsap.set(text, { yPercent: 200 });
-            gsap.timeline({ defaults: { duration: 0.3 } })
-                .to(figure, { xPercent: 0, delay: 0.5 })
-                .to(text, {
-                    yPercent: 0,
-                    stagger: { each: 0.1 },
+            const bg = document.querySelector('.monthly_book_bg');
+            const bookImg = document.querySelector('.monthly_book_img');
+            const tabMenu = gsap.utils.toArray('.monthly_book_tab');
+            const bookInfo = gsap.utils.toArray('.gsap-text-ani');
+            const figcaption = document.querySelector('.monthly_book_img figcaption i');
+
+            gsap.timeline()
+                .to(bg, {
+                    filter: 'blur(15px) brightness(0.5)',
+                })
+                .from(bookImg, {
+                    y: 50,
+                    opacity: 0,
+                })
+                .from(
+                    tabMenu,
+                    {
+                        delay: 0.1,
+                        opacity: 0,
+                        y: 50,
+                    },
+                    '<'
+                )
+                .from(bookInfo, {
+                    opacity: 0,
+                    x: 50,
+                    stagger: {
+                        each: 0.3,
+                        amount: 0.3,
+                    },
+                })
+                .to(
+                    bookImg,
+                    {
+                        boxShadow: '0 0 15px rgba(255,255,255,1)',
+                    },
+                    '<'
+                )
+                .to(figcaption, {
+                    text: `${currentMonthBook.value}`,
+                    duration: 1,
                 });
         };
 
         const monthlyAnimationLeave = () => {
-            const figure = document.querySelector('.book_figure figure img');
-            const text = gsap.utils.toArray('.gsap-text-ani');
+            const bg = document.querySelector('.monthly_book_bg');
+            const bookImg = document.querySelector('.monthly_book_img');
+            const tabMenu = gsap.utils.toArray('.monthly_book_tab');
+            const bookInfo = gsap.utils.toArray('.gsap-text-ani');
 
-            gsap.timeline({ defaults: { duration: 0.3 } })
-                .to(figure, { xPercent: -150 })
-                .to(text, {
-                    yPercent: -200,
-                    stagger: { each: 0.1 },
-
-                    onComplete: () => {
-                        monthlyStatus.value = 1;
-                        menuStatus.value = false;
-                    },
-                });
-        };
-
-        const monthlyAnimation2 = () => {
-            const profile = gsap.utils.toArray('.member_profile ul li');
-            const review = gsap.utils.toArray('.member_review ul li');
-
-            gsap.set(profile, { scale: 0 });
-            gsap.set(review, { opacity: 0, y: 50 });
-
-            gsap.timeline({ defaults: { duration: 0.3 } })
-                .to(profile, { scale: 1, stagger: { each: 0.1 } })
-                .to(review, { opacity: 1, y: 0, stagger: { each: 0.1 } }, '<');
-        };
-
-        const monthlyAnimation2Leave = () => {
-            const profile = gsap.utils.toArray('.member_profile ul li');
-            const review = gsap.utils.toArray('.member_review ul li');
-
-            gsap.timeline({ defaults: { duration: 0.3 } })
-                .to(profile, { scale: 0 })
+            gsap.timeline()
+                .to([bookImg, tabMenu, bookInfo], { opacity: 0, stagger: { each: 0.3, amount: 0.5 } })
                 .to(
-                    review,
+                    bg,
                     {
-                        transformOrigin: 'center left',
-                        scale: 0,
-                        stagger: {
-                            each: 0.2,
-                            from: 'end',
-                        },
+                        delay: 0.5,
+                        filter: 'blur(5px) brightness(0)',
                         onComplete: () => {
-                            monthlyStatus.value = 0;
+                            monthlyStatus.value = 1;
+                            menuStatus.value = false;
+                            monthlyBookReviewWrap();
                         },
                     },
                     '<'
                 );
+        };
+
+        const monthlyAnimation2 = () => {
+            const reviews = gsap.utils.toArray('.card-panel');
+            const bg = document.querySelector('.monthly_book_bg');
+
+            gsap.timeline()
+                .from(bg, {
+                    filter: 'blur(5px) brightness(0)',
+                })
+                .from(reviews, {
+                    opacity: 0,
+                    stagger: {
+                        each: 0.1,
+                    },
+                });
+        };
+
+        const monthlyAnimation2Leave = () => {
+            const reviews = gsap.utils.toArray('.card-panel');
+            const bg = document.querySelector('.monthly_book_bg');
+
+            gsap.timeline()
+                .to(reviews, { opacity: 0, scale: 0 })
+                .to(bg, {
+                    filter: 'blur(5px) brightness(0)',
+
+                    onComplete: () => {
+                        monthlyStatus.value = 0;
+                    },
+                });
         };
 
         onMounted(() => {
@@ -540,6 +590,25 @@ export default {
             value.value = Number(Number(value.value).toFixed(2));
         });
 
+        /* /////////////////////////////////*/
+        /* ///리뷰 복사하기//////////////////*/
+        /* ///////////////////////////////*/
+        const reviewCopy = () => {
+            console.log(userReviewWraps.value);
+
+            const formattedReviews = userReviewWraps.value.map((review) => `${review.name}\n 평점:${review.userPoint} \n ${review.userReview}`).join('\n\n');
+
+            navigator.clipboard
+                .writeText(formattedReviews)
+                .then(() => {
+                    alert('클립보드에 복사되었습니다');
+                })
+                .catch((err) => {
+                    console.error('클립보드 복사 실패', err);
+                    alert('클립보드 복사에 실패했습니다.');
+                });
+        };
+
         return {
             userStore,
             monthlyBook,
@@ -558,7 +627,7 @@ export default {
             userReviewWraps,
             monthlyBookDetail,
             monthlyBookReview,
-            data,
+            monthlyBookReviewWrap,
             error,
             tabs,
             activeTab,
@@ -578,21 +647,124 @@ export default {
             menuClose,
             menuStatus,
             menuStatusChange,
+            menuImg,
+            plugins: [new Perspective({ rotate: 0.5 })],
+            reviewCopy,
+            defaultProfileUrl,
         };
+    },
+
+    methods: {
+        updateTransform: (e) => {
+            console.log(e.currentTarget.panels);
+            /* e.currentTarget.panels.forEach((panel, index) => {
+                console.log(e, index);
+                
+            }); */
+        },
     },
 };
 </script>
 
 <style lang="scss" scoped>
+@font-face {
+    font-family: 'Bujangnim_nunchi';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/naverfont_02@1.0/Bujangnim_nunchi.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.flicking-viewport {
+    height: 70%;
+}
+.card-panel {
+    font-size: 26px;
+    width: 350px;
+    aspect-ratio: 6/5;
+    border: 3px solid #fff;
+    box-shadow: 0 0 15px rgba($color: #000000, $alpha: 0.5);
+    position: relative;
+
+    .review_text {
+        width: 100%;
+        height: 70%;
+        overflow: auto;
+        font-family: 'Bujangnim_nunchi';
+
+        &::-webkit-scrollbar {
+            width: 2px; /* 스크롤바의 너비 */
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: #217af4;
+            border-radius: 10px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: rgba(33, 122, 244, 0.1); /*스크롤바 뒷 배경 색상*/
+        }
+
+        .review_text_wrap {
+            min-height: 100%;
+            background-image: url('/src/assets/img/texture.webp');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center center;
+            padding: 8px;
+        }
+    }
+
+    .review_user {
+        height: 30%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fff;
+        padding: 10px;
+        font-family: 'Bujangnim_nunchi';
+
+        .profile {
+            display: flex;
+            height: 100%;
+            align-items: center;
+            gap: 10px;
+
+            figure {
+                height: 100%;
+                overflow: hidden;
+                border-radius: 50%;
+                aspect-ratio: 1/1;
+                border: 1px solid #222;
+
+                img {
+                    height: 100%;
+                    object-fit: cover;
+                }
+            }
+        }
+    }
+
+    .edit_review {
+        position: absolute;
+        right: -3px;
+        bottom: -45px;
+        padding: 8px 15px;
+        font-size: 15px;
+        background: #ff9f0a;
+        color: #fff;
+        border-radius: 5px;
+    }
+}
+
 .monthly {
     position: relative;
     height: 100%;
-    .gsap-text-ani {
-        display: block;
-    }
-
-    height: 100%;
     overflow: auto;
+
+    .gsap-text-ani {
+        display: flex;
+        width: 100%;
+    }
     &_inner {
         box-sizing: border-box;
         width: 100%;
@@ -613,7 +785,7 @@ export default {
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
-            filter: blur(15px) brightness(0.5);
+            filter: blur(15px) brightness(0);
             img {
                 width: 100%;
                 object-fit: cover;
@@ -631,10 +803,11 @@ export default {
         &_wrap {
             width: 100%;
             display: flex;
-            justify-content: center;
+            justify-content: flex-end;
             align-items: flex-start;
             height: 70%;
             gap: 25px;
+            padding: 0 50px;
 
             .member_review {
                 width: 50%;
@@ -654,22 +827,33 @@ export default {
             img {
                 height: 100%;
                 object-fit: contain;
-                box-shadow: 0 0 15px rgba($color: #fff, $alpha: 1);
+                //box-shadow: 0 0 15px rgba($color: #fff, $alpha: 1);
             }
 
             figcaption {
                 position: absolute;
                 font-size: 15px;
+                width: 18px;
                 left: -26px;
                 top: 0;
                 writing-mode: vertical-rl;
                 text-orientation: upright;
                 color: #eee;
+
+                span {
+                    width: 100%;
+                    height: 1px;
+                    background: #fff;
+                    display: inline-block;
+                    margin-top: 5px;
+                    animation: cursor 1s infinite;
+                    animation-timing-function: steps(1, end);
+                }
             }
         }
 
         &_info {
-            width: min(300px, 45%);
+            width: 50%;
             color: #ededed;
         }
 
@@ -729,7 +913,7 @@ export default {
                 display: block;
                 width: 100%;
                 height: 100%;
-                background: #c79707;
+                background: #30d158;
                 border-radius: 50%;
                 display: flex;
                 flex-direction: column;
@@ -768,12 +952,60 @@ export default {
                 width: 100%;
                 height: 100%;
                 border-radius: 50%;
-                background: #f00;
+                padding: 5px;
+                background: #0a84ff;
+                opacity: 0;
                 position: absolute;
                 left: 0;
                 top: 0;
                 z-index: -1;
+                transition: box-shadow 0.3s;
+
+                &:hover {
+                    box-shadow: 0 0 15px rgba($color: #fff, $alpha: 0.3);
+                }
             }
+            .write_review {
+                background: #ffd60a;
+            }
+        }
+
+        &_review {
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+    }
+    .history_back {
+        position: fixed;
+        right: 25px;
+        bottom: 25px;
+        width: 50px;
+        aspect-ratio: 1/1;
+        background: #ff9f0a;
+        border-radius: 50%;
+        padding: 5px;
+
+        &:hover {
+            -webkit-animation: vibrate-1 0.3s linear infinite both;
+            animation: vibrate-1 0.3s linear infinite both;
+        }
+    }
+
+    .review_copy {
+        position: fixed;
+        left: 25px;
+        bottom: 25px;
+        width: 50px;
+        aspect-ratio: 1/1;
+        background: #0a84ff;
+        border-radius: 50%;
+        padding: 5px;
+        transition: transform 0.3s, box-shadow 0.3s;
+
+        &:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba($color: #fff, $alpha: 0.3);
         }
     }
 
@@ -794,31 +1026,22 @@ export default {
 
                 b {
                     display: inline-block;
-                    width: 65px;
+                    width: 80px;
                     opacity: 0.8;
                 }
 
                 i {
                     display: inline-block;
-                    width: calc(100% - 65px);
+                    width: calc(100% - 80px);
                     line-height: 1.2;
                 }
             }
         }
     }
 
-    .edit_review {
-        position: fixed;
-        right: 10px;
-        bottom: 10px;
-        width: 150px;
-        height: 35px;
-        background: #222;
-        color: #fff;
-    }
-
     &_review,
     &_review_edit {
+        z-index: 9;
         position: absolute;
         left: 0;
         top: 0;
@@ -919,12 +1142,58 @@ export default {
             }
         }
     }
+}
 
-    .history_back {
-        height: 48px;
-        position: absolute;
-        left: 10px;
-        top: 35px;
+@-webkit-keyframes vibrate-1 {
+    0% {
+        -webkit-transform: translate(0);
+        transform: translate(0);
+    }
+    20% {
+        -webkit-transform: translate(-2px, 2px);
+        transform: translate(-2px, 2px);
+    }
+    40% {
+        -webkit-transform: translate(-2px, -2px);
+        transform: translate(-2px, -2px);
+    }
+    60% {
+        -webkit-transform: translate(2px, 2px);
+        transform: translate(2px, 2px);
+    }
+    80% {
+        -webkit-transform: translate(2px, -2px);
+        transform: translate(2px, -2px);
+    }
+    100% {
+        -webkit-transform: translate(0);
+        transform: translate(0);
+    }
+}
+@keyframes vibrate-1 {
+    0% {
+        -webkit-transform: translate(0);
+        transform: translate(0);
+    }
+    20% {
+        -webkit-transform: translate(-2px, 2px);
+        transform: translate(-2px, 2px);
+    }
+    40% {
+        -webkit-transform: translate(-2px, -2px);
+        transform: translate(-2px, -2px);
+    }
+    60% {
+        -webkit-transform: translate(2px, 2px);
+        transform: translate(2px, 2px);
+    }
+    80% {
+        -webkit-transform: translate(2px, -2px);
+        transform: translate(2px, -2px);
+    }
+    100% {
+        -webkit-transform: translate(0);
+        transform: translate(0);
     }
 }
 </style>

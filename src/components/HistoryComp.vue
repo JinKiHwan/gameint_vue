@@ -7,29 +7,14 @@
                 <li>2023년</li>
             </ul>
 
-            <div class="list">
-                <swiper :slides-per-view="3" :modules="modules" navigation @swiper="onSwiper" @slideChange="onSlideChange">
-                    <swiper-slide v-for="(selectedBook, index) in textData" :key="index">
-                        <figure>
-                            <img :src="selectedBook.bookImg" alt="" />
-                        </figure>
-                        <!-- <p>{{ selectedBook }}</p> -->
-                    </swiper-slide>
-                </swiper>
-            </div>
+            <div class="list"></div>
         </article>
     </div>
 </template>
 
 <script>
-import { Swiper, SwiperSlide } from 'swiper/vue';
-
 export default {
     name: 'HistoryComp',
-    components: {
-        Swiper,
-        SwiperSlide,
-    },
 
     setup() {
         const testBook = require('@/assets/img/books/book20.webp');
@@ -46,15 +31,8 @@ export default {
             { bookImg: require('@/assets/img/books/book11.webp'), bookName: '아버지해방일지', bookStar: '5', month: '8' },
             { bookImg: require('@/assets/img/books/book10.webp'), bookName: '아버지해방일지', bookStar: '5', month: '8' },
         ];
-        const onSwiper = (swiper) => {
-            console.log(swiper);
-        };
-        const onSlideChange = () => {
-            console.log('slide change');
-        };
+
         return {
-            onSlideChange,
-            onSwiper,
             testBook,
             textData,
         };
