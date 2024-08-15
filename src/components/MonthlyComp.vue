@@ -249,11 +249,15 @@ export default {
                         star: value.value,
                     };
 
-                    const response = await axios.post(`http://localhost:3000/api/book/monthly/${bookIdx.value}/evaluate`, reviewData);
+                    const response = await axios.post(`http://localhost:3000/api/book/monthly/${bookIdx.value}/evaluate`, {
+                        reviewData,
+                        withCredentials: true, // 쿠키를 주고받을 수 있게 설정
+                    });
+
                     switch (response.data.code) {
                         case 1:
                             console.log('평가 성공:', response.data.message);
-
+                            reviewData;
                             break;
                         case -1:
                             console.log('오류: 로그인이 필요합니다.');
@@ -281,10 +285,11 @@ export default {
         /* //MonthlyBook 리뷰 받아오기////// */
         /* /////////////////////////////// */
         const monthlyBookReviewWrap = async () => {
-            console.log(bookIdx.value);
-
             try {
+                console.log(bookIdx.value);
                 const response = await axios.get(`http://localhost:3000/api/book/monthly/${bookIdx.value}/evaluate/list`, { withCredentials: true });
+
+                console.log(response, '리스폰');
 
                 if (response.data.code === 1) {
                     userReviewWraps.value = response.data.data;
@@ -595,8 +600,8 @@ export default {
         /* ///////////////////////////////*/
         const reviewCopy = () => {
             console.log(userReviewWraps.value);
-
-            const formattedReviews = userReviewWraps.value.map((review) => `${review.name}\n 평점:${review.userPoint} \n ${review.userReview}`).join('\n\n');
+            console.log(userReviewWraps.value);
+            const formattedReviews = userReviewWraps.value.map((review) => `${review.name}\n 평점:${review.evaluateStar} \n ${review.evaluateContents}`).join('\n\n');
 
             navigator.clipboard
                 .writeText(formattedReviews)
@@ -656,7 +661,8 @@ export default {
 
     methods: {
         updateTransform: (e) => {
-            console.log(e.currentTarget.panels);
+            e;
+            //console.log(e.currentTarget.panels);
             /* e.currentTarget.panels.forEach((panel, index) => {
                 console.log(e, index);
                 

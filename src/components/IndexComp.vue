@@ -155,9 +155,9 @@ export default {
 
         const menuStatus = reactive({
             home: false,
-            monthly: true,
+            monthly: false,
             favorite: false,
-            history: false,
+            history: true,
             // 추가 메뉴들...
         });
 
