@@ -249,7 +249,7 @@ export default {
                         star: value.value,
                     };
 
-                    const response = await axios.post(`http://localhost:3000/api/book/monthly/${bookIdx.value}/evaluate`, reviewData);
+                    const response = await axios.post(`http://localhost:3000/api/book/monthly/${bookIdx.value}/evaluate`, reviewData, { withCredentials: true });
                     switch (response.data.code) {
                         case 1:
                             console.log('평가 성공:', response.data.message);

@@ -2,6 +2,9 @@
     <div class="system">
         <div class="current_time">{{ formattedTime }}</div>
         <div class="widgets">
+            <div class="chat">
+                <button href="javascript:void(0)" class="button" @click="browserOpen('chat')">채팅</button>
+            </div>
             <ul>
                 <li><img :src="signal" alt="" /></li>
                 <li><img :src="wifi" alt="" /></li>
@@ -78,6 +81,9 @@
         </ul>
     </div>
 
+    
+    
+
     <LoginComp v-if="userStore.loginPopup"></LoginComp>
 
     <Transition name="fade">
@@ -97,6 +103,9 @@
                     <FavoriteBookComp v-if="menuStatus.favorite"></FavoriteBookComp>
                     <HistoryComp v-if="menuStatus.history"></HistoryComp>
                 </div>
+                <div class="chat_content">
+                    <ChattingComp v-if="menuStatus.chat"></ChattingComp>
+                </div>
             </article>
         </div>
     </Transition>
@@ -108,6 +117,7 @@ import HomeComp from '@/components/HomeComp.vue';
 import MonthlyComp from '@/components/MonthlyComp.vue';
 import FavoriteBookComp from '@/components/FavoriteBookComp.vue';
 import HistoryComp from '@/components/HistoryComp.vue';
+import ChattingComp from '@/components/ChattingComp.vue';
 
 import { ref, onMounted, reactive, computed, onUnmounted, watch } from 'vue';
 
@@ -125,6 +135,7 @@ export default {
         MonthlyComp,
         FavoriteBookComp,
         HistoryComp,
+        ChattingComp,
     },
 
     setup() {
@@ -143,7 +154,7 @@ export default {
         const wifi = ref(require('@/assets/img/wifi.svg'));
         const browserRef = ref(null);
         const isFullScreen = ref(false);
-        const browserStatus = ref(true);
+        const browserStatus = ref(false);
         const currentTime = ref(new Date());
         const popupState = ref(false);
         const text01 = ref(['GameInt에 오신걸 환영합니다!', '동호회 가입시 컨텐츠 이용이 가능합니다!']);
@@ -155,9 +166,10 @@ export default {
 
         const menuStatus = reactive({
             home: false,
-            monthly: true,
+            monthly: false,
             favorite: false,
             history: false,
+            chat: false,
             // 추가 메뉴들...
         });
 
@@ -228,6 +240,17 @@ export default {
         const popupOpen = () => {
             userStore.loginPopup = true;
         };
+
+        // const chattingOpen = (page) => {
+        //     browserStatus.value = true;
+
+        //     Object.keys(menuStatus).forEach((key) => {
+        //         menuStatus[key] = false;
+        //     });
+        //     if (page in menuStatus) {
+        //         menuStatus[page] = true;
+        //     }
+        // } 
 
         const browserOpen = (page) => {
             browserStatus.value = true;
@@ -321,6 +344,7 @@ export default {
 body {
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 }
+
 .system {
     position: fixed;
     left: 0;
@@ -331,7 +355,6 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    pointer-events: none;
 
     @include mobile {
         padding: 1vw 3vw !important;
@@ -348,6 +371,16 @@ body {
     }
 
     .widgets {
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+
+        .chat {
+            .button {
+                color: #fff;
+            }
+        }
+
         ul {
             height: 100%;
             display: flex;
