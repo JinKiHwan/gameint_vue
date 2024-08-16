@@ -160,7 +160,7 @@ export default {
     },
     setup() {
         const userStore = useUserStore();
-        const monthlyBook = ref('https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791193044162.jpg');
+        const monthlyBook = ref('');
         const currentMonthBook = computed(() => {
             const now = new Date();
             //const year = now.getFullYear();
@@ -209,6 +209,8 @@ export default {
             try {
                 const response = await axios.get('http://localhost:3000/api/book/monthly/this-month', { withCredentials: true });
 
+                console.log(response.data.data);
+
                 if (response.data.code === 1) {
                     bookIdx.value = response.data.data.bookIdx;
                     bookName.value = response.data.data.bookTitle; //책제목
@@ -217,6 +219,7 @@ export default {
                     bookWriter.value = response.data.data.author; //작가명
                     recommendUser.value = response.data.data.memberName; //추천인
                     recommendReason.value = response.data.data.recommendReason; //추천이유
+                    monthlyBook.value = response.data.data.bookImgUrl;
                 } else if (response.data.code === -1) {
                     // 책 리스트가 비어있는 경우
                     error.value = '추천 책 리스트가 비어있습니다.';
@@ -237,11 +240,11 @@ export default {
         const monthlyBookReview = async () => {
             event.preventDefault(); // 기본 동작 방지
 
-            console.log('별점:', value.value);
-            console.log('리뷰 내용:', reviewContents.value);
+            /* console.log('별점:', value.value);
+            console.log('리뷰 내용:', reviewContents.value); */
 
             if (!value.value || !reviewContents.value) {
-                alert('입력을 하시죠');
+                alert('빈 값은 보낼 수 없습니다.');
             } else {
                 try {
                     const reviewData = {
@@ -249,11 +252,19 @@ export default {
                         star: value.value,
                     };
 
-                    const response = await axios.post(`http://localhost:3000/api/book/monthly/${bookIdx.value}/evaluate`, reviewData, { withCredentials: true });
+                    const response = await axios.post(
+                        `http://localhost:3000/api/book/monthly/${bookIdx.value}/evaluate`,
+                        {
+                            reviewData, // 쿠키를 주고받을 수 있게 설정
+                        },
+                        { withCredentials: true }
+                    );
+
                     switch (response.data.code) {
                         case 1:
-                            console.log('평가 성공:', response.data.message);
-
+                            //console.log('평가 성공:', response.data.message);
+                            alert('작성완료!');
+                            reviewPopup.value = false;
                             break;
                         case -1:
                             console.log('오류: 로그인이 필요합니다.');
@@ -281,10 +292,10 @@ export default {
         /* //MonthlyBook 리뷰 받아오기////// */
         /* /////////////////////////////// */
         const monthlyBookReviewWrap = async () => {
-            console.log(bookIdx.value);
-
             try {
                 const response = await axios.get(`http://localhost:3000/api/book/monthly/${bookIdx.value}/evaluate/list`, { withCredentials: true });
+
+                console.log(response, '리스폰');
 
                 if (response.data.code === 1) {
                     userReviewWraps.value = response.data.data;
@@ -383,10 +394,15 @@ export default {
                     },
                     '<'
                 )
-                .to(viewReview, {
-                    x: -60,
-                    opacity: 1,
-                })
+                .to(
+                    viewReview,
+                    {
+                        delay: 0.3,
+                        x: -60,
+                        opacity: 1,
+                    },
+                    '<'
+                )
                 .to(
                     writeReview,
                     {
@@ -398,8 +414,9 @@ export default {
                     '<'
                 )
                 .to(menuX, {
-                    opacity: 1,
-                    scale: 1,
+                    width: '50%',
+                    //opacity: 1,
+                    //scale: 1,
                 })
                 .to(menuX, {
                     rotate: gsap.utils.wrap([45, -45]),
@@ -448,8 +465,9 @@ export default {
                     '<'
                 )
                 .to(menuX, {
-                    opacity: 0,
-                    scale: 0,
+                    width: 0,
+                    //opacity: 0,
+                    //scale: 0,
                 })
 
                 .to(menuHamburger, {
@@ -595,8 +613,8 @@ export default {
         /* ///////////////////////////////*/
         const reviewCopy = () => {
             console.log(userReviewWraps.value);
-
-            const formattedReviews = userReviewWraps.value.map((review) => `${review.name}\n 평점:${review.userPoint} \n ${review.userReview}`).join('\n\n');
+            console.log(userReviewWraps.value);
+            const formattedReviews = userReviewWraps.value.map((review) => `${review.name}\n 평점:${review.evaluateStar} \n ${review.evaluateContents}`).join('\n\n');
 
             navigator.clipboard
                 .writeText(formattedReviews)
@@ -656,7 +674,8 @@ export default {
 
     methods: {
         updateTransform: (e) => {
-            console.log(e.currentTarget.panels);
+            e;
+            //console.log(e.currentTarget.panels);
             /* e.currentTarget.panels.forEach((panel, index) => {
                 console.log(e, index);
                 
@@ -933,10 +952,9 @@ export default {
                 i {
                     position: absolute;
                     display: block;
-                    width: 50%;
                     height: 2px;
                     background: #fff;
-                    opacity: 0;
+                    width: 0;
 
                     &.x1 {
                         transform: rotate(45deg);
@@ -1125,7 +1143,6 @@ export default {
                 button {
                     width: 100px;
                     height: 100%;
-                    border-left: 1px solid #000;
 
                     &.close {
                         //background: #f00;
@@ -1141,59 +1158,6 @@ export default {
                 }
             }
         }
-    }
-}
-
-@-webkit-keyframes vibrate-1 {
-    0% {
-        -webkit-transform: translate(0);
-        transform: translate(0);
-    }
-    20% {
-        -webkit-transform: translate(-2px, 2px);
-        transform: translate(-2px, 2px);
-    }
-    40% {
-        -webkit-transform: translate(-2px, -2px);
-        transform: translate(-2px, -2px);
-    }
-    60% {
-        -webkit-transform: translate(2px, 2px);
-        transform: translate(2px, 2px);
-    }
-    80% {
-        -webkit-transform: translate(2px, -2px);
-        transform: translate(2px, -2px);
-    }
-    100% {
-        -webkit-transform: translate(0);
-        transform: translate(0);
-    }
-}
-@keyframes vibrate-1 {
-    0% {
-        -webkit-transform: translate(0);
-        transform: translate(0);
-    }
-    20% {
-        -webkit-transform: translate(-2px, 2px);
-        transform: translate(-2px, 2px);
-    }
-    40% {
-        -webkit-transform: translate(-2px, -2px);
-        transform: translate(-2px, -2px);
-    }
-    60% {
-        -webkit-transform: translate(2px, 2px);
-        transform: translate(2px, 2px);
-    }
-    80% {
-        -webkit-transform: translate(2px, -2px);
-        transform: translate(2px, -2px);
-    }
-    100% {
-        -webkit-transform: translate(0);
-        transform: translate(0);
     }
 }
 </style>
