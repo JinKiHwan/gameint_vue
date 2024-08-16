@@ -306,10 +306,11 @@ export default {
                     display: flex;
                     width: 100%;
                     margin-bottom: 6vw;
+                    gap: 100px;
 
                     li {
-                        width: calc((100% - 35vw) / 6);
-                        margin-left: 7vw;
+                        width: calc((100% - 500px) / 6);
+                        //margin-left: 7vw;
                         display: flex;
                         align-items: flex-end;
                         cursor: pointer;
@@ -433,13 +434,14 @@ export default {
                     bottom: 0;
                     width: 35%;
                     aspect-ratio: 1/1;
-                    background: #fff;
+                    //background: #fff;
                     border-top-left-radius: 50%;
                     padding: 5px;
                     img {
                         display: block;
                         width: 100%;
                         height: 100%;
+                        object-fit: cover;
                         background: #f00;
                         border-radius: 50%;
                     }
