@@ -388,10 +388,15 @@ export default {
                     },
                     '<'
                 )
-                .to(viewReview, {
-                    x: -60,
-                    opacity: 1,
-                })
+                .to(
+                    viewReview,
+                    {
+                        delay: 0.3,
+                        x: -60,
+                        opacity: 1,
+                    },
+                    '<'
+                )
                 .to(
                     writeReview,
                     {
@@ -403,8 +408,9 @@ export default {
                     '<'
                 )
                 .to(menuX, {
-                    opacity: 1,
-                    scale: 1,
+                    width: '50%',
+                    //opacity: 1,
+                    //scale: 1,
                 })
                 .to(menuX, {
                     rotate: gsap.utils.wrap([45, -45]),
@@ -453,8 +459,9 @@ export default {
                     '<'
                 )
                 .to(menuX, {
-                    opacity: 0,
-                    scale: 0,
+                    width: 0,
+                    //opacity: 0,
+                    //scale: 0,
                 })
 
                 .to(menuHamburger, {
@@ -939,10 +946,9 @@ export default {
                 i {
                     position: absolute;
                     display: block;
-                    width: 50%;
                     height: 2px;
                     background: #fff;
-                    opacity: 0;
+                    width: 0;
 
                     &.x1 {
                         transform: rotate(45deg);

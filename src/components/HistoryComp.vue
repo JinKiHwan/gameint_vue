@@ -1,27 +1,33 @@
 <template>
     <div class="historyComp">
-        <div class="historyComp_inner">
-            <div v-for="year in years" :key="year">
-                <article>
-                    <h3>{{ year }}</h3>
-                    <div class="second" v-if="getBooksByYearAndHalf(year, 'second').length > 0">
-                        <ul>
-                            <li v-for="book in getBooksByYearAndHalf(year, 'second')" :key="book.month">
-                                <img :src="book.bookImg" :alt="book.bookName" />
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="first" v-if="getBooksByYearAndHalf(year, 'first').length > 0">
-                        <ul>
-                            <li v-for="book in getBooksByYearAndHalf(year, 'first')" :key="book.month">
-                                <img src="" alt="" />
-                                <img :src="book.bookImg" :alt="book.bookName" />
-                            </li>
-                        </ul>
-                    </div>
-                </article>
+        <section>
+            <div class="historyComp_inner">
+                <div v-for="year in years" :key="year">
+                    <article>
+                        <h3>{{ year }}</h3>
+                        <div class="second" v-if="getBooksByYearAndHalf(year, 'second').length > 0">
+                            <ul>
+                                <li v-for="book in getBooksByYearAndHalf(year, 'second')" :key="book.month">
+                                    <img :src="book.bookImg" :alt="book.bookName" />
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="first" v-if="getBooksByYearAndHalf(year, 'first').length > 0">
+                            <ul>
+                                <li v-for="book in getBooksByYearAndHalf(year, 'first')" :key="book.month">
+                                    <img src="" alt="" />
+                                    <img :src="book.bookImg" :alt="book.bookName" />
+                                </li>
+                            </ul>
+                        </div>
+                    </article>
+                </div>
             </div>
-        </div>
+        </section>
+
+        <section>
+            <div class="historyComp_inner"></div>
+        </section>
     </div>
 </template>
 
@@ -38,9 +44,9 @@ export default {
             { bookImg: require('@/assets/img/books/book38.webp'), bookName: '지옥변', bookStar: '5', month: '7', year: 2024 },
             { bookImg: require('@/assets/img/books/book33.webp'), bookName: '종이여자', bookStar: '5', month: '6', year: 2024 },
             { bookImg: require('@/assets/img/books/book11.webp'), bookName: '이방인', bookStar: '5', month: '5', year: 2024 },
-            { bookImg: require('@/assets/img/books/book25.webp'), bookName: '구의 증명', bookStar: '5', month: '4', year: 2024 },
+            { bookImg: require('@/assets/img/books/book_free.webp'), bookName: '자율', bookStar: '5', month: '4', year: 2024 },
             { bookImg: require('@/assets/img/books/book06.webp'), bookName: '스틱!', bookStar: '5', month: '3', year: 2024 },
-            { bookImg: require('@/assets/img/books/book13.webp'), bookName: '참을 수 없는 존재의 가벼움', bookStar: '5', month: '2', year: 2024 },
+            { bookImg: require('@/assets/img/books/book_free.webp'), bookName: '자율', bookStar: '5', month: '2', year: 2024 },
             { bookImg: require('@/assets/img/books/book07.webp'), bookName: '내가 한 말을 오해하지 않기로 함', bookStar: '5', month: '1', year: 2024 },
             { bookImg: require('@/assets/img/books/book01.webp'), bookName: '심판', bookStar: '5', month: '12', year: 2023 },
         ];
@@ -94,11 +100,28 @@ export default {
 .historyComp {
     height: 100%;
     background: beige;
+    section {
+        height: 100%;
+    }
+
     &_inner {
         width: 100%;
         height: 100%;
         overflow: auto;
         padding: 10px;
+
+        /* 스크롤바 설정*/
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        /* 스크롤바 막대 설정*/
+        &::-webkit-scrollbar-thumb {
+            background-color: #333333;
+            /* 스크롤바 둥글게 설정    */
+            border-radius: 10px;
+            border: 7px solid #333;
+        }
 
         article {
             h3 {
@@ -137,15 +160,17 @@ export default {
                         margin-left: 7vw;
                         display: flex;
                         align-items: flex-end;
-                        transition: transform 0.3s;
                         cursor: pointer;
 
                         &:hover {
-                            transform: translateY(-15px);
+                            img {
+                                transform: translateY(-15px);
+                            }
                         }
 
                         img {
-                            transition: box-shadow 0.3s;
+                            transition: transform 0.3s;
+
                             box-shadow: -5px 10px 15px rgba($color: #000000, $alpha: 0.5);
                         }
 
