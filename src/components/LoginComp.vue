@@ -100,7 +100,9 @@ export default {
                     );
 
                     if (response.data.code === 1) {
+                        console.log(response.data.data.profileImg);
                         alert('로그인 성공!');
+
                         loginInputStore.id = userId.value;
                         loginInputStore.pw = password.value;
 
@@ -110,12 +112,12 @@ export default {
                         userStore.setName(response.data.data.name);
                         userStore.setMemberIdx(response.data.data.memberIdx);
 
-                        // 페이지 리로드
-                        window.location.reload();
-
                         if (response.data.data.profileImg) {
                             userStore.setProfileImg(response.data.data.profileImg);
                         }
+
+                        // 페이지 리로드
+                        window.location.reload();
 
                         //imageSrc.value = response.data.profileImage;
                     } else {

@@ -259,26 +259,24 @@ export default {
             } else {
                 try {
                     const formData = new FormData();
+
+                    // 텍스트 데이터 추가
+                    formData.append('name', username.value);
+                    formData.append('account', userId.value);
+                    formData.append('password', password.value);
+                    formData.append('telegram', telegram.value);
+
+                    // 이미지 파일 추가 (있는 경우에만)
                     if (profileImageFile.value) {
                         formData.append('profileImage', profileImageFile.value);
                     }
 
-                    const response = await axios.post(
-                        'http://localhost:3000/api/member/create',
-                        {
-                            name: username.value,
-                            account: userId.value,
-                            password: password.value,
-                            telegram: telegram.value,
-                            profileImage: formData,
+                    const response = await axios.post('http://localhost:3000/api/member/create', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
                         },
-                        {
-                            headers: {
-                                'Content-Type': 'multipart/form-data',
-                            },
-                            withCredentials: true,
-                        }
-                    );
+                        withCredentials: true,
+                    });
                     if (response.data.code === 1) {
                         alert('가입성공!');
                         window.location.href = '/';

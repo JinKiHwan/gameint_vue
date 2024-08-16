@@ -16,7 +16,7 @@ export const useUserStore = defineStore('user', {
             this.name = newName;
         },
         setProfileImg(newProfileImg) {
-            this.profileImg = newProfileImg;
+            this.profileImg = './upload-test/member/' + newProfileImg;
         },
         setMemberIdx(newMemberIdx) {
             this.memberIdx = newMemberIdx;

@@ -22,8 +22,6 @@
                     </article>
                 </div>
             </div>
-
-            <!-- <div style="position: absolute; top: 150px" @click="historyBookSelect()">1</div> -->
         </section>
 
         <section class="history_book_selected" v-if="historyStatus === 1">
@@ -59,15 +57,15 @@
             <div class="historyComp_inner">
                 <ul>
                     <!-- test데이터입니다. -->
-                    <li v-for="(books, index) in bookList" :key="index">
+                    <li v-for="(books, index) in selectedBookOthers" :key="index">
                         <div class="book_image">
-                            <figure class=""><img :src="bookList[0].bookImage" alt="" /></figure>
+                            <figure class=""><img :src="books.imgUrl" alt="" /></figure>
 
                             <figure class="profile"><img :src="selectedBook.memberImage" alt="" /></figure>
                         </div>
                         <dl>
-                            <dt>책제목 {{ selectedBook.commentCount }}</dt>
-                            <dd>까치 | 에덤스미스</dd>
+                            <dt>{{ books.title }} {{ selectedBook.commentCount }}</dt>
+                            <dd>{{ books.author }} | {{ books.bookPublisher }}</dd>
                         </dl>
                     </li>
                 </ul>
@@ -89,27 +87,23 @@ export default {
         const menuImg = ref([{ img: require('@/assets/img/ico-back.webp') }, { img: require('@/assets/img/ico-book.webp') }]);
         const selectedBook = ref(null);
         const selectedBookReview = ref(null);
-        // 책 추천 글 (작성자)
-        const writerView = ref({
-            writer: '김기현',
-            userProfile: require('@/assets/img/profile/profile_df.webp'),
-            userReview: '다윗의 진화론을 바탕으로 한 과학이야기. 어떻게 인간은 진화해 왔는가 왜 매미는 큰 울음소리를 갖게되었는가 왜 나무늘보는 느리지만 끝까지 살아남았는가',
-        });
-        // 책 추천 글보기 리뷰
-        const userReviewWraps = ref([]);
+        const selectedBookUpdate = ref(null);
+        const selectedBookOthers = ref([]);
 
         /* //////////////////////////////// */
         /* ///History 스테이터스 변경 ////// */
         /* ////////////////////////////// */
         const historyBookSelect = async (idx) => {
             try {
+                console.log(idx);
                 const response = await axios.get(`http://localhost:3000/api/book/monthly/recommend/${idx}`, { withCredentials: true });
-
                 if (response.data.code === 1) {
-                    selectedBook.value = response.data.data[0];
+                    selectedBook.value = response.data.data.bookData;
                     historyBookSelectReview(idx);
                     historyStatus.value = 1;
-                    console.log(selectedBook.value, '통신성공');
+                    selectedBookUpdate.value = response.data.data.bookData.updDate;
+
+                    console.log('통신성공');
                 } else if (response.data.code === -1) {
                     console.log('통신실패 -1');
                 } else if (response.data.code === -2) {
@@ -126,9 +120,34 @@ export default {
         const historyBack = () => {
             historyStatus.value -= 1;
         };
-        const historyNext = () => {
-            historyStatus.value = 2;
+
+        /* //////////////////////////////// */
+        /* ///해당 달에 추천된 책 조회///////// */
+        /* ////////////////////////////// */
+        const historyNext = async () => {
+            console.log(selectedBookUpdate.value);
+
+            try {
+                const response = await axios.get(`http://localhost:3000/api/book/last/recommend/list?updDate=${selectedBookUpdate.value}`, { withCredentials: true });
+                if (response.data.code === 1) {
+                    selectedBookOthers.value = response.data.data;
+
+                    console.log(selectedBookOthers.value);
+                    console.log('통신성공');
+                    historyStatus.value = 2;
+                } else if (response.data.code === -1) {
+                    console.log('통신실패 -1');
+                } else if (response.data.code === -2) {
+                    console.log('통신실패 -2');
+                } else {
+                    // 기타 오류
+                    console.log('통신실패 etc');
+                }
+            } catch (err) {
+                console.log('서버오류');
+            }
         };
+
         /* //////////////////////////////// */
         /* ///History 셀렉트 리뷰 조회////// */
         /* ////////////////////////////// */
@@ -145,9 +164,7 @@ export default {
                         return item;
                     });
 
-                    console.log(selectedBookReview.value);
-
-                    console.log('통신성공', selectedBookReview.value);
+                    console.log('통신성공');
                 } else if (response.data.code === -1) {
                     console.log('통신실패 -1', '댓글조회');
                 } else if (response.data.code === -2) {
@@ -186,8 +203,6 @@ export default {
                 //console.log(response.data.data);
 
                 if (response.data.code === 1) {
-                    console.log('통신성공');
-
                     bookList.value = response.data.data;
                     return bookList.value;
                 } else if (response.data.code === -1) {
@@ -210,13 +225,13 @@ export default {
         return {
             bookList,
             menuImg,
-            writerView,
-            userReviewWraps,
             historyCompBookList,
             years,
             getBooksByYearAndHalf,
             selectedBook,
             selectedBookReview,
+            selectedBookUpdate,
+            selectedBookOthers,
             historyStatus,
             historyBookSelect,
             historyBookSelectReview,
@@ -351,7 +366,8 @@ export default {
             margin: auto 0;
 
             img {
-                height: 70%;
+                max-height: 70%;
+                object-fit: contain;
                 box-shadow: 0 0 15px rgba($color: #fff, $alpha: 0.5);
             }
         }
