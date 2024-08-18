@@ -202,7 +202,7 @@ export default {
     name: 'FavoriteBookComp',
     setup() {
         // 변수
-        const isFavoriteBookStatus = ref(1); // List : 0, Write/Edit : 1, View : 2
+        const isFavoriteBookStatus = ref(2); // List : 0, Write/Edit : 1, View : 2
         // const bookName = ref('');
         // const publisher = ref('');
         // const writer = ref('');

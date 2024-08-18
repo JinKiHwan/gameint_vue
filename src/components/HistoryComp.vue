@@ -56,8 +56,7 @@
         <section class="history_book_past_list" v-if="historyStatus === 2">
             <div class="historyComp_inner">
                 <ul>
-                    <!-- test데이터입니다. -->
-                    <li v-for="(books, index) in selectedBookOthers" :key="index">
+                    <li v-for="(books, index) in selectedBookOthers" :key="index" @click="historyBookListComment(books.bookIdx)">
                         <div class="book_image">
                             <figure class=""><img :src="books.imgUrl" alt="" /></figure>
 
@@ -67,6 +66,29 @@
                             <dt>{{ books.title }} {{ selectedBook.commentCount }}</dt>
                             <dd>{{ books.author }} | {{ books.bookPublisher }}</dd>
                         </dl>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="history_book_past_list_detail" v-if="historyStatus === 3">
+            <div class="historyComp_inner">
+                <figure>
+                    <img :src="selectedBookOthersBookData.bookImage" alt="" />
+                </figure>
+
+                <ul class="history_book_selected_comment">
+                    <li v-for="(comment, index) in selectedBookOthersComment" :key="index">
+                        <figure>
+                            <img :src="comment.memberImage" />
+                        </figure>
+
+                        <p>
+                            {{ selectedBookOthersBookData.recommendReason }}
+                        </p>
+                        <p>
+                            {{ comment.contents }}
+                        </p>
                     </li>
                 </ul>
             </div>
@@ -89,6 +111,8 @@ export default {
         const selectedBookReview = ref(null);
         const selectedBookUpdate = ref(null);
         const selectedBookOthers = ref([]);
+        const selectedBookOthersBookData = ref(null);
+        const selectedBookOthersComment = ref([]);
 
         /* //////////////////////////////// */
         /* ///History 스테이터스 변경 ////// */
@@ -218,6 +242,34 @@ export default {
             }
         };
 
+        /* //////////////////////////////// */
+        /* ///HistoryBook 그 달 상세보기///// */
+        /* ////////////////////////////// */
+        const historyBookListComment = async (idx) => {
+            console.log(idx);
+            try {
+                const response = await axios.get(`http://localhost:3000/api/book/monthly/recommend/${idx}`, { withCredentials: true });
+
+                selectedBookOthersBookData.value = response.data.data.bookData;
+                selectedBookOthersComment.value = response.data.data.commentData;
+                console.log(selectedBookOthersBookData.value, selectedBookOthersComment.value);
+
+                if (response.data.code === 1) {
+                    console.log('통신성공');
+                    historyStatus.value = 3;
+                } else if (response.data.code === -1) {
+                    console.log('통신실패 -1');
+                } else if (response.data.code === -2) {
+                    console.log('통신실패 -2');
+                } else {
+                    // 기타 오류
+                    console.log('통신실패 etc');
+                }
+            } catch (err) {
+                console.log('서버오류');
+            }
+        };
+
         onMounted(async () => {
             await historyCompBookList();
         });
@@ -232,9 +284,12 @@ export default {
             selectedBookReview,
             selectedBookUpdate,
             selectedBookOthers,
+            selectedBookOthersBookData,
+            selectedBookOthersComment,
             historyStatus,
             historyBookSelect,
             historyBookSelectReview,
+            historyBookListComment,
             historyBack,
             historyNext,
         };
@@ -312,8 +367,8 @@ export default {
                     bottom: -25px;
                     border-top-right-radius: 5px;
                     border-top-left-radius: 5px;
-                    border-bottom-right-radius: 15px;
-                    border-bottom-left-radius: 15px;
+                    border-bottom-right-radius: 8px;
+                    border-bottom-left-radius: 8px;
                     box-shadow: -5px 10px 15px rgba($color: #000000, $alpha: 0.3), 0 3px 5px rgba($color: #fff, $alpha: 0.5) inset;
                 }
 
