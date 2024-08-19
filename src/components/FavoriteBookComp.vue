@@ -18,7 +18,7 @@
                                         <button type="button" class="cool-button btn-blue" @click="changeFavoriteType(1, 'edit', info)">내용 수정</button>
                                     </div>
                                     <div>
-                                        <button type="button" class="cool-button btn-green" @click="changeFavoriteType(2)">글 보기</button>
+                                        <button type="button" class="cool-button btn-green" @click="changeFavoriteType(2, 'read', info)">글 보기</button>
                                     </div>
                                     <div v-if="info.master" class="bt">
                                         <button type="button" class="cool-button btn-red" @click="selBook(index, info)">책 당선</button>
@@ -112,7 +112,7 @@
                 <div class="favorite_area">
                     <div class="favorite_book_img">
                         <figure>
-                            <img :src="favoriteBook" alt="" />
+                            <img :src="bookDetailInfo.bookImage" alt="" />
                         </figure>
                     </div>
 
@@ -122,12 +122,12 @@
                                 <div class="review-li">
                                     <div class="user_profile">
                                         <figure>
-                                            <img :src="writerView.userProfile" :alt="writerView.writer" />
+                                            <img :src="bookDetailInfo.memberImage" :alt="bookDetailInfo.memberImage" />
                                         </figure>
-                                        <span>{{ writerView.writer }}</span>
+                                        <span>{{ bookDetailInfo.bookAuthor }}</span>
                                     </div>
                                     <div class="user_review">
-                                        <p>{{ writerView.userReview }}</p>
+                                        <p>{{ bookDetailInfo.recommendReason }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -136,7 +136,7 @@
                                     <div class="block-header">
                                         <div class="title">
                                             <h2>댓글</h2>
-                                            <div class="tag">{{ userReviewWraps.length }}</div>
+                                            <div class="tag">{{ bookDetailInfo.commentCount }}</div>
                                             개
                                         </div>
                                     </div>
@@ -319,11 +319,15 @@ export default {
                 bookCate.value = data.category;
 
                 editMode.value = true;
+            } else if (type === 'read') {
+                getFavoriteBookDetail(data);
             } else {
                 resetInputs();
             }
+
             isFavoriteBookStatus.value = index;
         };
+
         const selBook = (index, info) => {
             index = index + 1;
             alert('[' + info.title + '] 가(이)\n당선이오  (해당 리스트에 ' + index + '번 책)');
@@ -350,6 +354,32 @@ export default {
             }
             
         };
+
+        var bookDetailInfo = ref({});
+        const getFavoriteBookDetail = async (data) => {
+            var bookIdx = data.bookIdx;
+
+            try {
+                const response = await axios.get(
+                    `http://localhost:3000/api/book/monthly/recommend/${bookIdx}`, 
+                    {
+                        withCredentials: true,
+                    }
+                );
+                if(response.data.code === 1) {
+                    bookDetailInfo.value.bookImage=response.data.data.bookData.bookImage;
+                    bookDetailInfo.value.memberImage=response.data.data.bookData.memberImage;
+                    bookDetailInfo.value.recommendReason=response.data.data.bookData.recommendReason;
+                    bookDetailInfo.value.commentCount=response.data.data.bookData.commentCount;
+                }
+
+                //changeFavoriteType(0);
+            } catch (error) {
+                console.error('Error uploading file:', error);
+            } 
+
+            console.log(bookDetailInfo)
+        }
 
 
         const actFavoriteWrite = async () => {
@@ -487,6 +517,7 @@ export default {
             previewImage,
             editorOption,
             writerView,
+            bookDetailInfo,
             userReviewWraps,
             quillEditor,
             initRecomBookList,
@@ -499,6 +530,7 @@ export default {
             actComment,
             selBook,
             actFavoriteWrite,
+            getFavoriteBookDetail,
         };
     },
     components: {
