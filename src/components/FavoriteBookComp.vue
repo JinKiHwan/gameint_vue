@@ -149,17 +149,17 @@
                         </div>
                         <div class="writerCommentArea">
                             <ul class="review_item">
-                                <li v-for="(review, index) in userReviewWraps" :key="index" class="comment">
+                                <li v-for="(review, index) in bookDetailCommentInfo" :key="index" class="comment">
                                     <div class="user-banner">
                                         <div class="user">
                                             <div class="avatar">
-                                                <img :src="review.userProfile" :alt="review.userName" />
+                                                <img :src="review.memberImage" :alt="review.memberName" />
                                             </div>
-                                            <h5>{{ review.userName }}</h5>
+                                            <h5>{{ review.memberName }}</h5>
                                         </div>
                                     </div>
                                     <div class="content">
-                                        <p v-if="commnetEdit != true">{{ review.userReview }}</p>
+                                        <p v-if="commnetEdit != true">{{ review.contents }}</p>
                                         <div v-else class="writing">
                                             <div contenteditable="true" class="textarea" autofocus spellcheck="false" v-html="review.userReview"></div>
                                             <button type="button" @click.once="actComment('edit')">등록</button>
@@ -356,6 +356,8 @@ export default {
         };
 
         var bookDetailInfo = ref({});
+        var bookDetailCommentInfo = ref({});
+
         const getFavoriteBookDetail = async (data) => {
             var bookIdx = data.bookIdx;
 
@@ -371,6 +373,12 @@ export default {
                     bookDetailInfo.value.memberImage=response.data.data.bookData.memberImage;
                     bookDetailInfo.value.recommendReason=response.data.data.bookData.recommendReason;
                     bookDetailInfo.value.commentCount=response.data.data.bookData.commentCount;
+
+                    if(response.data.data.commentData.length > 0 ){
+                        bookDetailCommentInfo.value.memberName = response.data.data.commentData.memberName;
+                        bookDetailCommentInfo.value.contents = response.data.data.commentData.contents;
+                        bookDetailCommentInfo.value.memberImage = response.data.data.commentData.memberImage;
+                    }
                 }
 
                 //changeFavoriteType(0);
@@ -531,6 +539,7 @@ export default {
             selBook,
             actFavoriteWrite,
             getFavoriteBookDetail,
+            bookDetailCommentInfo,
         };
     },
     components: {
