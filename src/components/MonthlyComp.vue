@@ -105,7 +105,7 @@
                             <b>{{ member.evaluateStar }}점</b>
                         </div>
 
-                        <button v-if="member.name == userStore.name" class="edit_review" @click="editReview">수정</button>
+                        <button v-if="member.name == userStore.name" class="edit_review" @click="editReview(member)">수정</button>
                     </div>
                 </Flicking>
             </div>
@@ -122,12 +122,12 @@
                     <h3>리뷰 수정</h3>
                     <dl>
                         <dt>평점</dt>
-                        <dd><input type="number" max="5" min="1" v-model.number="value" step="0.01" placeholder="1~5점을 입력해 주세요" /></dd>
+                        <dd><input type="number" max="5" min="1" v-model.number="editPoint" step="0.01" /></dd>
                     </dl>
 
                     <dl>
                         <dt>리뷰</dt>
-                        <dd><textarea name="" id="" placeholder="책을 읽고 느낀점을 자유롭게 적어주세요"></textarea></dd>
+                        <dd><textarea name="" id="" placeholder="책을 읽고 느낀점을 자유롭게 적어주세요" v-model.number="editText"></textarea></dd>
                     </dl>
 
                     <div class="btn_wrap">
@@ -183,10 +183,15 @@ export default {
         const menuImg = ref([{ img: require('@/assets/img/ico-view.webp') }, { img: require('@/assets/img/ico-write.webp') }, { img: require('@/assets/img/ico-back.webp') }, { img: require('@/assets/img/ico-copy.webp') }]);
         const defaultProfileUrl = require('@/assets/img/profile/profile_df.webp'); // 기본 프로필 이미지 경로
 
+        const reviewPoint = ref(null);
         const userReviewWraps = ref(null);
         const selectedIndex = ref(0);
         const value = ref(null);
         const reviewContents = ref('');
+        const editPoint = ref(null);
+        const editText = ref(null);
+        const editReviewIdx = ref(null);
+        const editBookIdx = ref(null);
         let menuStatus = ref(false);
 
         const selectUser = (index) => {
@@ -322,7 +327,6 @@ export default {
         /* //리뷰작성 & 수정하기 팝업 On&Off/// */
         /* /////////////////////////////// */
         const writeReview = () => {
-            console.log(userStore.isLogin);
             if (!userStore.isLogin) {
                 alert('로그인이 필요한 컨텐츠입니다');
                 return;
@@ -334,15 +338,30 @@ export default {
             event.preventDefault(); // 기본 동작 방지
             reviewPopup.value = false;
         };
-        const editReview = () => {
+        const editReview = (member) => {
             reviewEditPopup.value = true;
+            console.log();
+
+            editPoint.value = member.evaluateStar;
+            editText.value = member.evaluateContents;
+            editReviewIdx.value = member.bookEvaluationIdx;
+            editBookIdx.value = bookIdx.value;
         };
 
         const editReviewConfirm = async () => {
             event.preventDefault(); // 기본 동작 방지
 
             try {
-                const response = await axios.post(`http://localhost:3000/api/book/monthly/evaluate/update`, { withCredentials: true });
+                const response = await axios.post(
+                    `http://localhost:3000/api/book/monthly/evaluate/update`,
+                    {
+                        bookEvaluationIdx: editReviewIdx.value,
+                        bookIdx: bookIdx.value,
+                        contents: editText.value,
+                        star: editPoint.value,
+                    },
+                    { withCredentials: true }
+                );
 
                 switch (response.data.code) {
                     case 1:
@@ -639,6 +658,13 @@ export default {
             // 소수점 둘째자리까지 반올림하고 다시 숫자로 변환
             value.value = Number(Number(value.value).toFixed(2));
         });
+        watch(editPoint, (newValue) => {
+            if (newValue > 5) {
+                editPoint.value = 5;
+            }
+            // 소수점 둘째자리까지 반올림하고 다시 숫자로 변환
+            editPoint.value = Number(Number(editPoint.value).toFixed(2));
+        });
 
         /* /////////////////////////////////*/
         /* ///리뷰 복사하기//////////////////*/
@@ -702,6 +728,11 @@ export default {
             plugins: [new Perspective({ rotate: 0.5 })],
             reviewCopy,
             defaultProfileUrl,
+            reviewPoint,
+            editPoint,
+            editText,
+            editReviewIdx,
+            editBookIdx,
         };
     },
 
