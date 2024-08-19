@@ -353,7 +353,7 @@ export default {
 
             try {
                 const response = await axios.post(
-                    `http://localhost:3000/api/book/monthly/evaluate/update`,
+                    'http://localhost:3000/api/book/monthly/evaluate/update',
                     {
                         bookEvaluationIdx: editReviewIdx.value,
                         bookIdx: bookIdx.value,
