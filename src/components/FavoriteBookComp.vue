@@ -141,8 +141,8 @@
                                         </div>
                                     </div>
                                     <div class="writing">
-                                        <div contenteditable="true" class="textarea" autofocus spellcheck="false"></div>
-                                        <button type="button">등록</button>
+                                        <input type="text" v-model="commentCreateVal" contenteditable="true" class="textarea" autofocus spellcheck="false" />
+                                        <button type="submit" @click.once="createComment(bookDetailInfo.bookIdx)">등록</button>
                                     </div>
                                 </div>
                             </div>
@@ -161,7 +161,7 @@
                                     <div class="content">
                                         <p v-if="commnetEdit != true">{{ review.contents }}</p>
                                         <div v-else class="writing">
-                                            <div contenteditable="true" class="textarea" autofocus spellcheck="false" v-html="review.userReview"></div>
+                                            <div contenteditable="true" class="textarea" autofocus spellcheck="false" v-html="review.contents"></div>
                                             <button type="button" @click.once="actComment('edit')">등록</button>
                                         </div>
                                     </div>
@@ -227,6 +227,8 @@ export default {
         const author = ref('');
         const fileName = ref(null);
         const previewImage = ref(null);
+        const commentCreateVal = ref('');
+
         const editorOption = {
             modules: {
                 toolbar: [[{ header: [1, 2, 3, false] }], ['bold', 'italic', 'underline'], ['code-block'], [{ list: 'ordered' }, 'blockquote']],
@@ -340,6 +342,7 @@ export default {
             bookTitle.value = '';
             bookPub.value = '';
             bookCate.value = '';
+            commentCreateVal.value='';
         };
         const actCopyImgSrc = (type) => {
             if (previewImage.value === null) {
@@ -368,16 +371,20 @@ export default {
                         withCredentials: true,
                     }
                 );
+                console.log(response.data)
                 if(response.data.code === 1) {
+                    bookDetailInfo.value.bookIdx=bookIdx;
                     bookDetailInfo.value.bookImage=response.data.data.bookData.bookImage;
                     bookDetailInfo.value.memberImage=response.data.data.bookData.memberImage;
                     bookDetailInfo.value.recommendReason=response.data.data.bookData.recommendReason;
                     bookDetailInfo.value.commentCount=response.data.data.bookData.commentCount;
 
-                    if(response.data.data.commentData.length > 0 ){
-                        bookDetailCommentInfo.value.memberName = response.data.data.commentData.memberName;
-                        bookDetailCommentInfo.value.contents = response.data.data.commentData.contents;
-                        bookDetailCommentInfo.value.memberImage = response.data.data.commentData.memberImage;
+                    if(response.data.data.commentData.length > 0 ) {
+                        // for(var i = 0; i < response.data.data.commentData.length; i++) {
+                        // }
+                        bookDetailCommentInfo.value = response.data.data.commentData
+
+                        console.log(bookDetailCommentInfo)
                     }
                 }
 
@@ -385,8 +392,6 @@ export default {
             } catch (error) {
                 console.error('Error uploading file:', error);
             } 
-
-            console.log(bookDetailInfo)
         }
 
 
@@ -435,59 +440,33 @@ export default {
             }
         };
 
-        ///////////////////////////////////////////
-        // 추천 책 글보기
-        ///////////////////////////////////////////
-        // 책 추천 글 (작성자)
-        const writerView = ref({
-            writer: '김기현',
-            userProfile: require('@/assets/img/profile/profile_df.webp'),
-            userReview: '다윗의 진화론을 바탕으로 한 과학이야기. 어떻게 인간은 진화해 왔는가 왜 매미는 큰 울음소리를 갖게되었는가 왜 나무늘보는 느리지만 끝까지 살아남았는가',
-        });
-        // 책 추천 글보기 리뷰
-        const userReviewWraps = ref([
-            {
-                userName: '안승필',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-            },
-            {
-                userName: '김효종',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-            },
-            {
-                userName: '진기환',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-            },
-            {
-                userName: '맹주영',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-            },
-            {
-                userName: '안승필',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-            },
-            {
-                userName: '김효종',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-            },
-            {
-                userName: '진기환',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-            },
-            {
-                userName: '맹주영',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview:
-                    '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-            },
-        ]);
+        const createComment = async (bookIdx) => {
+            const jsonPayload = {
+                bookIdx: bookIdx,
+                contents: commentCreateVal.value
+            }
+            console.log(jsonPayload)
+
+            try {
+                const response = await axios.post(
+                    'http://localhost:3000/api/comment/create', jsonPayload,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        withCredentials: true,
+                    }
+                );
+                console.log(response.data)
+                
+                //changeFavoriteType(0);
+            } catch (error) {
+                console.error('Error uploading file:', error);
+            }   finally {
+                isFavoriteBookStatus.value = 0;
+            }
+        }
+
         // 댓글 등록
         const actComment = (type) => {
             if (type == 'edit') {
@@ -524,9 +503,7 @@ export default {
             fileName,
             previewImage,
             editorOption,
-            writerView,
             bookDetailInfo,
-            userReviewWraps,
             quillEditor,
             initRecomBookList,
             doMouseOver,
@@ -540,6 +517,8 @@ export default {
             actFavoriteWrite,
             getFavoriteBookDetail,
             bookDetailCommentInfo,
+            commentCreateVal,
+            createComment,
         };
     },
     components: {
