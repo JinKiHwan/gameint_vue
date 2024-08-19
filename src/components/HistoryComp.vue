@@ -29,17 +29,28 @@
             <div class="historyComp_inner">
                 <div class="history_book_selected_wrap">
                     <figure>
-                        <img :src="selectedBook?.bookImage" :alt="selectedBook?.selectedMonth" />
+                        <div>
+                            <img :src="selectedBook?.bookImage" :alt="selectedBook?.selectedMonth" />
+                        </div>
                     </figure>
 
                     <ul class="history_book_selected_review">
                         <li v-for="(review, index) in selectedBookReview" :key="index">
-                            <figure>
-                                <img :src="review.profileImg" :alt="review.name" />
-                            </figure>
-                            <p>
-                                {{ review.evaluateContents }}
-                            </p>
+                            <div class="review_text">
+                                <div class="review_text_wrap">
+                                    {{ review.evaluateContents }}
+                                </div>
+                            </div>
+                            <div class="review_user">
+                                <div class="profile">
+                                    <figure>
+                                        <img :src="review.profileImg" alt="" />
+                                    </figure>
+                                    <p>{{ review.name }} 님</p>
+                                </div>
+
+                                <b>{{ review.evaluateStar }}점</b>
+                            </div>
                         </li>
                     </ul>
                 </div>
@@ -60,38 +71,56 @@
                         <div class="book_image">
                             <figure class=""><img :src="books.imgUrl" alt="" /></figure>
 
-                            <figure class="profile"><img :src="selectedBook.memberImage" alt="" /></figure>
+                            <figure class="profile"><img :src="books.profileImg" alt="" /></figure>
                         </div>
                         <dl>
-                            <dt>{{ books.title }} {{ selectedBook.commentCount }}</dt>
+                            <dt>{{ books.title }}</dt>
                             <dd>{{ books.author }} | {{ books.bookPublisher }}</dd>
                         </dl>
                     </li>
                 </ul>
             </div>
+            <button class="history_back" @click="historyBack">
+                <img :src="menuImg[0].img" alt="" />
+            </button>
         </section>
 
         <section class="history_book_past_list_detail" v-if="historyStatus === 3">
+            <figure class="historyBg">
+                <img :src="selectedBookOthersBookData.bookImage" alt="" />
+            </figure>
             <div class="historyComp_inner">
-                <figure>
-                    <img :src="selectedBookOthersBookData.bookImage" alt="" />
+                <figure class="bookImg">
+                    <div>
+                        <img :src="selectedBookOthersBookData.bookImage" alt="" />
+                    </div>
                 </figure>
 
-                <ul class="history_book_selected_comment">
-                    <li v-for="(comment, index) in selectedBookOthersComment" :key="index">
-                        <figure>
-                            <img :src="comment.memberImage" />
-                        </figure>
-
+                <div>
+                    <div class="recommender">
+                        <figure><img :src="selectedBookOthersBookData.memberImage" alt="" /></figure>
                         <p>
                             {{ selectedBookOthersBookData.recommendReason }}
                         </p>
-                        <p>
-                            {{ comment.contents }}
-                        </p>
-                    </li>
-                </ul>
+                    </div>
+                    <hr />
+                    <b>댓글 {{ selectedBookOthersBookData.commentCount }}</b>
+                    <ul class="history_book_selected_comment">
+                        <li v-for="(comment, index) in selectedBookOthersComment" :key="index">
+                            <figure>
+                                <img :src="comment.memberImage" />
+                            </figure>
+
+                            <p>
+                                {{ comment.contents }}
+                            </p>
+                        </li>
+                    </ul>
+                </div>
             </div>
+            <button class="history_back" @click="historyBack">
+                <img :src="menuImg[0].img" alt="" />
+            </button>
         </section>
     </div>
 </template>
@@ -119,7 +148,7 @@ export default {
         /* ////////////////////////////// */
         const historyBookSelect = async (idx) => {
             try {
-                console.log(idx);
+                //console.log(idx);
                 const response = await axios.get(`http://localhost:3000/api/book/monthly/recommend/${idx}`, { withCredentials: true });
                 if (response.data.code === 1) {
                     selectedBook.value = response.data.data.bookData;
@@ -149,14 +178,15 @@ export default {
         /* ///해당 달에 추천된 책 조회///////// */
         /* ////////////////////////////// */
         const historyNext = async () => {
-            console.log(selectedBookUpdate.value);
+            //console.log(selectedBookUpdate.value);
 
             try {
                 const response = await axios.get(`http://localhost:3000/api/book/last/recommend/list?updDate=${selectedBookUpdate.value}`, { withCredentials: true });
                 if (response.data.code === 1) {
                     selectedBookOthers.value = response.data.data;
 
-                    console.log(selectedBookOthers.value);
+                    console.log(selectedBookOthers.value, '추천된 책 조회');
+
                     console.log('통신성공');
                     historyStatus.value = 2;
                 } else if (response.data.code === -1) {
@@ -181,6 +211,8 @@ export default {
 
                 if (response.data.code === 1) {
                     // 모든 데이터의 profileImg 처리
+                    //console.log(response.data.data);
+
                     selectedBookReview.value = response.data.data.map((item) => {
                         if (item.profileImg == null) {
                             item.profileImg = require('@/assets/img/profile/profile_df.webp');
@@ -191,11 +223,14 @@ export default {
                     console.log('통신성공');
                 } else if (response.data.code === -1) {
                     console.log('통신실패 -1', '댓글조회');
+                    selectedBookReview.value = null;
                 } else if (response.data.code === -2) {
                     console.log('통신실패 -2', '댓글조회');
+                    selectedBookReview.value = null;
                 } else {
                     // 기타 오류
                     console.log('통신실패 etc', '댓글조회');
+                    selectedBookReview.value = null;
                 }
             } catch (err) {
                 console.log('서버오류', '댓글조회');
@@ -246,13 +281,13 @@ export default {
         /* ///HistoryBook 그 달 상세보기///// */
         /* ////////////////////////////// */
         const historyBookListComment = async (idx) => {
-            console.log(idx);
+            //(idx);
             try {
                 const response = await axios.get(`http://localhost:3000/api/book/monthly/recommend/${idx}`, { withCredentials: true });
 
                 selectedBookOthersBookData.value = response.data.data.bookData;
                 selectedBookOthersComment.value = response.data.data.commentData;
-                console.log(selectedBookOthersBookData.value, selectedBookOthersComment.value);
+                console.log(response.data.data.commentData, '상세보기');
 
                 if (response.data.code === 1) {
                     console.log('통신성공');
@@ -416,12 +451,30 @@ export default {
             width: 45%;
             height: 100%;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             margin: auto 0;
+            position: relative;
+
+            div {
+                height: 70%;
+                position: relative;
+
+                &::before {
+                    font-size: 28px;
+                    content: 'Review';
+                    color: #fff;
+                    position: absolute;
+                    left: 0;
+                    top: -45px;
+                    font-weight: 800;
+                }
+            }
 
             img {
-                max-height: 70%;
+                height: 100%;
+
                 object-fit: contain;
                 box-shadow: 0 0 15px rgba($color: #fff, $alpha: 0.5);
             }
@@ -430,8 +483,12 @@ export default {
     &_review {
         height: 100%;
         overflow: auto;
-        max-width: 50%;
+        width: 50%;
         padding: 8% 0;
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        flex-wrap: wrap;
 
         /* 스크롤바 설정*/
         &::-webkit-scrollbar {
@@ -446,12 +503,82 @@ export default {
             border: 7px solid #333;
         }
 
-        li {
+        > li {
+            width: calc((100% - 15px) / 2);
+            aspect-ratio: 6/5;
+            border: 3px solid #fff;
+            box-shadow: 0 0 15px rgba($color: #000000, $alpha: 0.5);
+            position: relative;
+        }
+
+        .review_text {
+            width: 100%;
+            height: 70%;
+            overflow: auto;
+            font-family: 'Bujangnim_nunchi';
+
+            &::-webkit-scrollbar {
+                width: 2px; /* 스크롤바의 너비 */
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background: #217af4;
+                border-radius: 10px;
+            }
+
+            &::-webkit-scrollbar-track {
+                background: rgba(33, 122, 244, 0.1); /*스크롤바 뒷 배경 색상*/
+            }
+
+            .review_text_wrap {
+                min-height: 100%;
+                background-image: url('/src/assets/img/texture.webp');
+                background-repeat: no-repeat;
+                background-size: cover;
+                background-position: center center;
+                padding: 8px;
+                font-size: 24px;
+            }
+        }
+
+        .review_user {
+            height: 30%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            padding: 10px;
+            font-family: 'Bujangnim_nunchi';
+            font-size: 20px;
+
+            .profile {
+                display: flex;
+                height: 100%;
+                align-items: center;
+                gap: 10px;
+
+                figure {
+                    height: 100%;
+                    overflow: hidden;
+                    border-radius: 50%;
+                    aspect-ratio: 1/1;
+                    border: 1px solid #222;
+
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+                }
+            }
+        }
+
+        /*  li {
             display: flex;
             align-items: flex-start;
-            gap: 10px;
+            gap: 30px;
             color: #fff;
-            margin-bottom: 15px;
+            margin-bottom: 25px;
             &:last-child {
                 margin-bottom: 0;
             }
@@ -474,13 +601,46 @@ export default {
             }
 
             p {
-                align-self: center;
+                max-width: calc((100% - 60px) - 30px);
                 display: flex;
                 align-items: center;
-                max-width: calc((100% - 60px) - 10px);
+                align-self: center;
                 line-height: 1.3;
+                padding: 15px 10px;
+                background: #42b883;
+                border-radius: 10px;
+                word-break: break-word;
+                position: relative;
+                &:before {
+                    content: '';
+                    display: block;
+                    width: 10px;
+                    height: 10px;
+                    border-right: 10px solid #42b883;
+                    border-left: 10px solid transparent;
+                    border-bottom: 10px solid transparent;
+                    position: absolute;
+                    left: -20px;
+                    top: 15px;
+                }
+
+                span {
+                    font-size: 16px;
+                    position: absolute;
+                    right: 10px;
+                    bottom: -22px;
+                }
             }
-        }
+
+            &:nth-child(even) {
+                p {
+                    background: #35495e;
+                    &:before {
+                        border-right: 10px solid #35495e;
+                    }
+                }
+            }
+        } */
     }
 }
 
@@ -490,8 +650,9 @@ export default {
         flex-wrap: wrap;
         gap: 20px;
         li {
-            width: calc((100% - 100px) / 6);
+            width: calc((100% - 80px) / 5);
             margin-bottom: 30px;
+            cursor: pointer;
 
             .book_image {
                 position: relative;
@@ -515,6 +676,191 @@ export default {
                         object-fit: cover;
                         background: #f00;
                         border-radius: 50%;
+                    }
+                }
+            }
+
+            dl {
+                dt {
+                    font-weight: 800;
+                    margin-bottom: 5px;
+                }
+            }
+        }
+    }
+}
+
+.history_book_past_list_detail {
+    .historyComp_inner {
+        display: flex;
+        align-items: center;
+
+        > div {
+            width: 50%;
+            height: 70%;
+            position: relative;
+
+            &:before {
+                font-size: 28px;
+                content: 'Recommender & Comment';
+                color: #fff;
+                position: absolute;
+                left: 0;
+                top: -45px;
+                font-weight: 800;
+            }
+        }
+    }
+    .bookImg {
+        width: 45%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: auto 0;
+        position: relative;
+
+        div {
+            height: 70%;
+            position: relative;
+
+            &:before {
+                font-size: 28px;
+                content: 'Comment';
+                color: #fff;
+                position: absolute;
+                left: 0;
+                top: -45px;
+                font-weight: 800;
+            }
+
+            img {
+                height: 100%;
+                -o-object-fit: contain;
+                object-fit: contain;
+                box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            }
+        }
+    }
+
+    .recommender {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 5px;
+        width: 100%;
+        gap: 20px;
+
+        figure {
+            width: 80px;
+            aspect-ratio: 1/1;
+            border-radius: 50%;
+            border: 1px solid #000;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        p {
+            max-width: calc(100% - 100px);
+            align-self: center;
+            line-height: 1.3;
+            padding: 15px 10px;
+            background: #42b883;
+            border-radius: 10px;
+            word-break: break-word;
+            position: relative;
+            color: #fff;
+            &:before {
+                content: '';
+                display: block;
+                width: 10px;
+                height: 10px;
+                border-right: 10px solid #42b883;
+                border-left: 10px solid transparent;
+                border-bottom: 10px solid transparent;
+                position: absolute;
+                left: -20px;
+                top: 15px;
+            }
+        }
+    }
+    hr {
+        margin-bottom: 5px;
+    }
+
+    hr + b {
+        color: #fff;
+    }
+
+    ul {
+        height: 85%;
+        overflow: auto;
+        padding: 3% 0;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+
+        /* 스크롤바 설정*/
+        &::-webkit-scrollbar {
+            width: 2px;
+        }
+
+        /* 스크롤바 막대 설정*/
+        &::-webkit-scrollbar-thumb {
+            background-color: #333333;
+            /* 스크롤바 둥글게 설정    */
+            border-radius: 10px;
+            border: 7px solid #333;
+        }
+
+        li {
+            gap: 20px;
+            display: flex;
+            align-items: flex-start;
+
+            figure {
+                width: 60px;
+                aspect-ratio: 1/1;
+                border-radius: 50%;
+                border: 1px solid #000;
+                background: #fff;
+                overflow: hidden;
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+            }
+
+            p {
+                max-width: calc(100% - 80px);
+                align-self: center;
+                line-height: 1.3;
+                padding: 15px 10px;
+                background: #42b883;
+                border-radius: 10px;
+                word-break: break-word;
+                position: relative;
+                color: #fff;
+                &:before {
+                    content: '';
+                    display: block;
+                    width: 10px;
+                    height: 10px;
+                    border-right: 10px solid #42b883;
+                    border-left: 10px solid transparent;
+                    border-bottom: 10px solid transparent;
+                    position: absolute;
+                    left: -20px;
+                    top: 15px;
+                }
+            }
+
+            &:nth-child(odd) {
+                p {
+                    background: #35495e;
+                    &:before {
+                        border-right: 10px solid #35495e;
                     }
                 }
             }

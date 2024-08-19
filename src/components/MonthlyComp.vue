@@ -132,7 +132,7 @@
 
                     <div class="btn_wrap">
                         <button class="close" @click="closeEditReview">닫기</button>
-                        <button class="write">수정하기</button>
+                        <button class="write" @click="editReviewConfirm">수정하기</button>
                     </div>
                 </form>
             </div>
@@ -337,6 +337,38 @@ export default {
         const editReview = () => {
             reviewEditPopup.value = true;
         };
+
+        const editReviewConfirm = async () => {
+            event.preventDefault(); // 기본 동작 방지
+
+            try {
+                const response = await axios.post(`http://localhost:3000/api/book/monthly/evaluate/update`, { withCredentials: true });
+
+                switch (response.data.code) {
+                    case 1:
+                        console.log('평가 성공:', response.data.message);
+                        //alert('작성완료!');
+
+                        break;
+                    case -1:
+                        console.log('code -1');
+
+                        break;
+                    case -2:
+                        console.log('code -2');
+                        break;
+                    case -99:
+                        console.log('code -99');
+                        break;
+                    default:
+                        console.log('알 수 없는 오류 발생:', response.data);
+                    // 예상치 못한 응답에 대한 처리
+                }
+            } catch (error) {
+                console.error('Error uploading file:', error);
+            }
+        };
+
         const closeEditReview = () => {
             reviewEditPopup.value = false;
         };
@@ -659,6 +691,7 @@ export default {
             value,
             reviewContents,
             editReview,
+            editReviewConfirm,
             closeEditReview,
             bookIdx,
             menuOpen,
@@ -678,7 +711,7 @@ export default {
             //console.log(e.currentTarget.panels);
             /* e.currentTarget.panels.forEach((panel, index) => {
                 console.log(e, index);
-                
+
             }); */
         },
     },
@@ -996,7 +1029,7 @@ export default {
     }
     .history_back {
         position: fixed;
-        right: 25px;
+        left: 25px;
         bottom: 25px;
         width: 50px;
         aspect-ratio: 1/1;
@@ -1012,7 +1045,7 @@ export default {
 
     .review_copy {
         position: fixed;
-        left: 25px;
+        right: 25px;
         bottom: 25px;
         width: 50px;
         aspect-ratio: 1/1;
