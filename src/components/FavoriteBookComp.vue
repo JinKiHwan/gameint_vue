@@ -3,13 +3,13 @@
         <div class="favorite_inner" v-bind:class="{ '-view': isFavoriteBookStatus !== 0 }">
             <!--[s] 책 추천 리스트-->
             <div class="favorite_list" v-if="isFavoriteBookStatus == 0">
-                <ul>
+                <ul v-if="isFavoriteBookListLoading">
                     <li v-for="(info, index) in isFavoriteBookList" :key="index">
-                        <div class="fav_img" @mouseover="doMouseOver(index)" @mouseleave="doMouseLeave(index)" @touchstart="doMouseOver(index)" @touchend="doMouseLeave(index)">
-                            <img :src="`${info.img}`" />
+                       <div class="fav_img" @mouseover="doMouseOver(index)" @mouseleave="doMouseLeave(index)" @touchstart="doMouseOver(index)" @touchend="doMouseLeave(index)">
+                            <img :src="`${info.bookImage}`" />
                             <div class="fav_recommender">
                                 <span class="fav_profile">
-                                    <img :src="`${info.recommender}`" />
+                                    <img :src="`${info.profileImage}`" />
                                 </span>
                             </div>
                             <div v-show="info.isHovered" class="fav_hover">
@@ -18,7 +18,7 @@
                                         <button type="button" class="cool-button btn-blue" @click="changeFavoriteType(1, 'edit', info)">내용 수정</button>
                                     </div>
                                     <div>
-                                        <button type="button" class="cool-button btn-green" @click="changeFavoriteType(2)">글 보기</button>
+                                        <button type="button" class="cool-button btn-green" @click="changeFavoriteType(2, 'read', info)">글 보기</button>
                                     </div>
                                     <div v-if="info.master" class="bt">
                                         <button type="button" class="cool-button btn-red" @click="selBook(index, info)">책 당선</button>
@@ -29,7 +29,7 @@
                         <dl>
                             <dt>
                                 <div class="fav_title">
-                                    {{ info.title }}
+                                    {{ info.bookTitle }}
                                 </div>
                                 <div class="fav_comment">
                                     <span class="fav_comment_num">
@@ -39,15 +39,18 @@
                             </dt>
                             <dd>
                                 <span class="fav_pub">
-                                    {{ info.publisher }}
+                                    {{ info.bookPublisher }}
                                 </span>
                                 <span class="fav_wri">
-                                    {{ info.writer }}
+                                    {{ info.bookAuthor }}
                                 </span>
                             </dd>
                         </dl>
                     </li>
                 </ul>
+                <div v-else>
+                    목록이 없습니다.
+                </div>
             </div>
             <!--[e] 책 추천 리스트-->
 
@@ -81,15 +84,24 @@
                             </li>
                             <li>
                                 <label for="book_img">책 이미지</label>
-                                <input type="file" id="upload-image" hidden @change="handleFileUpload" />
+                                <div class="bookAddArea">
+                                    <input type="text" :disabled="emptyImg === false" v-model.trim="previewImage" placeholder="책 이미지 URL을 넣어주세요.">
+                                    <button v-if="emptyImg === true" type="button" @:click="actCopyImgSrc('preview')">
+                                        미리보기
+                                    </button>
+                                    <button v-else type="button" @:click="actCopyImgSrc('cancle')">
+                                        취소
+                                    </button>
+                                    <p class="tipTxt">※ 가져 올 책 이미지 오른쪽 클릭 ▷ 이미지 주소 복사</p>
+                                </div>
                             </li>
                         </ul>
                     </div>
                     <div class="form-right">
                         <label v-show="emptyImg != true" class="uploadImg">
-                            <img ref="previewImage" />
+                            <img v-bind:src="previewImage" />
                         </label>
-                        <p v-show="emptyImg" class="dfTxt">책 이미지를 첨부해주세요</p>
+                        <p v-show="emptyImg" class="dfTxt">책 이미지 URL를 첨부해주세요</p>
                     </div>
                 </div>
             </div>
@@ -100,7 +112,7 @@
                 <div class="favorite_area">
                     <div class="favorite_book_img">
                         <figure>
-                            <img :src="favoriteBook" alt="" />
+                            <img :src="bookDetailInfo.bookImage" alt="" />
                         </figure>
                     </div>
 
@@ -110,12 +122,12 @@
                                 <div class="review-li">
                                     <div class="user_profile">
                                         <figure>
-                                            <img :src="writerView.userProfile" :alt="writerView.writer" />
+                                            <img :src="bookDetailInfo.memberImage" :alt="bookDetailInfo.memberImage" />
                                         </figure>
-                                        <span>{{ writerView.writer }}</span>
+                                        <span>{{ bookDetailInfo.bookAuthor }}</span>
                                     </div>
                                     <div class="user_review">
-                                        <p>{{ writerView.userReview }}</p>
+                                        <p>{{ bookDetailInfo.recommendReason }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -124,32 +136,32 @@
                                     <div class="block-header">
                                         <div class="title">
                                             <h2>댓글</h2>
-                                            <div class="tag">{{ userReviewWraps.length }}</div>
+                                            <div class="tag">{{ bookDetailInfo.commentCount }}</div>
                                             개
                                         </div>
                                     </div>
                                     <div class="writing">
-                                        <div contenteditable="true" class="textarea" autofocus spellcheck="false"></div>
-                                        <button type="button">등록</button>
+                                        <input type="text" v-model="commentCreateVal" contenteditable="true" class="textarea" autofocus spellcheck="false" />
+                                        <button type="submit" @click.once="createComment(bookDetailInfo.bookIdx)">등록</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="writerCommentArea">
                             <ul class="review_item">
-                                <li v-for="(review, index) in userReviewWraps" :key="index" class="comment">
+                                <li v-for="(review, index) in bookDetailCommentInfo" :key="index" class="comment">
                                     <div class="user-banner">
                                         <div class="user">
                                             <div class="avatar">
-                                                <img :src="review.userProfile" :alt="review.userName" />
+                                                <img :src="review.memberImage" :alt="review.memberName" />
                                             </div>
-                                            <h5>{{ review.userName }}</h5>
+                                            <h5>{{ review.memberName }}</h5>
                                         </div>
                                     </div>
                                     <div class="content">
-                                        <p v-if="commnetEdit != true">{{ review.userReview }}</p>
+                                        <p v-if="commnetEdit != true">{{ review.contents }}</p>
                                         <div v-else class="writing">
-                                            <div contenteditable="true" class="textarea" autofocus spellcheck="false" v-html="review.userReview"></div>
+                                            <div contenteditable="true" class="textarea" autofocus spellcheck="false" v-html="review.contents"></div>
                                             <button type="button" @click.once="actComment('edit')">등록</button>
                                         </div>
                                     </div>
@@ -193,8 +205,8 @@
 ///////////////////////////////////////////
 // import
 ///////////////////////////////////////////
-import { ref, computed } from 'vue';
-import { QuillEditor } from '@vueup/vue-quill';
+import { ref, computed, onMounted, reactive, toRaw } from 'vue';
+import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import axios from 'axios';
 
@@ -202,7 +214,7 @@ export default {
     name: 'FavoriteBookComp',
     setup() {
         // 변수
-        const isFavoriteBookStatus = ref(2); // List : 0, Write/Edit : 1, View : 2
+        const isFavoriteBookStatus = ref(0); // List : 0, Write/Edit : 1, View : 2
         // const bookName = ref('');
         // const publisher = ref('');
         // const writer = ref('');
@@ -215,7 +227,8 @@ export default {
         const author = ref('');
         const fileName = ref(null);
         const previewImage = ref(null);
-        const previewImageFile = ref(null);
+        const commentCreateVal = ref('');
+
         const editorOption = {
             modules: {
                 toolbar: [[{ header: [1, 2, 3, false] }], ['bold', 'italic', 'underline'], ['code-block'], [{ list: 'ordered' }, 'blockquote']],
@@ -224,8 +237,11 @@ export default {
         };
         const quillEditor = ref(null); // QuillEditor 인스턴스 참조
         const favoriteBook = ref(require('@/assets/img/book01.webp'));
-
+        
         let isFavoriteBookList = ref([]);
+        let isFavoriteBookListArray = ref([]);
+        let isFavoriteBookListLoading = ref(false);
+
         let master = ref(false); // 마스터 시 true
         let editMode = ref(false); // 본인 작성 글 true
         let emptyImg = ref(true);
@@ -259,148 +275,42 @@ export default {
         const initRecomBookList = async () => {
             const url = 'http://localhost:3000/api/book/monthly/recommend/list';
             try {
-                const response = await axios.get(url);
-                console.log(response.data);
-                isFavoriteBookList = response.data;
+                const response = await axios.get(url, { withCredentials: true });
+
+                if (response.data.code === 1) {
+                    isFavoriteBookListArray.value = reactive(response.data.data);
+                    isFavoriteBookList.value = toRaw(isFavoriteBookListArray.value);                    
+                    isFavoriteBookList.value.forEach(book => {
+                        book.isHovered = false;
+                    });
+                    console.log('List successful:', isFavoriteBookList.value)
+                } else if (response.data.code === -1) {
+                    // 
+                    alert('책이 없습니다');
+                } else if (response.data.code === -2) {
+                    alert('오류');
+                } else {
+                    // 기타 오류
+                    alert(response.data.message || '알 수 없는 오류가 발생했습니다.');
+                }
             } catch (error) {
                 alert(error);
+            } finally {
+                isFavoriteBookListLoading.value = true;
             }
         };
-
-        // 데이터 매핑
-        // isFavoriteBookList = reactive([
-        //     {
-        //         img: require('@/assets/img/favorite/book28.webp'),
-        //         title: (bookName.value = '제일 긴 책제목은 과연 몇자일까요오오오오오'),
-        //         publisher: (publisher.value = '민음사'),
-        //         writer: (writer.value = '김동동'),
-        //         category: (category.value = '에세이'),
-        //         commentNum: (commentNum.value = '10'),
-        //         recommender: require('@/assets/img/profile/test.jpg'),
-        //         edit,
-        //         master,
-        //         isHovered: false,
-        //     },
-        //     {
-        //         img: require('@/assets/img/favorite/book28.webp'),
-        //         title: (bookName.value = '제일 긴 책제목은 과연'),
-        //         publisher: (publisher.value = '민음사'),
-        //         writer: (writer.value = '김동동'),
-        //         category: (category.value = '에세이'),
-        //         commentNum: (commentNum.value = '10'),
-        //         recommender: require('@/assets/img/profile/test.jpg'),
-        //         edit,
-        //         master,
-        //         isHovered: false,
-        //     },
-        //     {
-        //         img: require('@/assets/img/favorite/book28.webp'),
-        //         title: (bookName.value = '몇자일까요오오오오오'),
-        //         publisher: (publisher.value = '민음사'),
-        //         writer: (writer.value = '김동동'),
-        //         category: (category.value = '에세이'),
-        //         commentNum: (commentNum.value = '2'),
-        //         recommender: require('@/assets/img/profile/test.jpg'),
-        //         edit,
-        //         master,
-        //         isHovered: false,
-        //     },
-        //     {
-        //         img: require('@/assets/img/favorite/book28.webp'),
-        //         title: (bookName.value = '효자손으로도 때리지 말라'),
-        //         publisher: (publisher.value = '민음사'),
-        //         writer: (writer.value = '김동동'),
-        //         category: (category.value = '에세이'),
-        //         commentNum: (commentNum.value = '3'),
-        //         recommender: require('@/assets/img/profile/test.jpg'),
-        //         edit,
-        //         master,
-        //         isHovered: false,
-        //     },
-        //     {
-        //         img: require('@/assets/img/favorite/book28.webp'),
-        //         title: (bookName.value = '임금 인상을 요청하기 위해 과장에게 접근하는 기술과 방법'),
-        //         publisher: (publisher.value = '민음사'),
-        //         writer: (writer.value = '김동동'),
-        //         category: (category.value = '에세이'),
-        //         commentNum: (commentNum.value = '4'),
-        //         recommender: require('@/assets/img/profile/test.jpg'),
-        //         edit,
-        //         master,
-        //         isHovered: false,
-        //     },
-        //     {
-        //         img: require('@/assets/img/favorite/book28.webp'),
-        //         title: (bookName.value = '에피쿠로스 쾌락 6'),
-        //         publisher: (publisher.value = '민음사'),
-        //         writer: (writer.value = '김동동'),
-        //         category: (category.value = '에세이'),
-        //         commentNum: (commentNum.value = '4'),
-        //         recommender: require('@/assets/img/profile/test.jpg'),
-        //         edit,
-        //         master,
-        //         isHovered: false,
-        //     },
-        //     {
-        //         img: require('@/assets/img/favorite/book28.webp'),
-        //         title: (bookName.value = '에피쿠로스 쾌락 7'),
-        //         publisher: (publisher.value = '민음사'),
-        //         writer: (writer.value = '김동동'),
-        //         category: (category.value = '에세이'),
-        //         commentNum: (commentNum.value = '5'),
-        //         recommender: require('@/assets/img/profile/test.jpg'),
-        //         edit,
-        //         master,
-        //         isHovered: false,
-        //     },
-        //     {
-        //         img: require('@/assets/img/favorite/book28.webp'),
-        //         title: (bookName.value = '에피쿠로스 쾌락 7'),
-        //         publisher: (publisher.value = '민음사'),
-        //         writer: (writer.value = '김동동'),
-        //         category: (category.value = '에세이'),
-        //         commentNum: (commentNum.value = '5'),
-        //         recommender: require('@/assets/img/profile/test.jpg'),
-        //         edit,
-        //         master,
-        //         isHovered: false,
-        //     },
-        //     {
-        //         img: require('@/assets/img/favorite/book28.webp'),
-        //         title: (bookName.value = '에피쿠로스 쾌락 7'),
-        //         publisher: (publisher.value = '민음사'),
-        //         writer: (writer.value = '김동동'),
-        //         category: (category.value = '에세이'),
-        //         commentNum: (commentNum.value = '5'),
-        //         recommender: require('@/assets/img/profile/test.jpg'),
-        //         edit,
-        //         master,
-        //         isHovered: false,
-        //     },
-        //     {
-        //         img: require('@/assets/img/favorite/book28.webp'),
-        //         title: (bookName.value = '에피쿠로스 쾌락 7'),
-        //         publisher: (publisher.value = '민음사'),
-        //         writer: (writer.value = '김동동'),
-        //         category: (category.value = '에세이'),
-        //         commentNum: (commentNum.value = '5'),
-        //         recommender: require('@/assets/img/profile/test.jpg'),
-        //         edit,
-        //         master,
-        //         isHovered: false,
-        //     },
-        // ])
-
-        if (isFavoriteBookStatus.value === 0) {
+        
+        onMounted(() => {
             initRecomBookList();
-        }
+            
+        });
 
         // 추천 책 설정 창 on/off
         const doMouseOver = (index) => {
-            isFavoriteBookList[index].isHovered = true;
+            isFavoriteBookList.value[index].isHovered = true;
         };
         const doMouseLeave = (index) => {
-            isFavoriteBookList[index].isHovered = false;
+            isFavoriteBookList.value[index].isHovered = false;
         };
 
         // 추천 책 리스트/작성,수정 전환
@@ -411,11 +321,15 @@ export default {
                 bookCate.value = data.category;
 
                 editMode.value = true;
+            } else if (type === 'read') {
+                getFavoriteBookDetail(data);
             } else {
                 resetInputs();
             }
+
             isFavoriteBookStatus.value = index;
         };
+
         const selBook = (index, info) => {
             index = index + 1;
             alert('[' + info.title + '] 가(이)\n당선이오  (해당 리스트에 ' + index + '번 책)');
@@ -428,53 +342,69 @@ export default {
             bookTitle.value = '';
             bookPub.value = '';
             bookCate.value = '';
+            commentCreateVal.value='';
+        };
+        const actCopyImgSrc = (type) => {
+            if (previewImage.value === null) {
+                alert('책 이미지 URL을 넣어주세요.')
+                return;
+            }
+
+            if(type == 'preview'){
+                emptyImg.value = false;
+            } else if (type == 'cancle') {
+                emptyImg.value = true;
+            }
+            
         };
 
-        // 추천 책 이미지 업로드
-        const base64 = (file) => {
-            return new Promise((resolve) => {
-                let reader = new FileReader();
-                reader.onload = (e) => {
-                    resolve(e.target.result);
-                    if (previewImage.value) {
-                        previewImage.value.src = e.target.result;
-                        emptyImg.value = false; // 이미지가 업로드되었으므로 emptyImg를 false로 설정
+        var bookDetailInfo = ref({});
+        var bookDetailCommentInfo = ref({});
+
+        const getFavoriteBookDetail = async (data) => {
+            var bookIdx = data.bookIdx;
+
+            try {
+                const response = await axios.get(
+                    `http://localhost:3000/api/book/monthly/recommend/${bookIdx}`, 
+                    {
+                        withCredentials: true,
                     }
-                };
-                reader.readAsDataURL(file);
-            });
-        };
+                );
+                console.log(response.data)
+                if(response.data.code === 1) {
+                    bookDetailInfo.value.bookIdx=bookIdx;
+                    bookDetailInfo.value.bookImage=response.data.data.bookData.bookImage;
+                    bookDetailInfo.value.memberImage=response.data.data.bookData.memberImage;
+                    bookDetailInfo.value.recommendReason=response.data.data.bookData.recommendReason;
+                    bookDetailInfo.value.commentCount=response.data.data.bookData.commentCount;
 
-        const uploadImg = async (files) => {
-            fileName.value = files[0];
+                    if(response.data.data.commentData.length > 0 ) {
+                        // for(var i = 0; i < response.data.data.commentData.length; i++) {
+                        // }
+                        bookDetailCommentInfo.value = response.data.data.commentData
 
-            await base64(fileName.value);
-        };
+                        console.log(bookDetailCommentInfo)
+                    }
+                }
 
-        const handleFileUpload = (event) => {
-            const files = event.target.files;
-            previewImageFile.value = event.target.files[0];
-            if (files.length > 0) {
-                uploadImg(files);
-            } else {
-                emptyImg.value = true; // 이미지가 업로드되었으므로 emptyImg를 false로 설정
-            }
-        };
-        const logFormData = (formData) => {
-            for (const pair of formData.entries()) {
-                console.log(pair[0] + ': ' + pair[1]);
-            }
-        };
+                //changeFavoriteType(0);
+            } catch (error) {
+                console.error('Error uploading file:', error);
+            } 
+        }
+
+
         const actFavoriteWrite = async () => {
             if (bookTitle.value == '' || bookPub.value == '' || bookCate.value == '' || author.value == '') {
                 alert('빈 입력 폼을 작성해 주세요.');
             } else if (bookContent.value == '') {
-                alert('추천 이유를 작성 해주세요.');
-            } else if (previewImageFile.value == null) {
-                alert('책 이미지를 첨부 해주세요.');
+                alert('추천 이유를 작성 해주세요.')
+            } else if (previewImage.value == null) {
+                alert('책 이미지를 첨부 해주세요.')
             } else {
                 const jsonPayload = {
-                    bookImage: previewImageFile.value,
+                    bookImage: previewImage.value,
                     bookTitle: bookTitle.value,
                     publisher: bookPub.value,
                     category: bookCate.value,
@@ -482,76 +412,61 @@ export default {
                     author: author.value,
                 };
 
-                const formData = new FormData();
-                formData.append('json', JSON.stringify(jsonPayload)); // JSON 데이터를 문자열로 추가
-                logFormData(formData);
+                // const formData = new FormData();
+                // formData.append('json', JSON.stringify(jsonPayload)); // JSON 데이터를 문자열로 추가
+                // logFormData(formData);
                 try {
-                    const response = await axios.post('http://localhost:3000/api/book/monthly/recommend/create', formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
-                    });
-                    console.log('Upload successful:', response.data);
+                    const response = await axios.post(
+                        'http://localhost:3000/api/book/monthly/recommend/create', jsonPayload, 
+                        {
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            withCredentials: true,
+                        }
+                    );
+                    console.log(response.data)
+                    if(response.data.code === -3) { // 책 작성 불가능한 멤버일 경우
+                        alert("아직 책 추천이 불가능합니다!")
+                    } else if (response.data.code === -4) { // 책 중복 작성할 경우
+                        alert("이미 추천했습니다!")
+                    }
                     //changeFavoriteType(0);
                 } catch (error) {
                     console.error('Error uploading file:', error);
+                }   finally {
+                    isFavoriteBookStatus.value = 0;
                 }
             }
         };
 
-        ///////////////////////////////////////////
-        // 추천 책 글보기
-        ///////////////////////////////////////////
-        // 책 추천 글 (작성자)
-        const writerView = ref({
-            writer: '김기현',
-            userProfile: require('@/assets/img/profile/profile_df.webp'),
-            userReview: '다윗의 진화론을 바탕으로 한 과학이야기. 어떻게 인간은 진화해 왔는가 왜 매미는 큰 울음소리를 갖게되었는가 왜 나무늘보는 느리지만 끝까지 살아남았는가',
-        });
-        // 책 추천 글보기 리뷰
-        const userReviewWraps = ref([
-            {
-                userName: '안승필',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-            },
-            {
-                userName: '김효종',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-            },
-            {
-                userName: '진기환',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-            },
-            {
-                userName: '맹주영',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-            },
-            {
-                userName: '안승필',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-            },
-            {
-                userName: '김효종',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-            },
-            {
-                userName: '진기환',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview: '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-            },
-            {
-                userName: '맹주영',
-                userProfile: require('@/assets/img/profile/profile_df.webp'),
-                userReview:
-                    '세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 세계정세가 급박하게 바뀌던 과거에 시대의 부조리와 불안감을  암울한 미래사회로 나타낸 작품입니다. 디스토피아를 다룬 많은 이야기에 영향을 주었던 작품입니다.현재 읽고 있는데 ',
-            },
-        ]);
+        const createComment = async (bookIdx) => {
+            const jsonPayload = {
+                bookIdx: bookIdx,
+                contents: commentCreateVal.value
+            }
+            console.log(jsonPayload)
+
+            try {
+                const response = await axios.post(
+                    'http://localhost:3000/api/comment/create', jsonPayload,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        withCredentials: true,
+                    }
+                );
+                console.log(response.data)
+                
+                //changeFavoriteType(0);
+            } catch (error) {
+                console.error('Error uploading file:', error);
+            }   finally {
+                isFavoriteBookStatus.value = 0;
+            }
+        }
+
         // 댓글 등록
         const actComment = (type) => {
             if (type == 'edit') {
@@ -568,11 +483,12 @@ export default {
                 alert('댓글 삭제');
             }
         };
-
         return {
             favoriteBook,
             isFavoriteBookStatus,
             isFavoriteBookList,
+            isFavoriteBookListArray,
+            isFavoriteBookListLoading,
             master,
             edit,
             editMode,
@@ -586,23 +502,23 @@ export default {
             author,
             fileName,
             previewImage,
-            previewImageFile,
             editorOption,
-            writerView,
-            userReviewWraps,
+            bookDetailInfo,
             quillEditor,
             initRecomBookList,
             doMouseOver,
             doMouseLeave,
             changeFavoriteType,
             resetInputs,
-            uploadImg,
-            base64,
-            handleFileUpload,
+            actCopyImgSrc,
             editComment,
             actComment,
             selBook,
             actFavoriteWrite,
+            getFavoriteBookDetail,
+            bookDetailCommentInfo,
+            commentCreateVal,
+            createComment,
         };
     },
     components: {
@@ -626,6 +542,7 @@ export default {
     */
     height: 100%;
     position: relative;
+    
     &_inner {
         width: 100%;
         height: 90%;
@@ -637,6 +554,7 @@ export default {
         gap: 20px;
         &.-view {
             height: 100%;
+            background-color: #333; /* Dark form background color */
         }
         /* 스크롤바 설정*/
         &::-webkit-scrollbar {
@@ -678,6 +596,12 @@ export default {
         > ul {
             display: grid;
             grid-template-columns: 20% 20% 20% 20% 20%;
+            @include mobile(){
+                grid-template-columns: 33% 33% 33%;
+            }
+            @include mobile-mini(){
+                grid-template-columns: 50% 50%;
+            }
             > li {
                 margin: 0 20px 40px;
                 > dl {
@@ -705,7 +629,6 @@ export default {
                     cursor: pointer;
                     width: fit-content;
                     > img {
-                        max-width: 191px;
                         border-radius: 18px;
                     }
                 }
@@ -728,7 +651,9 @@ export default {
                         align-items: center;
                         justify-content: center;
                         flex-direction: column;
-
+                        @include custom(1200px){
+                            min-width: auto;
+                        }
                         > div {
                             margin-bottom: 10px;
                         }
@@ -738,6 +663,10 @@ export default {
                             z-index: 2;
                             color: #fff;
                             min-width: 150px;
+                            
+                            @include custom(1200px){
+                                min-width: auto;
+                            }
                         }
 
                         .bt {
@@ -784,10 +713,18 @@ export default {
                     display: block;
                     border-radius: 50%;
                     background-color: #eee;
+                    @include mobile(){
+                        width: 30px;
+                        height: 30px;
+                    }
                 }
                 .fav_title {
                     width: 80%;
                     word-break: break-word;
+                    @include mobile(){
+                        font-size: 12px;
+                        line-height: 20px;
+                    }
                 }
                 .fav_pub {
                     &::after {
@@ -818,24 +755,36 @@ export default {
                 .fav_comment_num {
                     padding-left: 16px;
                     font-size: 12px;
+                    @include mobile(){
+                        position: relative;
+                        top: 10px;
+                        padding-left: 0;
+                    }
                 }
             }
         }
     }
     &_form {
         width: 100%;
+        height: 100%;
         .form-container {
             max-width: 100%;
             height: 100%;
             margin: 0 auto;
             padding: 20px;
-            background-color: #333; /* Dark form background color */
+            
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: row;
-            & .form-left {
+            @include mobile(){
+                flex-direction: column;
+            }
+            & .form-left{
                 width: 70%;
                 height: 100%;
+                @include mobile(){
+                    width: 100%;
+                }
                 > ul {
                     height: 100%;
                     > li {
@@ -843,12 +792,51 @@ export default {
                         margin-bottom: 10px;
                         &.hc {
                             height: 55%;
+                            @include mobile(){
+                                height: 32%;
+                                max-height: 32%;
+                            }
                         }
                         label {
                             width: 10%;
                             display: inline-block;
-                            font-size: 16px;
+                            font-size: 14px;
+                            font-weight: bold;
                             color: #bbb; /* Label color for dark mode */
+                            vertical-align: middle;
+                            @include mobile(){
+                                width: 100%;
+                                display: block;
+                                margin-bottom: 1vw;
+                                font-size: 12px;
+                            }
+                        }
+                        
+                        & .bookAddArea{
+                            display: inline-block;
+                            width: 85%;
+                            justify-content: center;
+                            align-items: center;
+                            vertical-align: middle;
+                            input{
+                                &.wC{
+                                    width: 70%;
+                                }
+                            }
+                            button {
+                                width: 14%;
+                                margin-left: 1%;
+                                height: 43px;
+                                padding: 0 1%;
+                                background: #ededed;
+                                border-radius: 5px;
+                                vertical-align: middle;
+                            }
+                            .tipTxt{
+                                margin-top: 0.5vw;
+                                color: #ddd;
+                                font-size: 12px;
+                            }
                         }
                         input,
                         .editerArea {
@@ -856,6 +844,18 @@ export default {
                             vertical-align: middle;
                             width: 85%;
                             height: 100%;
+                            @include mobile(){
+                                width: 100%;
+                                font-size: 12px;
+                                padding: 5px 10px;
+                            }
+                        }
+                        .editerArea{
+                            @include mobile(){
+                                width: 100%;
+                                font-size: 12px;
+                                padding: 0;
+                            }
                         }
                     }
                 }
@@ -867,16 +867,30 @@ export default {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-
-                .uploadImg {
-                    > img {
-                        max-width: 210px;
+                @include mobile(){
+                    display: none;
+                    &.-show{
+                        display: block;
+                        position: fixed;
+                        top: 0;
+                        right: 0;
+                        left: 0;
+                        width: 100%;
+                        z-index: 1;
+                    }
+                }
+                .uploadImg{
+                    > img{
+                        max-width: 300px;
                     }
                 }
                 & .dfTxt {
                     font-size: 16px;
                     color: #fff;
                     text-align: center;
+                    span{
+                        font-size: 14px;
+                    }
                 }
             }
         }
@@ -1039,6 +1053,7 @@ export default {
                     .user_review {
                         width: 70%;
                         line-height: 1.3;
+                        color: #fff;
                     }
                 }
             }
@@ -1052,6 +1067,7 @@ export default {
                     .title {
                         display: flex;
                         align-items: flex-start;
+                        color: #fff;
                         .tag {
                             display: flex;
                             align-items: center;
@@ -1092,6 +1108,7 @@ export default {
                         gap: 8px;
                         align-items: center;
                         display: flex;
+                        color: #fff;
                         .avatar {
                             height: 32px;
                             width: 32px;
@@ -1140,12 +1157,14 @@ export default {
                     button {
                         font-size: 12px;
                         padding: 0 8px;
+                        color: #fff;
                         &:hover {
                             color: #0085ff;
                         }
                     }
                 }
                 p {
+                    color: #fff;
                     font-size: 14px;
                     line-height: 24px;
                 }
@@ -1222,6 +1241,10 @@ export default {
         padding: 15px 30px;
         font-size: 14px;
         color: #fff;
+        @include mobile(){
+            font-size: 12px;
+            padding: 2vw 5vw;
+        }
         &:hover,
         &.-active {
             &.btn-blue {
@@ -1255,10 +1278,18 @@ export default {
         height: 13%;
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
-        &.ql-snow {
+        @include mobile(){
+            height: 20%;
+        }
+        &.ql-snow{
             border-left-width: 0;
             border-right-width: 0;
             border-color: #555;
+            & .ql-formats{
+                @include mobile(){
+                    margin-right: 0;
+                }
+            }
         }
     }
     .ql-container {
@@ -1271,6 +1302,7 @@ export default {
         z-index: 1;
         left: 10px;
         top: 10px;
+        color: #fff;
     }
 }
 </style>
