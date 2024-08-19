@@ -382,7 +382,12 @@ export default {
                             withCredentials: true,
                         }
                     );
-                    console.log('Upload successful:', response.data);
+                    console.log(response.data)
+                    if(response.data.code === -3) { // 책 작성 불가능한 멤버일 경우
+                        alert("아직 책 추천이 불가능합니다!")
+                    } else if (response.data.code === -4) { // 책 중복 작성할 경우
+                        alert("이미 추천했습니다!")
+                    }
                     //changeFavoriteType(0);
                 } catch (error) {
                     console.error('Error uploading file:', error);
