@@ -206,6 +206,7 @@
 // import
 ///////////////////////////////////////////
 import { ref, computed, onMounted, reactive, toRaw } from 'vue';
+import { useUserStore } from '@/store/user';
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import axios from 'axios';
@@ -214,8 +215,9 @@ export default {
     name: 'FavoriteBookComp',
     setup() {
         // 변수
+        const userStore = useUserStore();
         const isFavoriteBookStatus = ref(0); // List : 0, Write/Edit : 1, View : 2
-        // const bookName = ref('');
+        const bookIdxSel = ref('');
         // const publisher = ref('');
         // const writer = ref('');
         // const category = ref('');
@@ -247,10 +249,6 @@ export default {
         let emptyImg = ref(true);
         let edit = ref(false); // 본인 작성 글 true
         let commnetEdit = ref(false);
-        // ================ 테스트 데이터================
-        let memberId = 1; // (e.x 마스터 idx : 1)
-        let bookIndex = 1; // (e.x 멤버 idx 와 비교 할 책 index)
-        // ================//테스트 데이터================
 
         ///////////////////////////////////////////
         // 공통
@@ -258,16 +256,6 @@ export default {
         const chWriteBtnTxt = computed(() => {
             return editMode.value ? '수정완료' : '작성완료';
         });
-
-        // 계정이 마스터 시 true
-        if (memberId === 1) {
-            master = true;
-        }
-
-        // 본인이 쓴 글은 내용 수정 가능 true
-        if (memberId == bookIndex) {
-            edit = true;
-        }
 
         ///////////////////////////////////////////
         // 추천 책 리스트
@@ -282,7 +270,20 @@ export default {
                     isFavoriteBookList.value = toRaw(isFavoriteBookListArray.value);                    
                     isFavoriteBookList.value.forEach(book => {
                         book.isHovered = false;
+                        book.edit = false;
+                        book.master = false;
+
+                        // 계정이 마스터 시 true
+                        if (book.memberIdx === 99) {
+                            book.master = true;
+                        }
+
+                        // 본인이 쓴 글은 내용 수정 가능 true
+                        if (book.memberIdx == userStore.memberIdx) {
+                            book.edit = true;
+                        }
                     });
+
                     console.log('List successful:', isFavoriteBookList.value)
                 } else if (response.data.code === -1) {
                     // 
@@ -313,13 +314,43 @@ export default {
             isFavoriteBookList.value[index].isHovered = false;
         };
 
+        // 추천 책 상세보기 (추천 이유 추출)
+        const viewBookSelect = async (idx) => {
+            try {
+                //console.log(idx);
+                const response = await axios.get(`http://localhost:3000/api/book/monthly/recommend/${idx}`, { withCredentials: true });
+                if (response.data.code === 1) {
+                    quillEditor.value.setHTML(response.data.data.bookData.recommendReason);
+                } else if (response.data.code === -1) {
+                    console.log('통신실패 -1');
+                } else if (response.data.code === -2) {
+                    console.log('통신실패 -2');
+                } else {
+                    // 기타 오류
+                    console.log('통신실패 etc');
+                }
+            } catch (err) {
+                console.log('서버오류');
+            }
+        };
+
         // 추천 책 리스트/작성,수정 전환
         const changeFavoriteType = (index, type, data) => {
             if (type == 'edit') {
-                bookTitle.value = data.title;
-                bookPub.value = data.publisher;
-                bookCate.value = data.category;
+                console.log(data)
+                bookTitle.value = data.bookTitle;
+                bookPub.value = data.bookPublisher;
+                author.value = data.bookAuthor;
+                bookCate.value = data.bookCategory;
 
+                // edit모드 중인 책 idx
+                bookIdxSel.value = data.bookIdx;
+
+                viewBookSelect(data.bookIdx);
+                previewImage.value = data.bookImage;
+                actCopyImgSrc('preview');
+
+                // 수정모드 ON ( 버튼 명칭 )
                 editMode.value = true;
             } else if (type === 'read') {
                 getFavoriteBookDetail(data);
@@ -403,6 +434,21 @@ export default {
             } else if (previewImage.value == null) {
                 alert('책 이미지를 첨부 해주세요.')
             } else {
+                var apiUrl = null;
+
+                
+                if (editMode.value) {
+                    if(bookIdxSel.value){
+                        // 이달의 책 추천 수정
+                        apiUrl = 'http://localhost:3000/api/monthly/recommend/' + bookIdxSel.value + '/update'
+                    } else {
+                        alert('잘못 된 경로로 접근 하셨습니다.');
+                        return;
+                    }
+                } else {
+                    // 이달의 책 추천 등록
+                    apiUrl = 'http://localhost:3000/api/book/monthly/recommend/create'
+                }
                 const jsonPayload = {
                     bookImage: previewImage.value,
                     bookTitle: bookTitle.value,
@@ -411,13 +457,10 @@ export default {
                     recommendReason: quillEditor.value.getHTML(),
                     author: author.value,
                 };
-
-                // const formData = new FormData();
-                // formData.append('json', JSON.stringify(jsonPayload)); // JSON 데이터를 문자열로 추가
-                // logFormData(formData);
+                console.log(jsonPayload)
                 try {
                     const response = await axios.post(
-                        'http://localhost:3000/api/book/monthly/recommend/create', jsonPayload, 
+                        apiUrl, jsonPayload, 
                         {
                             headers: {
                                 'Content-Type': 'application/json'
@@ -484,6 +527,8 @@ export default {
             }
         };
         return {
+            bookIdxSel,
+            userStore,
             favoriteBook,
             isFavoriteBookStatus,
             isFavoriteBookList,
@@ -519,6 +564,7 @@ export default {
             bookDetailCommentInfo,
             commentCreateVal,
             createComment,
+            viewBookSelect,
         };
     },
     components: {
@@ -628,9 +674,6 @@ export default {
                     position: relative;
                     cursor: pointer;
                     width: fit-content;
-                    > img {
-                        border-radius: 18px;
-                    }
                 }
                 & .fav_hover {
                     position: absolute;
@@ -689,7 +732,6 @@ export default {
                         flex-direction: column;
                         justify-content: center;
                         align-items: center;
-                        border-radius: 18px;
                         content: '';
                         display: block;
                         background: rgba(0, 0, 0, 0.8);
@@ -703,7 +745,7 @@ export default {
                     background: rgba($color: #dfdfdf, $alpha: 0.8);
                     backdrop-filter: blur(15px);
                     padding: 8px 0 0 8px;
-                    border-radius: 32.5px 0 14.5px 0;
+                    border-radius: 32.5px 0 0 0;
                 }
                 .fav_profile {
                     width: 48px;
