@@ -5,7 +5,7 @@
             <div class="favorite_list" v-if="isFavoriteBookStatus == 0">
                 <ul v-if="isFavoriteBookListLoading">
                     <li v-for="(info, index) in isFavoriteBookList" :key="index">
-                       <div class="fav_img" @mouseover="doMouseOver(index)" @mouseleave="doMouseLeave(index)" @touchstart="doMouseOver(index)" @touchend="doMouseLeave(index)">
+                        <div class="fav_img" @mouseover="doMouseOver(index)" @mouseleave="doMouseLeave(index)" @touchstart="doMouseOver(index)" @touchend="doMouseLeave(index)">
                             <img :src="`${info.bookImage}`" />
                             <div class="fav_recommender">
                                 <span class="fav_profile">
@@ -48,9 +48,7 @@
                         </dl>
                     </li>
                 </ul>
-                <div v-else>
-                    목록이 없습니다.
-                </div>
+                <div v-else>목록이 없습니다.</div>
             </div>
             <!--[e] 책 추천 리스트-->
 
@@ -85,13 +83,9 @@
                             <li>
                                 <label for="book_img">책 이미지</label>
                                 <div class="bookAddArea">
-                                    <input type="text" :disabled="emptyImg === false" v-model.trim="previewImage" placeholder="책 이미지 URL을 넣어주세요.">
-                                    <button v-if="emptyImg === true" type="button" @:click="actCopyImgSrc('preview')">
-                                        미리보기
-                                    </button>
-                                    <button v-else type="button" @:click="actCopyImgSrc('cancle')">
-                                        취소
-                                    </button>
+                                    <input type="text" :disabled="emptyImg === false" v-model.trim="previewImage" placeholder="책 이미지 URL을 넣어주세요." />
+                                    <button v-if="emptyImg === true" type="button" @:click="actCopyImgSrc('preview')">미리보기</button>
+                                    <button v-else type="button" @:click="actCopyImgSrc('cancle')">취소</button>
                                     <p class="tipTxt">※ 가져 올 책 이미지 오른쪽 클릭 ▷ 이미지 주소 복사</p>
                                 </div>
                             </li>
@@ -126,9 +120,7 @@
                                         </figure>
                                         <span>{{ bookDetailInfo.bookAuthor }}</span>
                                     </div>
-                                    <div class="user_review">
-                                        <p>{{ bookDetailInfo.recommendReason }}</p>
-                                    </div>
+                                    <div class="user_review" v-html="bookDetailInfo.recommendReason"></div>
                                 </div>
                             </div>
                             <div class="comment">
@@ -206,7 +198,7 @@
 // import
 ///////////////////////////////////////////
 import { ref, computed, onMounted, reactive, toRaw } from 'vue';
-import { QuillEditor } from '@vueup/vue-quill'
+import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import axios from 'axios';
 
@@ -237,7 +229,7 @@ export default {
         };
         const quillEditor = ref(null); // QuillEditor 인스턴스 참조
         const favoriteBook = ref(require('@/assets/img/book01.webp'));
-        
+
         let isFavoriteBookList = ref([]);
         let isFavoriteBookListArray = ref([]);
         let isFavoriteBookListLoading = ref(false);
@@ -279,13 +271,13 @@ export default {
 
                 if (response.data.code === 1) {
                     isFavoriteBookListArray.value = reactive(response.data.data);
-                    isFavoriteBookList.value = toRaw(isFavoriteBookListArray.value);                    
-                    isFavoriteBookList.value.forEach(book => {
+                    isFavoriteBookList.value = toRaw(isFavoriteBookListArray.value);
+                    isFavoriteBookList.value.forEach((book) => {
                         book.isHovered = false;
                     });
-                    console.log('List successful:', isFavoriteBookList.value)
+                    console.log('List successful:', isFavoriteBookList.value);
                 } else if (response.data.code === -1) {
-                    // 
+                    //
                     alert('책이 없습니다');
                 } else if (response.data.code === -2) {
                     alert('오류');
@@ -299,10 +291,9 @@ export default {
                 isFavoriteBookListLoading.value = true;
             }
         };
-        
+
         onMounted(() => {
             initRecomBookList();
-            
         });
 
         // 추천 책 설정 창 on/off
@@ -342,20 +333,19 @@ export default {
             bookTitle.value = '';
             bookPub.value = '';
             bookCate.value = '';
-            commentCreateVal.value='';
+            commentCreateVal.value = '';
         };
         const actCopyImgSrc = (type) => {
             if (previewImage.value === null) {
-                alert('책 이미지 URL을 넣어주세요.')
+                alert('책 이미지 URL을 넣어주세요.');
                 return;
             }
 
-            if(type == 'preview'){
+            if (type == 'preview') {
                 emptyImg.value = false;
             } else if (type == 'cancle') {
                 emptyImg.value = true;
             }
-            
         };
 
         var bookDetailInfo = ref({});
@@ -365,43 +355,39 @@ export default {
             var bookIdx = data.bookIdx;
 
             try {
-                const response = await axios.get(
-                    `http://localhost:3000/api/book/monthly/recommend/${bookIdx}`, 
-                    {
-                        withCredentials: true,
-                    }
-                );
-                console.log(response.data)
-                if(response.data.code === 1) {
-                    bookDetailInfo.value.bookIdx=bookIdx;
-                    bookDetailInfo.value.bookImage=response.data.data.bookData.bookImage;
-                    bookDetailInfo.value.memberImage=response.data.data.bookData.memberImage;
-                    bookDetailInfo.value.recommendReason=response.data.data.bookData.recommendReason;
-                    bookDetailInfo.value.commentCount=response.data.data.bookData.commentCount;
+                const response = await axios.get(`http://localhost:3000/api/book/monthly/recommend/${bookIdx}`, {
+                    withCredentials: true,
+                });
+                console.log(response.data);
+                if (response.data.code === 1) {
+                    bookDetailInfo.value.bookIdx = bookIdx;
+                    bookDetailInfo.value.bookImage = response.data.data.bookData.bookImage;
+                    bookDetailInfo.value.memberImage = response.data.data.bookData.memberImage;
+                    bookDetailInfo.value.recommendReason = response.data.data.bookData.recommendReason;
+                    bookDetailInfo.value.commentCount = response.data.data.bookData.commentCount;
 
-                    if(response.data.data.commentData.length > 0 ) {
+                    if (response.data.data.commentData.length > 0) {
                         // for(var i = 0; i < response.data.data.commentData.length; i++) {
                         // }
-                        bookDetailCommentInfo.value = response.data.data.commentData
+                        bookDetailCommentInfo.value = response.data.data.commentData;
 
-                        console.log(bookDetailCommentInfo)
+                        console.log(bookDetailCommentInfo);
                     }
                 }
 
                 //changeFavoriteType(0);
             } catch (error) {
                 console.error('Error uploading file:', error);
-            } 
-        }
-
+            }
+        };
 
         const actFavoriteWrite = async () => {
             if (bookTitle.value == '' || bookPub.value == '' || bookCate.value == '' || author.value == '') {
                 alert('빈 입력 폼을 작성해 주세요.');
             } else if (bookContent.value == '') {
-                alert('추천 이유를 작성 해주세요.')
+                alert('추천 이유를 작성 해주세요.');
             } else if (previewImage.value == null) {
-                alert('책 이미지를 첨부 해주세요.')
+                alert('책 이미지를 첨부 해주세요.');
             } else {
                 const jsonPayload = {
                     bookImage: previewImage.value,
@@ -416,25 +402,24 @@ export default {
                 // formData.append('json', JSON.stringify(jsonPayload)); // JSON 데이터를 문자열로 추가
                 // logFormData(formData);
                 try {
-                    const response = await axios.post(
-                        'http://localhost:3000/api/book/monthly/recommend/create', jsonPayload, 
-                        {
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            withCredentials: true,
-                        }
-                    );
-                    console.log(response.data)
-                    if(response.data.code === -3) { // 책 작성 불가능한 멤버일 경우
-                        alert("아직 책 추천이 불가능합니다!")
-                    } else if (response.data.code === -4) { // 책 중복 작성할 경우
-                        alert("이미 추천했습니다!")
+                    const response = await axios.post('http://localhost:3000/api/book/monthly/recommend/create', jsonPayload, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        withCredentials: true,
+                    });
+                    console.log(response.data);
+                    if (response.data.code === -3) {
+                        // 책 작성 불가능한 멤버일 경우
+                        alert('아직 책 추천이 불가능합니다!');
+                    } else if (response.data.code === -4) {
+                        // 책 중복 작성할 경우
+                        alert('이미 추천했습니다!');
                     }
                     //changeFavoriteType(0);
                 } catch (error) {
                     console.error('Error uploading file:', error);
-                }   finally {
+                } finally {
                     isFavoriteBookStatus.value = 0;
                 }
             }
@@ -443,29 +428,26 @@ export default {
         const createComment = async (bookIdx) => {
             const jsonPayload = {
                 bookIdx: bookIdx,
-                contents: commentCreateVal.value
-            }
-            console.log(jsonPayload)
+                contents: commentCreateVal.value,
+            };
+            console.log(jsonPayload);
 
             try {
-                const response = await axios.post(
-                    'http://localhost:3000/api/comment/create', jsonPayload,
-                    {
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        withCredentials: true,
-                    }
-                );
-                console.log(response.data)
-                
+                const response = await axios.post('http://localhost:3000/api/comment/create', jsonPayload, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    withCredentials: true,
+                });
+                console.log(response.data);
+
                 //changeFavoriteType(0);
             } catch (error) {
                 console.error('Error uploading file:', error);
-            }   finally {
+            } finally {
                 isFavoriteBookStatus.value = 0;
             }
-        }
+        };
 
         // 댓글 등록
         const actComment = (type) => {
@@ -542,7 +524,7 @@ export default {
     */
     height: 100%;
     position: relative;
-    
+
     &_inner {
         width: 100%;
         height: 90%;
@@ -596,10 +578,10 @@ export default {
         > ul {
             display: grid;
             grid-template-columns: 20% 20% 20% 20% 20%;
-            @include mobile(){
+            @include mobile() {
                 grid-template-columns: 33% 33% 33%;
             }
-            @include mobile-mini(){
+            @include mobile-mini() {
                 grid-template-columns: 50% 50%;
             }
             > li {
@@ -651,7 +633,7 @@ export default {
                         align-items: center;
                         justify-content: center;
                         flex-direction: column;
-                        @include custom(1200px){
+                        @include custom(1200px) {
                             min-width: auto;
                         }
                         > div {
@@ -663,8 +645,8 @@ export default {
                             z-index: 2;
                             color: #fff;
                             min-width: 150px;
-                            
-                            @include custom(1200px){
+
+                            @include custom(1200px) {
                                 min-width: auto;
                             }
                         }
@@ -713,7 +695,7 @@ export default {
                     display: block;
                     border-radius: 50%;
                     background-color: #eee;
-                    @include mobile(){
+                    @include mobile() {
                         width: 30px;
                         height: 30px;
                     }
@@ -721,7 +703,7 @@ export default {
                 .fav_title {
                     width: 80%;
                     word-break: break-word;
-                    @include mobile(){
+                    @include mobile() {
                         font-size: 12px;
                         line-height: 20px;
                     }
@@ -755,7 +737,7 @@ export default {
                 .fav_comment_num {
                     padding-left: 16px;
                     font-size: 12px;
-                    @include mobile(){
+                    @include mobile() {
                         position: relative;
                         top: 10px;
                         padding-left: 0;
@@ -772,17 +754,17 @@ export default {
             height: 100%;
             margin: 0 auto;
             padding: 20px;
-            
+
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: row;
-            @include mobile(){
+            @include mobile() {
                 flex-direction: column;
             }
-            & .form-left{
+            & .form-left {
                 width: 70%;
                 height: 100%;
-                @include mobile(){
+                @include mobile() {
                     width: 100%;
                 }
                 > ul {
@@ -792,7 +774,7 @@ export default {
                         margin-bottom: 10px;
                         &.hc {
                             height: 55%;
-                            @include mobile(){
+                            @include mobile() {
                                 height: 32%;
                                 max-height: 32%;
                             }
@@ -804,22 +786,22 @@ export default {
                             font-weight: bold;
                             color: #bbb; /* Label color for dark mode */
                             vertical-align: middle;
-                            @include mobile(){
+                            @include mobile() {
                                 width: 100%;
                                 display: block;
                                 margin-bottom: 1vw;
                                 font-size: 12px;
                             }
                         }
-                        
-                        & .bookAddArea{
+
+                        & .bookAddArea {
                             display: inline-block;
                             width: 85%;
                             justify-content: center;
                             align-items: center;
                             vertical-align: middle;
-                            input{
-                                &.wC{
+                            input {
+                                &.wC {
                                     width: 70%;
                                 }
                             }
@@ -832,7 +814,7 @@ export default {
                                 border-radius: 5px;
                                 vertical-align: middle;
                             }
-                            .tipTxt{
+                            .tipTxt {
                                 margin-top: 0.5vw;
                                 color: #ddd;
                                 font-size: 12px;
@@ -844,14 +826,14 @@ export default {
                             vertical-align: middle;
                             width: 85%;
                             height: 100%;
-                            @include mobile(){
+                            @include mobile() {
                                 width: 100%;
                                 font-size: 12px;
                                 padding: 5px 10px;
                             }
                         }
-                        .editerArea{
-                            @include mobile(){
+                        .editerArea {
+                            @include mobile() {
                                 width: 100%;
                                 font-size: 12px;
                                 padding: 0;
@@ -867,9 +849,9 @@ export default {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                @include mobile(){
+                @include mobile() {
                     display: none;
-                    &.-show{
+                    &.-show {
                         display: block;
                         position: fixed;
                         top: 0;
@@ -879,8 +861,8 @@ export default {
                         z-index: 1;
                     }
                 }
-                .uploadImg{
-                    > img{
+                .uploadImg {
+                    > img {
                         max-width: 300px;
                     }
                 }
@@ -888,7 +870,7 @@ export default {
                     font-size: 16px;
                     color: #fff;
                     text-align: center;
-                    span{
+                    span {
                         font-size: 14px;
                     }
                 }
@@ -1241,7 +1223,7 @@ export default {
         padding: 15px 30px;
         font-size: 14px;
         color: #fff;
-        @include mobile(){
+        @include mobile() {
             font-size: 12px;
             padding: 2vw 5vw;
         }
@@ -1278,15 +1260,15 @@ export default {
         height: 13%;
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
-        @include mobile(){
+        @include mobile() {
             height: 20%;
         }
-        &.ql-snow{
+        &.ql-snow {
             border-left-width: 0;
             border-right-width: 0;
             border-color: #555;
-            & .ql-formats{
-                @include mobile(){
+            & .ql-formats {
+                @include mobile() {
                     margin-right: 0;
                 }
             }

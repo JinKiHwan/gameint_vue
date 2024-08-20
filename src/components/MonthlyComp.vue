@@ -41,7 +41,7 @@
                                     <li class="recommend_reason">
                                         <span class="gsap-text-ani">
                                             <b>추천이유 </b>
-                                            <i>{{ recommendReason }}</i>
+                                            <i v-html="recommendReason"></i>
                                         </span>
                                     </li>
                                 </ul>
@@ -61,8 +61,6 @@
                 </div>
             </div>
 
-            <!-- <button class="view_review" @click="monthlyAnimationLeave">작성글보기→</button> -->
-            <!-- <button class="write_review" @click="writeReview" v-if="userStore.isLogin">리뷰 작성</button> -->
             <div class="monthly_review" v-if="reviewPopup">
                 <form action="">
                     <h3>리뷰 작성</h3>
@@ -97,7 +95,7 @@
                         <div class="review_user">
                             <div class="profile">
                                 <figure>
-                                    <img :src="member.profile" alt="" />
+                                    <img :src="member.profileImg" alt="" />
                                 </figure>
                                 <p>{{ member.name }} 님</p>
                             </div>
@@ -304,10 +302,11 @@ export default {
 
                 if (response.data.code === 1) {
                     userReviewWraps.value = response.data.data;
+                    console.log(userReviewWraps.value);
 
                     userReviewWraps.value = response.data.data.map((user) => ({
                         ...user,
-                        profile: user.profile || defaultProfileUrl,
+                        // profile: user.profile || defaultProfileUrl,
                     }));
                 } else if (response.data.code === -1) {
                     // 리뷰가 비어있는 경우
@@ -779,7 +778,7 @@ export default {
         }
 
         &::-webkit-scrollbar-thumb {
-            background: #217af4;
+            background: #41b883;
             border-radius: 10px;
         }
 
@@ -794,6 +793,10 @@ export default {
             background-size: cover;
             background-position: center center;
             padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
         }
     }
 
@@ -1035,7 +1038,7 @@ export default {
                 height: 100%;
                 border-radius: 50%;
                 padding: 5px;
-                background: #0a84ff;
+                background: #41b883;
                 opacity: 0;
                 position: absolute;
                 left: 0;
@@ -1048,7 +1051,7 @@ export default {
                 }
             }
             .write_review {
-                background: #ffd60a;
+                background: #35495e;
             }
         }
 
@@ -1064,7 +1067,7 @@ export default {
         bottom: 25px;
         width: 50px;
         aspect-ratio: 1/1;
-        background: #ff9f0a;
+        background: #35495e;
         border-radius: 50%;
         padding: 5px;
 
@@ -1080,7 +1083,7 @@ export default {
         bottom: 25px;
         width: 50px;
         aspect-ratio: 1/1;
-        background: #0a84ff;
+        background: #41b883;
         border-radius: 50%;
         padding: 5px;
         transition: transform 0.3s, box-shadow 0.3s;

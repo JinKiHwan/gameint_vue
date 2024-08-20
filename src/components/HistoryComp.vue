@@ -99,9 +99,9 @@
                 <div>
                     <div class="recommender">
                         <figure><img :src="selectedBookOthersBookData.memberImage" alt="" /></figure>
-                        <p>
-                            {{ selectedBookOthersBookData.recommendReason }}
-                        </p>
+                        <div>
+                            <div v-html="selectedBookOthersBookData.recommendReason"></div>
+                        </div>
                     </div>
                     <hr />
                     <b>댓글 {{ selectedBookOthersBookData.commentCount }}</b>
@@ -522,7 +522,7 @@ export default {
             }
 
             &::-webkit-scrollbar-thumb {
-                background: #217af4;
+                background: #41b883;
                 border-radius: 10px;
             }
 
@@ -538,6 +538,10 @@ export default {
                 background-position: center center;
                 padding: 8px;
                 font-size: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
             }
         }
 
@@ -747,7 +751,7 @@ export default {
     .recommender {
         display: flex;
         align-items: flex-start;
-        margin-bottom: 5px;
+        margin-bottom: 15px;
         width: 100%;
         gap: 20px;
 
@@ -760,7 +764,7 @@ export default {
             overflow: hidden;
         }
 
-        p {
+        > div {
             max-width: calc(100% - 100px);
             align-self: center;
             line-height: 1.3;
@@ -770,6 +774,25 @@ export default {
             word-break: break-word;
             position: relative;
             color: #fff;
+
+            div {
+                max-height: 100px;
+                overflow: auto;
+
+                /* 스크롤바 설정*/
+                &::-webkit-scrollbar {
+                    width: 2px;
+                }
+
+                /* 스크롤바 막대 설정*/
+                &::-webkit-scrollbar-thumb {
+                    background-color: #333333;
+                    /* 스크롤바 둥글게 설정    */
+                    border-radius: 10px;
+                    border: 7px solid #333;
+                }
+            }
+
             &:before {
                 content: '';
                 display: block;
@@ -785,7 +808,7 @@ export default {
         }
     }
     hr {
-        margin-bottom: 5px;
+        margin-bottom: 15px;
     }
 
     hr + b {
@@ -874,7 +897,7 @@ export default {
     bottom: 25px;
     width: 50px;
     aspect-ratio: 1/1;
-    background: #ff9f0a;
+    background: #35495e;
     border-radius: 50%;
     padding: 5px;
     &:hover {
@@ -889,7 +912,7 @@ export default {
     bottom: 25px;
     width: 50px;
     aspect-ratio: 1/1;
-    background: #0a84ff;
+    background: #41b883;
     border-radius: 50%;
     padding: 5px;
 }
