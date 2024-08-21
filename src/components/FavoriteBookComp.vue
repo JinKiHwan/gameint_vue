@@ -253,7 +253,7 @@ export default {
         // 추천 책 리스트
         ///////////////////////////////////////////
         const initRecomBookList = async () => {
-            const url = 'http://localhost:3000/api/book/monthly/recommend/list';
+            const url = 'http://www.gameint.site/api/book/monthly/recommend/list';
             try {
                 const response = await axios.get(url, { withCredentials: true });
 
@@ -309,7 +309,7 @@ export default {
         const viewBookSelect = async (idx) => {
             try {
                 //console.log(idx);
-                const response = await axios.get(`http://localhost:3000/api/book/monthly/recommend/${idx}`, { withCredentials: true });
+                const response = await axios.get(`http://www.gameint.site/api/book/monthly/recommend/${idx}`, { withCredentials: true });
                 if (response.data.code === 1) {
                     quillEditor.value.setHTML(response.data.data.bookData.recommendReason);
                 } else if (response.data.code === -1) {
@@ -386,16 +386,19 @@ export default {
             var bookIdx = data.bookIdx;
 
             try {
-                const response = await axios.get(`http://localhost:3000/api/book/monthly/recommend/${bookIdx}`, {
-                    withCredentials: true,
-                });
-                console.log(response.data);
-                if (response.data.code === 1) {
-                    bookDetailInfo.value.bookIdx = bookIdx;
-                    bookDetailInfo.value.bookImage = response.data.data.bookData.bookImage;
-                    bookDetailInfo.value.memberImage = response.data.data.bookData.memberImage;
-                    bookDetailInfo.value.recommendReason = response.data.data.bookData.recommendReason;
-                    bookDetailInfo.value.commentCount = response.data.data.bookData.commentCount;
+                const response = await axios.get(
+                    `http://www.gameint.site/api/book/monthly/recommend/${bookIdx}`, 
+                    {
+                        withCredentials: true,
+                    }
+                );
+                console.log(response.data)
+                if(response.data.code === 1) {
+                    bookDetailInfo.value.bookIdx=bookIdx;
+                    bookDetailInfo.value.bookImage=response.data.data.bookData.bookImage;
+                    bookDetailInfo.value.memberImage=response.data.data.bookData.memberImage;
+                    bookDetailInfo.value.recommendReason=response.data.data.bookData.recommendReason;
+                    bookDetailInfo.value.commentCount=response.data.data.bookData.commentCount;
 
                     if (response.data.data.commentData.length > 0) {
                         // for(var i = 0; i < response.data.data.commentData.length; i++) {
@@ -426,14 +429,14 @@ export default {
                 if (editMode.value) {
                     if(bookIdxSel.value){
                         // 이달의 책 추천 수정
-                        apiUrl = 'http://localhost:3000/api/monthly/recommend/' + bookIdxSel.value + '/update'
+                        apiUrl = 'http://www.gameint.site/api/monthly/recommend/' + bookIdxSel.value + '/update'
                     } else {
                         alert('잘못 된 경로로 접근 하셨습니다.');
                         return;
                     }
                 } else {
                     // 이달의 책 추천 등록
-                    apiUrl = 'http://localhost:3000/api/book/monthly/recommend/create'
+                    apiUrl = 'http://www.gameint.site/api/book/monthly/recommend/create'
                 }
                 const jsonPayload = {
                     bookImage: previewImage.value,
@@ -477,14 +480,17 @@ export default {
             console.log(jsonPayload);
 
             try {
-                const response = await axios.post('http://localhost:3000/api/comment/create', jsonPayload, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    withCredentials: true,
-                });
-                console.log(response.data);
-
+                const response = await axios.post(
+                    'http://www.gameint.site/api/comment/create', jsonPayload,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        withCredentials: true,
+                    }
+                );
+                console.log(response.data)
+                
                 //changeFavoriteType(0);
             } catch (error) {
                 console.error('Error uploading file:', error);
