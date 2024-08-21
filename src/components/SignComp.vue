@@ -149,6 +149,7 @@ export default {
         /* //이미지 모음 */
 
         /* 변수 모음 */
+        const apiUrl = process.env.VUE_APP_API_URL;
         const pen = ref('https://cdn-icons-png.flaticon.com/512/227/227104.png');
         const userId = ref('');
         const isInvalidId = ref('');
@@ -271,7 +272,7 @@ export default {
                         formData.append('profileImage', profileImageFile.value);
                     }
 
-                    const response = await axios.post('http://www.gameint.site/api/member/create', formData, {
+                    const response = await axios.post(`${apiUrl}api/member/create`, formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },

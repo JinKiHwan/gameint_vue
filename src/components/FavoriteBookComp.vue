@@ -31,11 +31,11 @@
                                 <div class="fav_title">
                                     {{ info.bookTitle }}
                                 </div>
-                                <div class="fav_comment">
+                                <!-- <div class="fav_comment">
                                     <span class="fav_comment_num">
                                         {{ info.commentNum }}
                                     </span>
-                                </div>
+                                </div> -->
                             </dt>
                             <dd>
                                 <span class="fav_pub">
@@ -136,7 +136,7 @@
                                     </div>
                                     <div class="writing">
                                         <input type="text" v-model="commentCreateVal" contenteditable="true" class="textarea" autofocus spellcheck="false" />
-                                        <button type="submit" @click.once="createComment(bookDetailInfo.bookIdx)">등록</button>
+                                        <button type="submit" @click="createComment(bookDetailInfo.bookIdx)">등록</button>
                                     </div>
                                 </div>
                             </div>
@@ -201,7 +201,7 @@
 ///////////////////////////////////////////
 // import
 ///////////////////////////////////////////
-import { ref, computed, onMounted, reactive, toRaw } from 'vue';
+import { ref, computed, onMounted, reactive, toRaw, watch } from 'vue';
 import { useUserStore } from '@/store/user';
 import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
@@ -211,6 +211,7 @@ export default {
     name: 'FavoriteBookComp',
     setup() {
         // 변수
+        const apiUrl = process.env.VUE_APP_API_URL;
         const userStore = useUserStore();
         const isFavoriteBookStatus = ref(0); // List : 0, Write/Edit : 1, View : 2
         const bookIdxSel = ref('');
@@ -314,7 +315,7 @@ export default {
         const viewBookSelect = async (idx) => {
             try {
                 //console.log(idx);
-                const response = await axios.get(`http://www.gameint.site/api/book/monthly/recommend/${idx}`, { withCredentials: true });
+                const response = await axios.get(`${apiUrl}api/book/monthly/recommend/${idx}`, { withCredentials: true });
                 if (response.data.code === 1) {
                     quillEditor.value.setHTML(response.data.data.bookData.recommendReason);
                 } else if (response.data.code === -1) {
@@ -389,9 +390,8 @@ export default {
 
         const getFavoriteBookDetail = async (data) => {
             var bookIdx = data.bookIdx;
-
             try {
-                const response = await axios.get(`http://www.gameint.site/api/book/monthly/recommend/${bookIdx}`, {
+                const response = await axios.get(`${apiUrl}api/book/monthly/recommend/${bookIdx}`, {
                     withCredentials: true,
                 });
                 console.log(response.data);
@@ -406,7 +406,6 @@ export default {
                         // for(var i = 0; i < response.data.data.commentData.length; i++) {
                         // }
                         bookDetailCommentInfo.value = response.data.data.commentData;
-
                         //console.log(bookDetailCommentInfo.value);
                     }
 
@@ -477,28 +476,49 @@ export default {
         };
 
         const createComment = async (bookIdx) => {
+            event.preventDefault(); // 기본 동작 방지
             const jsonPayload = {
                 bookIdx: bookIdx,
                 contents: commentCreateVal.value,
             };
             console.log(jsonPayload);
 
+            const browserUpdate = {
+                contents: commentCreateVal.value,
+                memberImage: userStore.profileImg,
+                memberName: userStore.name,
+            };
+
             try {
-                const response = await axios.post('http://localhost:3000/api/comment/create', jsonPayload, {
+                const response = await axios.post(`${apiUrl}api/comment/create`, jsonPayload, {
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     withCredentials: true,
                 });
-                console.log(response.data);
+                if (response.data.code === 1) {
+                    console.log('1', browserUpdate);
+                    commentCreateVal.value = '';
+                } else if (response.data.code === -1) {
+                    console.log('-1');
+                }
 
                 //changeFavoriteType(0);
             } catch (error) {
                 console.error('Error uploading file:', error);
             } finally {
-                isFavoriteBookStatus.value = 0;
+                console.log(bookDetailCommentInfo.value?.length === 0, '댓글몇개');
+                browserUpdate.value = '';
             }
         };
+
+        watch(
+            () => bookDetailCommentInfo.value,
+            (newCommentData) => {
+                // bookDetailCommentInfo 변경 시 화면 업데이트
+                console.log('Comment data changed:', newCommentData);
+            }
+        );
 
         // 댓글 등록
         const actComment = (type) => {
@@ -641,6 +661,10 @@ export default {
             }
             > li {
                 margin: 0 20px 40px;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+
                 > dl {
                     > dt {
                         width: 100%;
@@ -754,6 +778,10 @@ export default {
                 .fav_title {
                     width: 80%;
                     word-break: break-word;
+                    display: inline-block;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow: hidden;
                     @include mobile() {
                         font-size: 12px;
                         line-height: 20px;
@@ -1293,7 +1321,7 @@ export default {
                 width: 15%;
                 height: 80px;
                 &:hover {
-                    background-color: #0085ff;
+                    background-color: #42b883;
                 }
             }
         }

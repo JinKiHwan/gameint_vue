@@ -66,6 +66,7 @@ export default {
     name: 'LoginComp',
 
     setup() {
+        const apiUrl = process.env.VUE_APP_API_URL;
         const userStore = useUserStore();
         const loginInputStore = userLoginInput();
         const pen = ref('https://cdn-icons-png.flaticon.com/512/227/227104.png');
@@ -86,7 +87,7 @@ export default {
             } else {
                 try {
                     const response = await axios.post(
-                        'http://www.gameint.site/api/member/sign-in',
+                        `${apiUrl}api/member/sign-in`,
                         {
                             account: userId.value,
                             password: password.value,
