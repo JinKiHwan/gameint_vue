@@ -509,6 +509,16 @@ export default {
             } finally {
                 console.log(bookDetailCommentInfo.value?.length === 0, '댓글몇개');
                 browserUpdate.value = '';
+                
+                var data;
+
+                for await (var isFavoriteBook of isFavoriteBookList.value) {
+                    if(isFavoriteBook.bookIdx === bookIdx) {
+                        data = isFavoriteBook;
+                    }
+                }
+                console.log("data test ", data)
+                changeFavoriteType(2, 'read', data)
             }
         };
 
