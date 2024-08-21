@@ -261,7 +261,7 @@ export default {
         // 추천 책 리스트
         ///////////////////////////////////////////
         const initRecomBookList = async () => {
-            const url = 'http://localhost:3000/api/book/monthly/recommend/list';
+            const url = 'http://www.gameint.site/api/book/monthly/recommend/list';
             try {
                 const response = await axios.get(url, { withCredentials: true });
 
@@ -318,7 +318,7 @@ export default {
         const viewBookSelect = async (idx) => {
             try {
                 //console.log(idx);
-                const response = await axios.get(`http://localhost:3000/api/book/monthly/recommend/${idx}`, { withCredentials: true });
+                const response = await axios.get(`http://www.gameint.site/api/book/monthly/recommend/${idx}`, { withCredentials: true });
                 if (response.data.code === 1) {
                     quillEditor.value.setHTML(response.data.data.bookData.recommendReason);
                 } else if (response.data.code === -1) {
@@ -397,7 +397,7 @@ export default {
 
             try {
                 const response = await axios.get(
-                    `http://localhost:3000/api/book/monthly/recommend/${bookIdx}`, 
+                    `http://www.gameint.site/api/book/monthly/recommend/${bookIdx}`, 
                     {
                         withCredentials: true,
                     }
@@ -440,14 +440,14 @@ export default {
                 if (editMode.value) {
                     if(bookIdxSel.value){
                         // 이달의 책 추천 수정
-                        apiUrl = 'http://localhost:3000/api/monthly/recommend/' + bookIdxSel.value + '/update'
+                        apiUrl = 'http://www.gameint.site/api/monthly/recommend/' + bookIdxSel.value + '/update'
                     } else {
                         alert('잘못 된 경로로 접근 하셨습니다.');
                         return;
                     }
                 } else {
                     // 이달의 책 추천 등록
-                    apiUrl = 'http://localhost:3000/api/book/monthly/recommend/create'
+                    apiUrl = 'http://www.gameint.site/api/book/monthly/recommend/create'
                 }
                 const jsonPayload = {
                     bookImage: previewImage.value,
@@ -492,7 +492,7 @@ export default {
 
             try {
                 const response = await axios.post(
-                    'http://localhost:3000/api/comment/create', jsonPayload,
+                    'http://www.gameint.site/api/comment/create', jsonPayload,
                     {
                         headers: {
                             'Content-Type': 'application/json'
