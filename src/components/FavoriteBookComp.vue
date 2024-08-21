@@ -153,15 +153,15 @@
                                         </div>
                                     </div>
                                     <div class="content">
-                                        <p v-if="commnetEdit != true">{{ review.contents }}</p>
+                                        <p v-if="commentEdit !== index">{{ review.contents }}</p>
                                         <div v-else class="writing">
                                             <div contenteditable="true" class="textarea" autofocus spellcheck="false" v-html="review.contents"></div>
                                             <button type="button" @click.once="actComment('edit')">등록</button>
                                         </div>
                                     </div>
-                                    <div v-if="true" class="writer_util">
-                                        <button type="button" @click.once="editComment('edit')">수정</button>
-                                        <span>|</span><button type="button" @click.once="editComment('del')">삭제</button>
+                                    <div v-if="review.memberName == userStore.name" class="writer_util">
+                                        <button type="button" @click.once="editComment('edit', index)">수정</button>
+                                        <!-- <span>|</span><button type="button" @click.once="editComment('del', index)">삭제</button> -->
                                     </div>
                                 </li>
                             </ul>
@@ -245,7 +245,7 @@ export default {
         let editMode = ref(false); // 본인 작성 글 true
         let emptyImg = ref(true);
         let edit = ref(false); // 본인 작성 글 true
-        let commnetEdit = ref(false);
+        let commentEdit = ref(false);
 
         ///////////////////////////////////////////
         // 공통
@@ -391,7 +391,7 @@ export default {
             var bookIdx = data.bookIdx;
 
             try {
-                const response = await axios.get(`http://localhost:3000/api/book/monthly/recommend/${bookIdx}`, {
+                const response = await axios.get(`http://www.gameint.site/api/book/monthly/recommend/${bookIdx}`, {
                     withCredentials: true,
                 });
                 console.log(response.data);
@@ -509,9 +509,10 @@ export default {
             }
         };
         // 댓글 수정 / 삭제
-        const editComment = (type) => {
+        const editComment = (type, index) => {
             if (type == 'edit') {
-                commnetEdit.value = true;
+                console.log(index);
+                commentEdit.value = index;
             } else if (type == 'del') {
                 alert('댓글 삭제');
             }
@@ -527,7 +528,7 @@ export default {
             master,
             edit,
             editMode,
-            commnetEdit,
+            commentEdit,
             chWriteBtnTxt,
             emptyImg,
             bookTitle,

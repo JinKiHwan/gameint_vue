@@ -158,6 +158,7 @@ export default {
         Flicking: Flicking,
     },
     setup() {
+        //const apiUrl = process.env.VUE_APP_API_URL;
         const userStore = useUserStore();
         const monthlyBook = ref('');
         const currentMonthBook = computed(() => {
@@ -628,10 +629,8 @@ export default {
                     },
                 });
         };
-
         onMounted(() => {
             monthlyStatus.value = 0; //초기 화면 값
-            console.log(userStore.isLogin);
 
             monthlyAnimation();
             watch(monthlyStatus, (newValue) => {
@@ -676,17 +675,31 @@ export default {
                 return;
             }
 
-            const formattedReviews = userReviewWraps.value.map((review) => `${review.name}\n 평점:${review.evaluateStar} \n ${review.evaluateContents}`).join('\n\n');
+            const formattedReviews = userReviewWraps.value.map((review) => `${review.name}\n평점:${review.evaluateStar} \n${review.evaluateContents}`).join('\n\n');
 
-            navigator.clipboard
-                .writeText(formattedReviews)
-                .then(() => {
-                    alert('클립보드에 복사되었습니다');
-                })
-                .catch((err) => {
-                    console.error('클립보드 복사 실패', err);
-                    alert('클립보드 복사에 실패했습니다.');
-                });
+            if (navigator.clipboard) {
+                navigator.clipboard
+                    .writeText(formattedReviews)
+                    .then(() => {
+                        alert('클립보드에 복사되었습니다');
+                    })
+                    .catch((err) => {
+                        console.error('클립보드 복사 실패', err);
+                        fallbackCopyToClipboard(formattedReviews);
+                    });
+            } else {
+                fallbackCopyToClipboard(formattedReviews);
+            }
+        };
+
+        const fallbackCopyToClipboard = (text) => {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('클립보드에 복사되었습니다');
         };
 
         return {
