@@ -271,7 +271,7 @@ export default {
                         formData.append('profileImage', profileImageFile.value);
                     }
 
-                    const response = await axios.post('http://localhost:3000/api/member/create', formData, {
+                    const response = await axios.post('http://www.gameint.site/api/member/create', formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },

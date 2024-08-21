@@ -36,10 +36,10 @@
                         <img :src="userStore.profileImg" :alt="userName" />
                     </figure>
 
-                    <input type="file" id="editProfile" accept="image/png, image/webp, image/jpeg" @change="handleFileChange" />
+                    <!-- <input type="file" id="editProfile" accept="image/png, image/webp, image/jpeg" @change="handleFileChange" />
                     <label for="editProfile" class="edit">
                         <img :src="pen" alt="" />
-                    </label>
+                    </label> -->
                 </div>
 
                 <p>
@@ -47,7 +47,7 @@
                 </p>
 
                 <div class="popupLayout_mypage_btn">
-                    <button>수정하기</button>
+                    <!-- <button>수정하기</button> -->
                     <button @click="logOut">로그아웃</button>
                 </div>
             </div>
@@ -86,7 +86,7 @@ export default {
             } else {
                 try {
                     const response = await axios.post(
-                        'http://localhost:3000/api/member/sign-in',
+                        'http://www.gameint.site/api/member/sign-in',
                         {
                             account: userId.value,
                             password: password.value,

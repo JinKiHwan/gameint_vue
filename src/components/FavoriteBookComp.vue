@@ -118,9 +118,11 @@
                                         <figure>
                                             <img :src="bookDetailInfo.memberImage" :alt="bookDetailInfo.memberImage" />
                                         </figure>
-                                        <span>{{ bookDetailInfo.bookAuthor }}</span>
+                                        <!-- <span>{{ bookDetailInfo.bookAuthor }}</span> -->
                                     </div>
-                                    <div class="user_review" v-html="bookDetailInfo.recommendReason"></div>
+                                    <div class="user_review">
+                                        <div v-html="bookDetailInfo.recommendReason"></div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="comment">
@@ -166,7 +168,9 @@
                         </div>
                     </div>
                 </div>
-                <button class="history_back" @click="changeFavoriteType(0)">←뒤로가기</button>
+                <button class="history_back" @click="changeFavoriteType(0)">
+                    <img :src="menuImg[0].img" alt="" />
+                </button>
             </div>
             <!--[e] 책 추천 글 보기-->
         </div>
@@ -199,7 +203,7 @@
 ///////////////////////////////////////////
 import { ref, computed, onMounted, reactive, toRaw } from 'vue';
 import { useUserStore } from '@/store/user';
-import { QuillEditor } from '@vueup/vue-quill'
+import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import axios from 'axios';
 
@@ -222,6 +226,7 @@ export default {
         const fileName = ref(null);
         const previewImage = ref(null);
         const commentCreateVal = ref('');
+        const menuImg = ref([{ img: require('@/assets/img/ico-back.webp') }]);
 
         const editorOption = {
             modules: {
@@ -276,7 +281,7 @@ export default {
                         }
                     });
 
-                    console.log('List successful:', isFavoriteBookList.value)
+                    console.log('List successful:', isFavoriteBookList.value);
                 } else if (response.data.code === -1) {
                     //
                     alert('책이 없습니다');
@@ -328,7 +333,7 @@ export default {
         // 추천 책 리스트/작성,수정 전환
         const changeFavoriteType = (index, type, data) => {
             if (type == 'edit') {
-                console.log(data)
+                console.log(data);
                 bookTitle.value = data.bookTitle;
                 bookPub.value = data.bookPublisher;
                 author.value = data.bookAuthor;
@@ -386,26 +391,27 @@ export default {
             var bookIdx = data.bookIdx;
 
             try {
-                const response = await axios.get(
-                    `http://www.gameint.site/api/book/monthly/recommend/${bookIdx}`, 
-                    {
-                        withCredentials: true,
-                    }
-                );
-                console.log(response.data)
-                if(response.data.code === 1) {
-                    bookDetailInfo.value.bookIdx=bookIdx;
-                    bookDetailInfo.value.bookImage=response.data.data.bookData.bookImage;
-                    bookDetailInfo.value.memberImage=response.data.data.bookData.memberImage;
-                    bookDetailInfo.value.recommendReason=response.data.data.bookData.recommendReason;
-                    bookDetailInfo.value.commentCount=response.data.data.bookData.commentCount;
+                const response = await axios.get(`http://localhost:3000/api/book/monthly/recommend/${bookIdx}`, {
+                    withCredentials: true,
+                });
+                console.log(response.data);
+                if (response.data.code === 1) {
+                    bookDetailInfo.value.bookIdx = bookIdx;
+                    bookDetailInfo.value.bookImage = response.data.data.bookData.bookImage;
+                    bookDetailInfo.value.memberImage = response.data.data.bookData.memberImage;
+                    bookDetailInfo.value.recommendReason = response.data.data.bookData.recommendReason;
+                    bookDetailInfo.value.commentCount = response.data.data.bookData.commentCount;
 
                     if (response.data.data.commentData.length > 0) {
                         // for(var i = 0; i < response.data.data.commentData.length; i++) {
                         // }
                         bookDetailCommentInfo.value = response.data.data.commentData;
 
-                        console.log(bookDetailCommentInfo);
+                        //console.log(bookDetailCommentInfo.value);
+                    }
+
+                    if (response.data.data.commentData.length == 0) {
+                        bookDetailCommentInfo.value = null;
                     }
                 }
 
@@ -425,18 +431,17 @@ export default {
             } else {
                 var apiUrl = null;
 
-                
                 if (editMode.value) {
-                    if(bookIdxSel.value){
+                    if (bookIdxSel.value) {
                         // 이달의 책 추천 수정
-                        apiUrl = 'http://www.gameint.site/api/monthly/recommend/' + bookIdxSel.value + '/update'
+                        apiUrl = 'http://www.gameint.site/api/monthly/recommend/' + bookIdxSel.value + '/update';
                     } else {
                         alert('잘못 된 경로로 접근 하셨습니다.');
                         return;
                     }
                 } else {
                     // 이달의 책 추천 등록
-                    apiUrl = 'http://www.gameint.site/api/book/monthly/recommend/create'
+                    apiUrl = 'http://www.gameint.site/api/book/monthly/recommend/create';
                 }
                 const jsonPayload = {
                     bookImage: previewImage.value,
@@ -446,22 +451,21 @@ export default {
                     recommendReason: quillEditor.value.getHTML(),
                     author: author.value,
                 };
-                console.log(jsonPayload)
+                console.log(jsonPayload);
                 try {
-                    const response = await axios.post(
-                        apiUrl, jsonPayload, 
-                        {
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            withCredentials: true,
-                        }
-                    );
-                    console.log(response.data)
-                    if(response.data.code === -3) { // 책 작성 불가능한 멤버일 경우
-                        alert("아직 책 추천이 불가능합니다!")
-                    } else if (response.data.code === -4) { // 책 중복 작성할 경우
-                        alert("이미 추천했습니다!")
+                    const response = await axios.post(apiUrl, jsonPayload, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        withCredentials: true,
+                    });
+                    console.log(response.data);
+                    if (response.data.code === -3) {
+                        // 책 작성 불가능한 멤버일 경우
+                        alert('아직 책 추천이 불가능합니다!');
+                    } else if (response.data.code === -4) {
+                        // 책 중복 작성할 경우
+                        alert('이미 추천했습니다!');
                     }
                     //changeFavoriteType(0);
                 } catch (error) {
@@ -480,17 +484,14 @@ export default {
             console.log(jsonPayload);
 
             try {
-                const response = await axios.post(
-                    'http://www.gameint.site/api/comment/create', jsonPayload,
-                    {
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        withCredentials: true,
-                    }
-                );
-                console.log(response.data)
-                
+                const response = await axios.post('http://localhost:3000/api/comment/create', jsonPayload, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    withCredentials: true,
+                });
+                console.log(response.data);
+
                 //changeFavoriteType(0);
             } catch (error) {
                 console.error('Error uploading file:', error);
@@ -553,6 +554,7 @@ export default {
             bookDetailCommentInfo,
             commentCreateVal,
             createComment,
+            menuImg,
             viewBookSelect,
         };
     },
@@ -618,10 +620,9 @@ export default {
         height: 100%;
         overflow: auto;
         display: flex;
-        justify-content: center;
         position: relative;
         padding: 10px;
-        gap: 20px;
+        gap: 30px;
     }
     &_list {
         width: 90%;
@@ -1012,14 +1013,23 @@ export default {
         }
     }
     &_book_img {
-        max-width: 45%;
+        width: 45%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: auto 0;
+        position: relative;
+
         p {
             text-align: center;
             font-size: 18px;
             margin-block: 10px;
         }
         figure {
-            height: 90%;
+            height: 70%;
+            position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -1030,13 +1040,21 @@ export default {
         }
     }
     &_book_reviews {
-        width: min(650px, 45%);
+        height: 100%;
+        overflow: auto;
+        width: 50%;
+        padding: 8% 0;
+
+        /* 스크롤바 설정*/
+        &::-webkit-scrollbar {
+            width: 0;
+        }
+
         .writerArea {
             .review_item {
                 display: flex;
                 flex-direction: column;
                 gap: 30px;
-                padding-top: 30px;
                 height: 100%;
                 overflow: auto;
                 border-bottom: 2px solid #fff;
@@ -1060,7 +1078,7 @@ export default {
                             }
                         }
 
-                        span {
+                        /* span {
                             position: absolute;
                             left: 0;
                             top: 0;
@@ -1078,13 +1096,47 @@ export default {
                             span {
                                 opacity: 1;
                             }
-                        }
+                        } */
                     }
 
                     .user_review {
-                        width: 70%;
                         line-height: 1.3;
                         color: #fff;
+                        max-width: calc(100% - 115px);
+                        align-self: center;
+                        line-height: 1.3;
+                        padding: 15px 10px;
+                        background: #42b883;
+                        border-radius: 10px;
+                        word-break: break-word;
+                        position: relative;
+
+                        > div {
+                            max-height: 100px;
+                            overflow: auto;
+                            &::-webkit-scrollbar {
+                                width: 2px;
+                            }
+                            &::-webkit-scrollbar-thumb {
+                                background-color: #333333;
+                                /* 스크롤바 둥글게 설정    */
+                                border-radius: 10px;
+                                border: 7px solid #333;
+                            }
+                        }
+
+                        &:before {
+                            content: '';
+                            display: block;
+                            width: 10px;
+                            height: 10px;
+                            border-right: 10px solid #42b883;
+                            border-left: 10px solid transparent;
+                            border-bottom: 10px solid transparent;
+                            position: absolute;
+                            left: -20px;
+                            top: 15px;
+                        }
                     }
                 }
             }
@@ -1122,8 +1174,8 @@ export default {
         }
 
         .writerCommentArea {
-            height: calc(100% - 400px);
-            overflow-y: auto;
+            //height: calc(100% - 400px);
+            //overflow-y: auto;
             .comment {
                 display: grid;
                 gap: 14px;
@@ -1330,10 +1382,17 @@ export default {
     }
     .history_back {
         position: absolute;
-        z-index: 1;
-        left: 10px;
-        top: 10px;
-        color: #fff;
+        left: 25px;
+        bottom: 25px;
+        width: 50px;
+        aspect-ratio: 1/1;
+        background: #35495e;
+        border-radius: 50%;
+        padding: 5px;
+        &:hover {
+            -webkit-animation: vibrate-1 0.3s linear infinite both;
+            animation: vibrate-1 0.3s linear infinite both;
+        }
     }
 }
 </style>

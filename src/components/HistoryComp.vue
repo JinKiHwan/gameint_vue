@@ -37,9 +37,10 @@
                     <ul class="history_book_selected_review">
                         <li v-for="(review, index) in selectedBookReview" :key="index">
                             <div class="review_text">
-                                <div class="review_text_wrap">
+                                <div class="review_text_wrap" v-if="userStore.isLogin">
                                     {{ review.evaluateContents }}
                                 </div>
+                                <div class="review_text_wrap blur" v-else></div>
                             </div>
                             <div class="review_user">
                                 <div class="profile">
@@ -128,11 +129,13 @@
 <script>
 import axios from 'axios';
 import { ref, onMounted, computed } from 'vue';
+import { useUserStore } from '@/store/user';
 
 export default {
     name: 'HistoryCompComp',
 
     setup() {
+        const userStore = useUserStore();
         const bookList = ref([]);
         const historyStatus = ref(0);
         const menuImg = ref([{ img: require('@/assets/img/ico-back.webp') }, { img: require('@/assets/img/ico-book.webp') }]);
@@ -149,7 +152,7 @@ export default {
         const historyBookSelect = async (idx) => {
             try {
                 //console.log(idx);
-                const response = await axios.get(`http://localhost:3000/api/book/monthly/recommend/${idx}`, { withCredentials: true });
+                const response = await axios.get(`http://www.gameint.site/api/book/monthly/recommend/${idx}`, { withCredentials: true });
                 if (response.data.code === 1) {
                     selectedBook.value = response.data.data.bookData;
                     historyBookSelectReview(idx);
@@ -181,7 +184,7 @@ export default {
             //console.log(selectedBookUpdate.value);
 
             try {
-                const response = await axios.get(`http://localhost:3000/api/book/last/recommend/list?updDate=${selectedBookUpdate.value}`, { withCredentials: true });
+                const response = await axios.get(`http://www.gameint.site/api/book/last/recommend/list?updDate=${selectedBookUpdate.value}`, { withCredentials: true });
                 if (response.data.code === 1) {
                     selectedBookOthers.value = response.data.data;
 
@@ -207,7 +210,7 @@ export default {
         /* ////////////////////////////// */
         const historyBookSelectReview = async (idx) => {
             try {
-                const response = await axios.get(`http://localhost:3000/api/book/monthly/${idx}/evaluate/list`, { withCredentials: true });
+                const response = await axios.get(`http://www.gameint.site/api/book/monthly/${idx}/evaluate/list`, { withCredentials: true });
 
                 if (response.data.code === 1) {
                     // 모든 데이터의 profileImg 처리
@@ -258,7 +261,7 @@ export default {
 
         const historyCompBookList = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/api/book/last/list?year=2024', { withCredentials: true });
+                const response = await axios.get('http://www.gameint.site/api/book/last/list?year=2024', { withCredentials: true });
                 //console.log(response.data.data);
 
                 if (response.data.code === 1) {
@@ -283,7 +286,7 @@ export default {
         const historyBookListComment = async (idx) => {
             //(idx);
             try {
-                const response = await axios.get(`http://localhost:3000/api/book/monthly/recommend/${idx}`, { withCredentials: true });
+                const response = await axios.get(`http://www.gameint.site/api/book/monthly/recommend/${idx}`, { withCredentials: true });
 
                 selectedBookOthersBookData.value = response.data.data.bookData;
                 selectedBookOthersComment.value = response.data.data.commentData;
@@ -327,6 +330,7 @@ export default {
             historyBookListComment,
             historyBack,
             historyNext,
+            userStore,
         };
     },
 };
@@ -474,7 +478,6 @@ export default {
 
             img {
                 height: 100%;
-
                 object-fit: contain;
                 box-shadow: 0 0 15px rgba($color: #fff, $alpha: 0.5);
             }
@@ -542,6 +545,10 @@ export default {
                 align-items: center;
                 justify-content: center;
                 text-align: center;
+
+                &.blur {
+                    background-image: url('/src/assets/img/review_blur.webp');
+                }
             }
         }
 

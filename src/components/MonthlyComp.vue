@@ -88,9 +88,10 @@
                 <Flicking :options="{ circular: false, horizontal: true, adaptive: false }" :plugins="plugins" @ready="updateTransform">
                     <div class="card-panel" v-for="(member, index) in userReviewWraps" :key="index">
                         <div class="review_text">
-                            <div class="review_text_wrap">
+                            <div class="review_text_wrap" v-if="userStore.isLogin">
                                 {{ member.evaluateContents }}
                             </div>
+                            <div class="review_text_wrap blur" v-else></div>
                         </div>
                         <div class="review_user">
                             <div class="profile">
@@ -210,7 +211,7 @@ export default {
         /* /////////////////////////////// */
         const monthlyBookDetail = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/api/book/monthly/this-month', { withCredentials: true });
+                const response = await axios.get('http://www.gameint.site/api/book/monthly/this-month', { withCredentials: true });
 
                 console.log(response.data.data);
 
@@ -256,7 +257,7 @@ export default {
                     };
 
                     const response = await axios.post(
-                        `http://localhost:3000/api/book/monthly/${bookIdx.value}/evaluate`,
+                        `http://www.gameint.site/api/book/monthly/${bookIdx.value}/evaluate`,
                         {
                             reviewData, // 쿠키를 주고받을 수 있게 설정
                         },
@@ -296,7 +297,7 @@ export default {
         /* /////////////////////////////// */
         const monthlyBookReviewWrap = async () => {
             try {
-                const response = await axios.get(`http://localhost:3000/api/book/monthly/${bookIdx.value}/evaluate/list`, { withCredentials: true });
+                const response = await axios.get(`http://www.gameint.site/api/book/monthly/${bookIdx.value}/evaluate/list`, { withCredentials: true });
 
                 console.log(response, '리스폰');
 
@@ -352,7 +353,7 @@ export default {
 
             try {
                 const response = await axios.post(
-                    'http://localhost:3000/api/book/monthly/evaluate/update',
+                    'http://www.gameint.site/api/book/monthly/evaluate/update',
                     {
                         bookEvaluationIdx: editReviewIdx.value,
                         bookIdx: bookIdx.value,
@@ -630,6 +631,7 @@ export default {
 
         onMounted(() => {
             monthlyStatus.value = 0; //초기 화면 값
+            console.log(userStore.isLogin);
 
             monthlyAnimation();
             watch(monthlyStatus, (newValue) => {
@@ -669,8 +671,11 @@ export default {
         /* ///리뷰 복사하기//////////////////*/
         /* ///////////////////////////////*/
         const reviewCopy = () => {
-            console.log(userReviewWraps.value);
-            console.log(userReviewWraps.value);
+            if (userStore.isLogin === false) {
+                alert('회원만 이용 가능한 기능입니다.');
+                return;
+            }
+
             const formattedReviews = userReviewWraps.value.map((review) => `${review.name}\n 평점:${review.evaluateStar} \n ${review.evaluateContents}`).join('\n\n');
 
             navigator.clipboard
@@ -797,6 +802,10 @@ export default {
             align-items: center;
             justify-content: center;
             text-align: center;
+
+            &.blur {
+                background-image: url('/src/assets/img/review_blur.webp');
+            }
         }
     }
 
