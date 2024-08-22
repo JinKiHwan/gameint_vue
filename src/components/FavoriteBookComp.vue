@@ -121,7 +121,7 @@
                                         <!-- <span>{{ bookDetailInfo.bookAuthor }}</span> -->
                                     </div>
                                     <div class="user_review">
-                                        <div v-html="bookDetailInfo.recommendReason"></div>
+                                        <div v-html="bookDetailInfo.recommendReason" class="recommend_reason"></div>
                                     </div>
                                 </div>
                             </div>
@@ -159,10 +159,10 @@
                                             <button type="button" @click.once="actComment('edit')">등록</button>
                                         </div>
                                     </div>
-                                    <div v-if="review.memberName == userStore.name" class="writer_util">
+                                    <!-- <div v-if="review.memberName == userStore.name" class="writer_util">
                                         <button type="button" @click.once="editComment('edit', index)">수정</button>
-                                        <!-- <span>|</span><button type="button" @click.once="editComment('del', index)">삭제</button> -->
-                                    </div>
+                                        <span>|</span><button type="button" @click.once="editComment('del', index)">삭제</button>
+                                    </div> -->
                                 </li>
                             </ul>
                         </div>
@@ -477,6 +477,12 @@ export default {
 
         const createComment = async (bookIdx) => {
             event.preventDefault(); // 기본 동작 방지
+
+            if (userStore.isLogin === false) {
+                alert('댓글 기능은 회원만 가능합니다!');
+                return;
+            }
+
             const jsonPayload = {
                 bookIdx: bookIdx,
                 contents: commentCreateVal.value,
@@ -509,16 +515,16 @@ export default {
             } finally {
                 console.log(bookDetailCommentInfo.value?.length === 0, '댓글몇개');
                 browserUpdate.value = '';
-                
+
                 var data;
 
                 for await (var isFavoriteBook of isFavoriteBookList.value) {
-                    if(isFavoriteBook.bookIdx === bookIdx) {
+                    if (isFavoriteBook.bookIdx === bookIdx) {
                         data = isFavoriteBook;
                     }
                 }
-                console.log("data test ", data)
-                changeFavoriteType(2, 'read', data)
+                console.log('data test ', data);
+                changeFavoriteType(2, 'read', data);
             }
         };
 
@@ -1145,7 +1151,7 @@ export default {
                         align-self: center;
                         line-height: 1.3;
                         padding: 15px 10px;
-                        background: #42b883;
+                        background: #085f38;
                         border-radius: 10px;
                         word-break: break-word;
                         position: relative;
@@ -1169,7 +1175,7 @@ export default {
                             display: block;
                             width: 10px;
                             height: 10px;
-                            border-right: 10px solid #42b883;
+                            border-right: 10px solid #085f38;
                             border-left: 10px solid transparent;
                             border-bottom: 10px solid transparent;
                             position: absolute;

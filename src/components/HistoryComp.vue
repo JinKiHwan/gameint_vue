@@ -101,7 +101,7 @@
                     <div class="recommender">
                         <figure><img :src="selectedBookOthersBookData.memberImage" alt="" /></figure>
                         <div>
-                            <div v-html="selectedBookOthersBookData.recommendReason"></div>
+                            <div v-html="selectedBookOthersBookData.recommendReason" class="recommend_reason"></div>
                         </div>
                     </div>
                     <hr />
@@ -664,6 +664,9 @@ export default {
             width: calc((100% - 80px) / 5);
             margin-bottom: 30px;
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
 
             .book_image {
                 position: relative;

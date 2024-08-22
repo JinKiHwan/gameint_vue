@@ -47,23 +47,8 @@
                     </figure>
                     <h3>Meet writers <span>여러 작가를 만나다</span></h3>
                     <ul>
-                        <li>
-                            <img src="https://image.ajunews.com/content/image/2021/12/01/20211201155123634014.jpg" alt="" />
-                        </li>
-                        <li>
-                            <img src="https://i.namu.wiki/i/HAkoBRVZDjrcAN_piKSCY64WZZpYRGYjsTd9vRB1YeQM6gSgEAGSauMJPF81090jrQ7aPQC8UvepudfYdsiPYAMAhcARCU_ap8S5qNCQY5NwGIOEWWr84Ci2VVabcFRwokat2UV-LYc_4VF2k_rTumKTrKBI2TuToNWF6tdX3Tw.webp" alt="" />
-                        </li>
-                        <li>
-                            <img src="https://www.theartof.com/assets/images/speaker-headshots/large/ChipHeath.jpg" alt="" />
-                        </li>
-                        <li>
-                            <img src="https://i.namu.wiki/i/HAkoBRVZDjrcAN_piKSCY-6nfUIpeRj6fkLGisZD6c4ichJmSztoZD143Q4u655FIivuas1qDq5Q9oN1dpzLBea5BZEahdc-81iujmypt-ywpeUJrScozyEnRcGoQ6lZ3-WDIFYiENTTaJojVUUBTUcBUXIYsTBaE6Jh_PROq3A.jpg" alt="" />
-                        </li>
-                        <li>
-                            <img src="https://www.kyobostory.co.kr/resources/front/images/contents/fs_travel/20191010/img03.png" alt="" />
-                        </li>
-                        <li>
-                            <img src="https://i.namu.wiki/i/HAkoBRVZDjrcAN_piKSCY537tZ-XL2gIGBD-bBee89bMcGM33P18poSbjanO3MSPhBFNEDnNSYdNOLKein00xBoL1MBxsSJDwGL6qy9cPNyTq9XEuS0VL7D-h0KNWXLuEeKSlIp_6gXnCd6j7j3MkDYwMqVwJFDebR2DRWcpQko.webp" alt="" />
+                        <li v-for="(writer, index) in writerImg" :key="index">
+                            <img :src="writer.img" alt="" />
                         </li>
                     </ul>
                 </article>
@@ -152,33 +137,40 @@ export default {
         const bigTitle = ref(null);
         const { animations, initAnimation } = createHomeAnimations();
         const telegramLogo = require('@/assets/img/telegram.svg');
-        const bg = require('@/assets/img/home/library.mp4');
         const picture = [
-            { img: require('@/assets/img/home/picture01.png') },
-            { img: require('@/assets/img/home/picture02.png') },
-            { img: require('@/assets/img/home/picture03.png') },
-            { img: require('@/assets/img/home/picture04.png') },
-            { img: require('@/assets/img/home/picture05.png') },
-            { img: require('@/assets/img/home/picture06.png') },
-            { img: require('@/assets/img/home/picture07.png') },
-            { img: require('@/assets/img/home/picture08.png') },
-            { img: require('@/assets/img/home/picture09.png') },
-            { img: require('@/assets/img/home/picture10.png') },
-            { img: require('@/assets/img/home/picture11.png') },
-            { img: require('@/assets/img/home/picture12.png') },
-            { img: require('@/assets/img/home/picture13.png') },
-            { img: require('@/assets/img/home/picture14.png') },
-            { img: require('@/assets/img/home/picture15.png') },
-            { img: require('@/assets/img/home/picture16.png') },
-            { img: require('@/assets/img/home/picture17.png') },
-            { img: require('@/assets/img/home/picture18.png') },
-            { img: require('@/assets/img/home/picture19.png') },
-            { img: require('@/assets/img/home/picture20.png') },
+            { img: require('@/assets/img/home/picture01.webp') },
+            { img: require('@/assets/img/home/picture02.webp') },
+            { img: require('@/assets/img/home/picture03.webp') },
+            { img: require('@/assets/img/home/picture04.webp') },
+            { img: require('@/assets/img/home/picture05.webp') },
+            { img: require('@/assets/img/home/picture06.webp') },
+            { img: require('@/assets/img/home/picture07.webp') },
+            { img: require('@/assets/img/home/picture08.webp') },
+            { img: require('@/assets/img/home/picture09.webp') },
+            { img: require('@/assets/img/home/picture10.webp') },
+            { img: require('@/assets/img/home/picture11.webp') },
+            { img: require('@/assets/img/home/picture12.webp') },
+            { img: require('@/assets/img/home/picture13.webp') },
+            { img: require('@/assets/img/home/picture14.webp') },
+            { img: require('@/assets/img/home/picture15.webp') },
+            { img: require('@/assets/img/home/picture16.webp') },
+            { img: require('@/assets/img/home/picture17.webp') },
+            { img: require('@/assets/img/home/picture18.webp') },
+            { img: require('@/assets/img/home/picture19.webp') },
+            { img: require('@/assets/img/home/picture20.webp') },
         ];
         const meritBg = [{ img: require('@/assets/img/home/merit-bg01.webp') }, { img: require('@/assets/img/home/merit-bg02.webp') }, { img: require('@/assets/img/home/merit-bg03.webp') }];
         const meritShare = [{ img: require('@/assets/img/home/merit-share01.webp') }, { img: require('@/assets/img/home/merit-share02.webp') }, { img: require('@/assets/img/home/merit-share03.webp') }, { img: require('@/assets/img/home/merit-share04.webp') }];
         const meritExpansion = [{ img: require('@/assets/img/home/merit-expansion01.webp') }, { img: require('@/assets/img/home/merit-expansion02.webp') }, { img: require('@/assets/img/home/merit-expansion03.webp') }, { img: require('@/assets/img/home/merit-expansion04.webp') }];
         const contactImg = require('@/assets/img/home/contact.webp');
+        const writerImg = [
+            { img: require('@/assets/img/home/writer01.webp') },
+            { img: require('@/assets/img/home/writer02.webp') },
+            { img: require('@/assets/img/home/writer03.webp') },
+            { img: require('@/assets/img/home/writer04.webp') },
+            { img: require('@/assets/img/home/writer05.webp') },
+            { img: require('@/assets/img/home/writer06.webp') },
+        ];
 
         onMounted(() => {
             initAnimation();
@@ -200,11 +192,11 @@ export default {
             animations,
             telegramLogo,
             picture,
-            bg,
             meritBg,
             meritExpansion,
             meritShare,
             contactImg,
+            writerImg,
         };
     },
 };

@@ -320,6 +320,20 @@ export default {
 <style lang="scss">
 body {
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+
+    @include mobile {
+        &::before {
+            content: '모바일은 지원되지 않습니다';
+            color: #fff;
+            font-size: 18px;
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 100%;
+            text-align: center;
+            transform: translateY(-50%);
+        }
+    }
 }
 .system {
     position: fixed;
@@ -382,8 +396,7 @@ body {
     gap: 15px;
 
     @include mobile {
-        padding-top: 15vw;
-        align-items: flex-start !important;
+        display: none !important;
     }
 
     .welcome_txt {
@@ -635,6 +648,51 @@ body {
     }
     100% {
         opacity: 0;
+    }
+}
+
+.recommend_reason {
+    h1 {
+        font-size: 2em;
+    }
+    h2 {
+        font-size: 1.5em;
+    }
+    h3 {
+        font-size: 1.17em;
+    }
+    p {
+        counter-reset: list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9;
+    }
+
+    strong {
+        font-weight: bold;
+    }
+    em {
+        font-style: italic;
+    }
+    u {
+        text-decoration: underline;
+    }
+    pre {
+        background-color: #23241f;
+        color: #f8f8f2;
+        overflow: visible;
+    }
+
+    ol {
+        padding-left: 1.5em;
+        li {
+            counter-reset: list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9;
+            counter-increment: list-0;
+            list-style: decimal;
+        }
+    }
+    blockquote {
+        border-left: 4px solid #ccc;
+        margin-bottom: 5px;
+        margin-top: 5px;
+        padding-left: 16px;
     }
 }
 </style>
