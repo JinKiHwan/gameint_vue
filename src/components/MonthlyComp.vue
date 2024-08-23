@@ -367,7 +367,8 @@ export default {
                 switch (response.data.code) {
                     case 1:
                         console.log('평가 성공:', response.data.message);
-                        //alert('작성완료!');
+                        alert('수정완료!');
+                        window.location.reload();
 
                         break;
                     case -1:

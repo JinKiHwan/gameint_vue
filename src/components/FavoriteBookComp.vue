@@ -3,8 +3,8 @@
         <div
             class="favorite_inner"
             v-bind:class="{
-                write: isFavoriteBookStatus === 1,
-                view: isFavoriteBookStatus === 2,
+                '-write': isFavoriteBookStatus === 1,
+                '-view': isFavoriteBookStatus === 2,
             }">
             <!--[s] 책 추천 리스트-->
             <div class="favorite_list" v-if="isFavoriteBookStatus == 0">
@@ -650,11 +650,10 @@ export default {
         box-sizing: content-box;
         gap: 20px;
 
-        &.view {
+        &.-view {
             height: 100%;
-            //background-color: #333; /* Dark form background color */
         }
-        &.write {
+        &.-write {
             height: 100%;
             background-color: #333; /* Dark form background color */
         }
