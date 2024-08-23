@@ -368,8 +368,8 @@ export default {
                     case 1:
                         console.log('평가 성공:', response.data.message);
                         alert('수정완료!');
-                        window.location.reload();
 
+                        monthlyStatus.value = 0;
                         break;
                     case -1:
                         console.log('code -1');

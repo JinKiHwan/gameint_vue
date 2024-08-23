@@ -91,7 +91,7 @@
                                     <input type="text" :disabled="emptyImg === false" v-model.trim="previewImage" placeholder="책 이미지 URL을 넣어주세요." />
                                     <button v-if="emptyImg === true" type="button" @:click="actCopyImgSrc('preview')">미리보기</button>
                                     <button v-else type="button" @:click="actCopyImgSrc('cancle')">취소</button>
-                                    <p class="tipTxt">※ 가져 올 책 이미지 오른쪽 클릭 ▷ 이미지 주소 복사</p>
+                                    <p class="tipTxt">※ Yes24/영풍/교보 홈페이지에서 책 이미지 오른쪽 클릭 ▷ <b>이미지 주소</b> 복사</p>
                                 </div>
                             </li>
                         </ul>
