@@ -1,6 +1,11 @@
 <template>
     <div class="favorite">
-        <div class="favorite_inner" v-bind:class="{ '-view': isFavoriteBookStatus !== 0 }">
+        <div
+            class="favorite_inner"
+            v-bind:class="{
+                write: isFavoriteBookStatus === 1,
+                view: isFavoriteBookStatus === 2,
+            }">
             <!--[s] 책 추천 리스트-->
             <div class="favorite_list" v-if="isFavoriteBookStatus == 0">
                 <ul v-if="isFavoriteBookListLoading">
@@ -103,6 +108,10 @@
 
             <!--[s] 책 추천 글 보기-->
             <div class="favorite_view" v-if="isFavoriteBookStatus == 2">
+                <div class="favorite_bg">
+                    <img :src="bookDetailInfo.bookImage" alt="" />
+                </div>
+
                 <div class="favorite_area">
                     <div class="favorite_book_img">
                         <figure>
@@ -617,6 +626,20 @@ export default {
     height: 100%;
     position: relative;
 
+    &_bg {
+        position: fixed;
+        z-index: -1;
+        width: 100%;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        filter: blur(15px) brightness(0.2);
+        img {
+            width: 100%;
+            object-fit: cover;
+        }
+    }
+
     &_inner {
         width: 100%;
         height: 90%;
@@ -626,7 +649,12 @@ export default {
         position: relative;
         box-sizing: content-box;
         gap: 20px;
-        &.-view {
+
+        &.view {
+            height: 100%;
+            //background-color: #333; /* Dark form background color */
+        }
+        &.write {
             height: 100%;
             background-color: #333; /* Dark form background color */
         }

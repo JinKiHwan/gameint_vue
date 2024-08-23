@@ -100,6 +100,19 @@
             </article>
         </div>
     </Transition>
+
+    <div class="producer">
+        <div class="producer_wrap">
+            <p @click="madeIt()">Who Made it?</p>
+
+            <ul class="producer_member" v-if="madeInfo">
+                <li>Frontend : <a href="https://github.com/JinKiHwan" target="_blank"> Jin Kihwan</a></li>
+                <li>Backend : <a href="https://github.com/kimgihean" target="_blank"> Kim Kihyun</a></li>
+
+                <li class="close" @click="madeIt()"><i></i><i></i></li>
+            </ul>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -148,6 +161,7 @@ export default {
         const popupState = ref(false);
         const text01 = ref(['GameInt에 오신걸 환영합니다!', '동호회 가입시 컨텐츠 이용이 가능합니다!']);
         const text02 = ref([`반갑습니다 ` + userStore.name + `님!`, 'GameInt에 오신걸 환영합니다!']);
+        const madeInfo = ref(false);
 
         /* //////////////////// */
         /* ///컴포넌트 스테이터스/ */
@@ -270,6 +284,13 @@ export default {
             alert('준비중입니다.');
         };
 
+        /* //////////////////////////////// */
+        /* ///Who Made It///////////////// */
+        /* /////////////////////////////// */
+        const madeIt = () => {
+            madeInfo.value = !madeInfo.value;
+        };
+
         watch(
             /* //////////////////////////////// */
             /* ///watch 사용할 곳이 있을까?////// */
@@ -312,6 +333,8 @@ export default {
             preparingForService,
             popupState,
             welcomeText01,
+            madeInfo,
+            madeIt,
         };
     },
 };
@@ -576,6 +599,7 @@ body {
     align-items: center;
     justify-content: center;
     padding-top: 25px;
+    z-index: 1;
 
     &_wrap {
         width: min(1300px, 95%);
@@ -693,6 +717,77 @@ body {
         margin-bottom: 5px;
         margin-top: 5px;
         padding-left: 16px;
+    }
+}
+
+.producer {
+    position: absolute;
+    right: 50px;
+    bottom: 20px;
+    z-index: 0;
+
+    &_wrap {
+        position: relative;
+        > p {
+            color: rgba($color: #fff, $alpha: 0.5);
+            cursor: pointer;
+            font-size: 12px;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
+    &_member {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        background: rgba($color: #fff, $alpha: 0.6);
+        width: 200px;
+        padding: 15px;
+        border-radius: 5px;
+        backdrop-filter: blur(2px);
+
+        li {
+            display: flex;
+            margin: 5px 0;
+
+            a {
+                color: blue;
+                text-decoration: underline;
+                padding-left: 3px;
+            }
+
+            &.close {
+                position: absolute;
+                right: 8px;
+                top: 2px;
+                width: 12px;
+                height: 12px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+
+                i {
+                    display: inline-block;
+                    width: 100%;
+                    height: 1px;
+                    background: #000;
+                    position: absolute;
+                    left: 50%;
+                    top: 50%;
+                    &:nth-child(1) {
+                        transform: translate(-50%, -50%) rotate(45deg);
+                    }
+                    &:nth-child(2) {
+                        transform: translate(-50%, -50%) rotate(-45deg);
+                    }
+                }
+            }
+        }
     }
 }
 </style>
