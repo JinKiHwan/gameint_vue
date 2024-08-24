@@ -400,7 +400,7 @@ export default {
         const getFavoriteBookDetail = async (data) => {
             var bookIdx = data.bookIdx;
             try {
-                const response = await axios.get(`${apiUrl}api/book/monthly/recommend/${bookIdx}`, {
+                const response = await axios.get(`${apiHost}api/book/monthly/recommend/${bookIdx}`, {
                     withCredentials: true,
                 });
                 console.log(response.data);
