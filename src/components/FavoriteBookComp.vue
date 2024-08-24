@@ -468,13 +468,19 @@ export default {
                         withCredentials: true,
                     });
                     console.log(response.data);
-                    if (response.data.code === -3) {
+                    if (response.data.code === -6) {
                         // 책 작성 불가능한 멤버일 경우
                         alert('아직 책 추천이 불가능합니다!');
                     } else if (response.data.code === -4) {
                         // 책 중복 작성할 경우
                         alert('이미 추천했습니다!');
-                    }
+                    } else if (response.data.code === -1) {
+                        alert('로그인 먼저 해주세요!')
+                    } else if (response.data.code === -5) {
+                        alert('아직 책 추천 기간이 아닙니다.')
+                    } else if (response.data.code === -3) {
+                        alert('알 수 없는 에러')
+                    } 
                     //changeFavoriteType(0);
                 } catch (error) {
                     console.error('Error uploading file:', error);
