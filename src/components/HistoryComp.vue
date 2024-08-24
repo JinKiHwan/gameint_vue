@@ -135,6 +135,7 @@ export default {
     name: 'HistoryCompComp',
 
     setup() {
+        const apiHost = process.env.VUE_APP_API_URL;
         const userStore = useUserStore();
         const bookList = ref([]);
         const historyStatus = ref(0);
@@ -152,7 +153,7 @@ export default {
         const historyBookSelect = async (idx) => {
             try {
                 //console.log(idx);
-                const response = await axios.get(`http://www.gameint.site/api/book/monthly/recommend/${idx}`, { withCredentials: true });
+                const response = await axios.get(`${apiHost}api/book/monthly/recommend/${idx}`, { withCredentials: true });
                 if (response.data.code === 1) {
                     selectedBook.value = response.data.data.bookData;
                     historyBookSelectReview(idx);
@@ -184,7 +185,7 @@ export default {
             //console.log(selectedBookUpdate.value);
 
             try {
-                const response = await axios.get(`http://www.gameint.site/api/book/last/recommend/list?updDate=${selectedBookUpdate.value}`, { withCredentials: true });
+                const response = await axios.get(`${apiHost}api/book/last/recommend/list?updDate=${selectedBookUpdate.value}`, { withCredentials: true });
                 if (response.data.code === 1) {
                     selectedBookOthers.value = response.data.data;
 
@@ -210,7 +211,7 @@ export default {
         /* ////////////////////////////// */
         const historyBookSelectReview = async (idx) => {
             try {
-                const response = await axios.get(`http://www.gameint.site/api/book/monthly/${idx}/evaluate/list`, { withCredentials: true });
+                const response = await axios.get(`${apiHost}api/book/monthly/${idx}/evaluate/list`, { withCredentials: true });
 
                 if (response.data.code === 1) {
                     // 모든 데이터의 profileImg 처리
@@ -261,7 +262,7 @@ export default {
 
         const historyCompBookList = async () => {
             try {
-                const response = await axios.get('http://www.gameint.site/api/book/last/list?year=2024', { withCredentials: true });
+                const response = await axios.get(`${apiHost}api/book/last/list?year=2024`, { withCredentials: true });
                 //console.log(response.data.data);
 
                 if (response.data.code === 1) {
@@ -286,7 +287,7 @@ export default {
         const historyBookListComment = async (idx) => {
             //(idx);
             try {
-                const response = await axios.get(`http://www.gameint.site/api/book/monthly/recommend/${idx}`, { withCredentials: true });
+                const response = await axios.get(`${apiHost}api/book/monthly/recommend/${idx}`, { withCredentials: true });
 
                 selectedBookOthersBookData.value = response.data.data.bookData;
                 selectedBookOthersComment.value = response.data.data.commentData;

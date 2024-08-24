@@ -159,6 +159,8 @@ export default {
     },
     setup() {
         //const apiUrl = process.env.VUE_APP_API_URL;
+        const apiHost = process.env.VUE_APP_API_URL;
+
         const userStore = useUserStore();
         const monthlyBook = ref('');
         const currentMonthBook = computed(() => {
@@ -212,7 +214,7 @@ export default {
         /* /////////////////////////////// */
         const monthlyBookDetail = async () => {
             try {
-                const response = await axios.get('http://www.gameint.site/api/book/monthly/this-month', { withCredentials: true });
+                const response = await axios.get(`${apiHost}api/book/monthly/this-month`, { withCredentials: true });
 
                 console.log(response.data.data);
 
@@ -258,7 +260,7 @@ export default {
                     };
 
                     const response = await axios.post(
-                        `http://www.gameint.site/api/book/monthly/${bookIdx.value}/evaluate`,
+                        `${apiHost}api/book/monthly/${bookIdx.value}/evaluate`,
                         {
                             reviewData, // 쿠키를 주고받을 수 있게 설정
                         },
@@ -298,7 +300,7 @@ export default {
         /* /////////////////////////////// */
         const monthlyBookReviewWrap = async () => {
             try {
-                const response = await axios.get(`http://www.gameint.site/api/book/monthly/${bookIdx.value}/evaluate/list`, { withCredentials: true });
+                const response = await axios.get(`${apiHost}api/book/monthly/${bookIdx.value}/evaluate/list`, { withCredentials: true });
 
                 console.log(response, '리스폰');
 
@@ -354,7 +356,7 @@ export default {
 
             try {
                 const response = await axios.post(
-                    'http://www.gameint.site/api/book/monthly/evaluate/update',
+                    `${apiHost}api/book/monthly/evaluate/update`,
                     {
                         bookEvaluationIdx: editReviewIdx.value,
                         bookIdx: bookIdx.value,
