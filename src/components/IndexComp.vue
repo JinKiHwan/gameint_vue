@@ -113,6 +113,14 @@
             </ul>
         </div>
     </div>
+
+    <div class="notice" v-show="notice">
+        <div class="notice_wrap">
+            <button @click="notice = false"></button>
+            <p>글 작성 이슈가 있을시 로그아웃 → 새로고침 → 로그인 → 새로고침 후 작성해주시길 바랍니다.</p>
+            <p>해당 이슈는 조속히 수정할 수 있도록 하겠습니다. 감사합니다.</p>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -162,6 +170,7 @@ export default {
         const text01 = ref(['GameInt에 오신걸 환영합니다!', '동호회 가입시 컨텐츠 이용이 가능합니다!']);
         const text02 = ref([`반갑습니다 ` + userStore.name + `님!`, 'GameInt에 오신걸 환영합니다!']);
         const madeInfo = ref(false);
+        const notice = ref(true);
 
         /* //////////////////// */
         /* ///컴포넌트 스테이터스/ */
@@ -335,6 +344,7 @@ export default {
             welcomeText01,
             madeInfo,
             madeIt,
+            notice,
         };
     },
 };
@@ -788,6 +798,44 @@ body {
                 }
             }
         }
+    }
+}
+
+.notice {
+    position: fixed;
+    left: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 400px;
+    height: 150px;
+    border-radius: 8px;
+    background: rgba($color: #fff, $alpha: 0.8);
+    backdrop-filter: blur(5px);
+
+    &_wrap {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 15px;
+        gap: 10px;
+        padding-top: 20px;
+        p {
+            line-height: 1.3;
+        }
+    }
+
+    button {
+        position: absolute;
+        left: 10px;
+        top: 5px;
+        background: #ff453a;
+        width: 15px;
+        aspect-ratio: 1/1;
+        border-radius: 50%;
     }
 }
 </style>
