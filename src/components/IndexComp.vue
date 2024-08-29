@@ -170,7 +170,7 @@ export default {
         const text01 = ref(['GameInt에 오신걸 환영합니다!', '동호회 가입시 컨텐츠 이용이 가능합니다!']);
         const text02 = ref([`반갑습니다 ` + userStore.name + `님!`, 'GameInt에 오신걸 환영합니다!']);
         const madeInfo = ref(false);
-        const notice = ref(true);
+        const notice = ref(false);
 
         /* //////////////////// */
         /* ///컴포넌트 스테이터스/ */
@@ -239,6 +239,7 @@ export default {
         onMounted(() => {
             timer = setInterval(updateTime, 1000);
             welcomeText01();
+            userStore.initializeStore();
         });
 
         onUnmounted(() => {

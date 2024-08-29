@@ -1,5 +1,10 @@
 import { defineStore } from 'pinia';
 
+// 쿠키를 확인하는 함수
+function checkMemberCookie() {
+    return document.cookie.split(';').some((item) => item.trim().startsWith('member='));
+}
+
 export const useUserStore = defineStore('user', {
     state: () => ({
         loginPopup: false,
@@ -20,6 +25,14 @@ export const useUserStore = defineStore('user', {
         },
         setMemberIdx(newMemberIdx) {
             this.memberIdx = newMemberIdx;
+        },
+
+        // 새로운 초기화 액션
+        initializeStore() {
+            if (!checkMemberCookie()) {
+                this.$reset();
+                localStorage.removeItem('user');
+            }
         },
     },
 
