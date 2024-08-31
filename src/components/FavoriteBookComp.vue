@@ -25,7 +25,7 @@
                                     <div>
                                         <button type="button" class="cool-button btn-green" @click="changeFavoriteType(2, 'read', info)">글 보기</button>
                                     </div>
-                                    <div v-if="info.master" class="bt">
+                                    <div v-if="userStore.memberIdx === 4" class="bt">
                                         <button type="button" class="cool-button btn-red" @click="selBook(index, info)">책 당선</button>
                                     </div>
                                 </div>
@@ -220,6 +220,7 @@ export default {
     name: 'FavoriteBookComp',
     setup() {
         // 변수
+        const apiUrl = process.env.VUE_APP_API_URL;
         const apiHost = process.env.VUE_APP_API_URL;
         const userStore = useUserStore();
         const isFavoriteBookStatus = ref(0); // List : 0, Write/Edit : 1, View : 2
@@ -268,10 +269,9 @@ export default {
         // 추천 책 리스트
         ///////////////////////////////////////////
         const initRecomBookList = async () => {
-            const url = `${apiHost}api/book/monthly/recommend/list`;
+            const url = `${apiUrl}api/book/monthly/recommend/list`;
             try {
                 const response = await axios.get(url, { withCredentials: true });
-
                 if (response.data.code === 1) {
                     isFavoriteBookListArray.value = reactive(response.data.data);
                     isFavoriteBookList.value = toRaw(isFavoriteBookListArray.value);
@@ -367,9 +367,41 @@ export default {
             isFavoriteBookStatus.value = index;
         };
 
-        const selBook = (index, info) => {
-            index = index + 1;
-            alert('[' + info.title + '] 가(이)\n당선이오  (해당 리스트에 ' + index + '번 책)');
+        const selBook = async (index, info) => {
+            //index = index + 1;
+
+            console.log(apiUrl);
+
+            try {
+                const response = await axios.post(
+                    `${apiUrl}api/book/monthly/recommend/elect`,
+                    { bookIdx: info.bookIdx },
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        withCredentials: true,
+                    }
+                );
+                console.log(response.data);
+                if (response.data.code === 1) {
+                    console.log('code:1, 책 당선');
+                } else if (response.data.code === -99) {
+                    console.log('code:-99, 서버에러');
+                } else if (response.data.code === -1) {
+                    console.log('code:-1, 클라이언트에러(이전 당선된 책이 없을 경우)');
+                } else if (response.data.code === -2) {
+                    console.log('code:-2, 당선된 책이 없음');
+                } else if (response.data.code === -3) {
+                    console.log('code:-3, 추천했던 도서의 타입변경 실패');
+                } else if (response.data.code === -4) {
+                    console.log('code:-4, 당선된 도서를 추천한 인원이 없음');
+                }
+            } catch (error) {
+                console.error('Error uploading file:', error);
+            } finally {
+                isFavoriteBookStatus.value = 0;
+            }
         };
         ///////////////////////////////////////////
         // 추천 책 글쓰기
@@ -475,12 +507,12 @@ export default {
                         // 책 중복 작성할 경우
                         alert('이미 추천했습니다!');
                     } else if (response.data.code === -1) {
-                        alert('로그인 먼저 해주세요!')
+                        alert('로그인 먼저 해주세요!');
                     } else if (response.data.code === -5) {
-                        alert('아직 책 추천 기간이 아닙니다.')
+                        alert('아직 책 추천 기간이 아닙니다.');
                     } else if (response.data.code === -3) {
-                        alert('알 수 없는 에러')
-                    } 
+                        alert('알 수 없는 에러');
+                    }
                     //changeFavoriteType(0);
                 } catch (error) {
                     console.error('Error uploading file:', error);
