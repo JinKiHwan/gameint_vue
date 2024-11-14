@@ -6,7 +6,8 @@
                     <div class="monthly_book_bg"><img :src="monthlyBook" alt="" /></div>
 
                     <figure class="monthly_book_img">
-                        <img :src="monthlyBook" alt="" />
+                        <img class="monthly_book_img_cover front":src="monthlyBook" alt="" />
+                        <img class="monthly_book_img_cover back":src="monthlyBook" alt="" />
                         <figcaption><i></i><span></span></figcaption>
                     </figure>
 
@@ -930,15 +931,52 @@ export default {
                     }
                 }
             }
+
+            @include mobile {
+                display: block;
+            }
         }
         &_img {
             height: 100%;
             position: relative;
 
+            @include mobile {
+                perspective: 1000px; 
+                cursor: pointer;
+
+                :hover .front {
+                    transform: rotateY(-180deg);
+                }
+
+                :hover .back {
+                    transform: rotateY(0deg);
+                }
+            }
+
             img {
                 height: 100%;
                 object-fit: contain;
                 //box-shadow: 0 0 15px rgba($color: #fff, $alpha: 1);
+                
+                @include mobile {
+
+                    &_cover {
+                        position: absolute;
+                        width: 100%;
+                        height: 100%;
+                        backface-visibility: hidden; /* 뒷면 숨기기 */
+                        transform-style: preserve-3d; /* 자식 요소에 3D 효과 유지 */
+                        transition: transform 0.8s ease; /* 회전 효과 */
+                        .font {
+                            transform: rotateY(0deg); /* 기본 위치 */
+                        }
+
+                        .back {
+                            transform: rotateY(180deg); /* 뒤집힌 상태 */
+                        }
+                    }
+
+                }
             }
 
             figcaption {
@@ -960,12 +998,30 @@ export default {
                     animation: cursor 1s infinite;
                     animation-timing-function: steps(1, end);
                 }
+                
+                // i {
+                //     @include mobile {
+                //         display: none;
+                //     }
+                // }
+                @include mobile {
+                    display: none;
+                }
             }
+
+            @include mobile {
+                display: block
+            }
+
         }
 
         &_info {
             width: 50%;
             color: #ededed;
+
+            @include mobile {
+                display: none;
+            }
         }
 
         &_tab {

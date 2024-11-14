@@ -12,7 +12,7 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 app.config.globalProperties.$axios = axios;
 
 const instance = axios.create({
-    baseURL: process.env.VUE_APP_API_URL, // process.env로 접근하여 변수 사용
+    baseURL: 'http://localhost:3000/', // process.env로 접근하여 변수 사용
 });
 
 function registerUser(userData) {
