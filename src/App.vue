@@ -15,10 +15,6 @@ body {
     background-position: center center;
     #app {
         height: 100vh;
-
-        @include mobile {
-            height: 35vh;
-        }
     }
 }
 

@@ -357,7 +357,7 @@ body {
 
     @include mobile {
         &::before {
-            // content: '모바일은 지원되지 않습니다';
+            content: '모바일은 지원되지 않습니다';
             color: #fff;
             font-size: 18px;
             position: absolute;
@@ -430,7 +430,7 @@ body {
     gap: 15px;
 
     @include mobile {
-        display: flex !important;
+        display: none !important;
     }
 
     .welcome_txt {
@@ -454,11 +454,6 @@ body {
             animation: cursor 1s infinite;
             animation-timing-function: steps(1, end);
         }
-
-        @include mobile {
-            display: none !important;
-        }
-
     }
 
     ul {
@@ -483,7 +478,7 @@ body {
             @include mobile {
                 width: calc((100% - 24vw) / 4) !important;
                 margin-left: 8vw !important;
-                margin-bottom: 9vw !important;
+                margin-bottom: 12vw !important;
 
                 &:nth-child(1),
                 &:nth-child(5) {
@@ -529,10 +524,9 @@ body {
                 font-size: 16px;
 
                 @include mobile {
-                    // font-size: 3vw !important;
-                    // bottom: 0 !important;
-                    // top: 17.5vw;
-                    display: none;
+                    font-size: 3vw !important;
+                    bottom: 0 !important;
+                    top: 17.5vw;
                 }
             }
 
